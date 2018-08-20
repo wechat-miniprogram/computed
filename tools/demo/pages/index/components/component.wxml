@@ -1,0 +1,4 @@
+<view>data: {{a}}</view>
+<view>computed: {{b}}</view>
+<view>computed: {{c}}</view>
+<button bindtap="onTap">click</button>
