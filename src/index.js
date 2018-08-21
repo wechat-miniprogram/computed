@@ -51,7 +51,6 @@ module.exports = Behavior({
 
     defFields.methods = defFields.methods || {}
     defFields.methods._setData = function (data, callback) {
-      // eslint-disable-next-line no-proto
       const originalSetData = this._originalSetData
 
       // eslint-disable-next-line no-console
