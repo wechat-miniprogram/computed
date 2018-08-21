@@ -53,8 +53,11 @@ module.exports = Behavior({
     defFields.methods._setData = function (data, callback) {
       const originalSetData = this._originalSetData
 
-      // eslint-disable-next-line no-console
-      if (doingSetData) console.warn('can\'t call setData in computed getter function!')
+      if (doingSetData) {
+        // eslint-disable-next-line no-console
+        console.warn('can\'t call setData in computed getter function!')
+        return
+      }
 
       doingSetData = true
 
