@@ -12,9 +12,9 @@
 		"nodeModules": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.1.0",
+	"libVersion": "2.2.3",
 	"appid": "",
-	"projectname": "miniprogram-custom-components",
+	"projectname": "miniprogram-computed",
 	"isGameTourist": false,
 	"condition": {
 		"search": {
