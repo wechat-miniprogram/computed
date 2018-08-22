@@ -23,8 +23,8 @@ module.exports = {
   demoDist,
 
   wxss: {
-    less: true,
-    sourcemap: false,
+    less: false, // compile wxss with less
+    sourcemap: false, // source map for less
   },
 
   webpack: {
@@ -56,7 +56,7 @@ module.exports = {
     optimization: {
       minimize: false,
     },
-    // devtool: 'nosources-source-map',
+    // devtool: 'nosources-source-map', // source map for js
     performance: {
       hints: 'warning',
       assetFilter: assetFilename => assetFilename.endsWith('.js')

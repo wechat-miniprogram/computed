@@ -1,6 +1,7 @@
 const path = require('path')
 
 const jComponent = require('j-component')
+
 const config = require('../config')
 const _ = require('../utils')
 
@@ -117,22 +118,6 @@ function render(componentId, properties) {
 }
 
 /**
- * attach component
- */
-function attach(component) {
-  const parent = document.createElement('parent-wrapper')
-  component.attach(parent)
-  return parent
-}
-
-/**
- * detach component
- */
-function detach(component) {
-  component.detach()
-}
-
-/**
  * test a dom is similar to the html
  */
 function match(dom, html) {
@@ -165,8 +150,6 @@ function sleep(time = 0) {
 module.exports = {
   load,
   render,
-  attach,
-  detach,
   match,
   sleep,
 }
