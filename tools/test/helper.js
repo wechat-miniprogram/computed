@@ -17,6 +17,7 @@ global.Component = options => {
   const definition = Object.assign({
     template: component.wxml,
     usingComponents: component.json.usingComponents,
+    tagName: component.tagName,
   }, options)
 
   component.id = jComponent.register(definition)
@@ -72,12 +73,19 @@ global.Touch = window.Touch = Touch
 /**
  * load component
  */
-async function load(componentPath) {
+async function load(componentPath, tagName) {
+  if (typeof componentPath === 'object') {
+    const definition = componentPath
+
+    return jComponent.register(definition)
+  }
+
   const wholePath = path.join(srcPath, componentPath)
 
   const oldLoad = nowLoad
   const component = nowLoad = {}
 
+  component.tagName = tagName
   component.wxml = await _.readFile(`${wholePath}.wxml`)
   component.wxss = await _.readFile(`${wholePath}.wxss`)
   component.json = _.readJson(`${wholePath}.json`)
