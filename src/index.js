@@ -13,19 +13,25 @@ module.exports = Behavior({
 
     // 计算 computed
     const calcComputed = (scope, insertToData) => {
+      // 挂载到节点上才需要计算，以便减少不必要的计算
+      if(!scope.__wxExparserNodeId__){
+        return;
+      }
+
       const needUpdate = {}
       const data = defFields.data = defFields.data || {}
 
       for (let i = 0, len = computedKeys.length; i < len; i++) {
         const key = computedKeys[i]
+        const computedCacheKey = `${scope.__wxExparserNodeId__}@${key}`
         const getter = computed[key]
 
         if (typeof getter === 'function') {
           const value = getter.call(scope)
 
-          if (computedCache[key] !== value) {
+          if (computedCache[computedCacheKey] !== value) {
             needUpdate[key] = value
-            computedCache[key] = value
+            computedCache[computedCacheKey] = value
           }
         }
 
@@ -75,8 +81,10 @@ module.exports = Behavior({
       // 计算 computed
       const needUpdate = calcComputed(this)
 
-      // 做 computed 属性的 setData
-      originalSetData.call(this, needUpdate)
+      if (needUpdate) {
+        // 做 computed 属性的 setData
+        originalSetData.call(this, needUpdate)
+      }
 
       doingSetData = false
     }
