@@ -1,6 +1,7 @@
 module.exports = Behavior({
   lifetimes: {
     created() {
+      this._computedCache = {}
       this._originalSetData = this.setData
       this.setData = this._setData
     }
@@ -8,13 +9,13 @@ module.exports = Behavior({
   definitionFilter(defFields) {
     const computed = defFields.computed || {}
     const computedKeys = Object.keys(computed)
-    const computedCache = {}
     let doingSetData = false
 
     // 计算 computed
     const calcComputed = (scope, insertToData) => {
       const needUpdate = {}
       const data = defFields.data = defFields.data || {}
+      const computedCache = scope._computedCache || scope.data
 
       for (let i = 0, len = computedKeys.length; i < len; i++) {
         const key = computedKeys[i]
