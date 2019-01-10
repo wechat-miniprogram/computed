@@ -5,11 +5,14 @@ module.exports = Behavior({
       this._originalSetData = this.setData
       this.setData = this._setData
       this._doingSetData = false
+      this._doingSetProps = false
     }
   },
   definitionFilter(defFields) {
     const computed = defFields.computed || {}
     const computedKeys = Object.keys(computed)
+    const properties = defFields.properties || {}
+    const propertyKeys = Object.keys(properties)
 
     // 计算 computed
     const calcComputed = (scope) => {
@@ -39,9 +42,8 @@ module.exports = Behavior({
 
       // 先将 properties 里的字段写入到 data 中
       const data = defFields.data
-      const properties = defFields.properties
       const hasOwnProperty = Object.prototype.hasOwnProperty
-      if (properties) {
+      if (propertyKeys.length) {
         // eslint-disable-next-line complexity
         Object.keys(properties).forEach(key => {
           const value = properties[key]
@@ -66,6 +68,12 @@ module.exports = Behavior({
           // 追加 observer，用于监听变动
           properties[key].observer = function (...args) {
             const originalSetData = this._originalSetData
+
+            if (this._doingSetProps) {
+              // 调用 setData 设置 properties
+              if (oldObserver) oldObserver.apply(this, args)
+              return
+            }
 
             if (this._doingSetData) {
               // eslint-disable-next-line no-console
@@ -112,6 +120,7 @@ module.exports = Behavior({
         const key = dataKeys[i]
 
         if (computed[key]) delete data[key]
+        if (!this._doingSetProps && propertyKeys.indexOf(key) >= 0) this._doingSetProps = true
       }
 
       // 做 data 属性的 setData
@@ -124,6 +133,7 @@ module.exports = Behavior({
       originalSetData.call(this, needUpdate)
 
       this._doingSetData = false
+      this._doingSetProps = false
     }
   }
 })

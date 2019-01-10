@@ -1,3 +1,7 @@
 ## 0.0.6
 
 * 支持 properties。
+
+## 0.0.7
+
+* 修复 setData 设置 properties 会报 can't call setData in computed getter function! 问题

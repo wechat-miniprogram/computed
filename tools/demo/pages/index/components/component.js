@@ -28,6 +28,11 @@ Component({
         a: ++this.data.a,
       })
       this.triggerEvent('update')
-    }
+    },
+    onTap2() {
+      this.setData({
+        propA: 9999,
+      })
+    },
   }
 })

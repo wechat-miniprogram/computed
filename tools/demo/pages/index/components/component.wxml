@@ -4,3 +4,4 @@
 <view>prop: {{propA}}</view>
 <view>computed: {{propB}}</view>
 <button bindtap="onTap">click</button>
+<button bindtap="onTap2">update prop</button>
