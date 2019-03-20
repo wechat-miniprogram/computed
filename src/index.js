@@ -97,7 +97,7 @@ module.exports = Behavior({
       }
 
       // 计算 computed
-      calcComputed(defFields, true)
+      calcComputed(defFields)
     }
 
     initComputed()
