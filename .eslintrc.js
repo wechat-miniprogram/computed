@@ -89,6 +89,8 @@ module.exports = {
     'App': true,
     'Page': true,
     'Component': true,
-    'Behavior': true
+    'Behavior': true,
+    'wx': true,
+    'getCurrentPages': true,
   }
 }

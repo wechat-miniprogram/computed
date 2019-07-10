@@ -1,8 +1,8 @@
 const _ = require('./utils')
 const computedBehavior = require('../src/index')
 
-test('computed: setData', async () => {
-  let componentId = await _.load({
+test('computed: setData', () => {
+  let componentId = _.load({
     template: '<view>{{a}}-{{b}}-{{c}}</view>',
     behaviors: [computedBehavior],
     properties: {
@@ -37,7 +37,7 @@ test('computed: setData', async () => {
 test('computed: properties', async () => {
   let observeNewVal = 0
   let observeOldVal = 0
-  let componentId1 = await _.load({
+  let componentId1 = _.load({
     template: '<view>{{a}}-{{b}}</view>',
     behaviors: [computedBehavior],
     properties: {
@@ -56,7 +56,7 @@ test('computed: properties', async () => {
       },
     },
   })
-  let componentId2 = await _.load({
+  let componentId2 = _.load({
     template: '<comp id="child" a="{{a}}"></comp>',
     usingComponents: {
       'comp': componentId1,

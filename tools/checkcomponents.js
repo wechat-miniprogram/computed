@@ -6,7 +6,7 @@ const config = require('./config')
 const srcPath = config.srcPath
 
 /**
- * get json path's info
+ * 获取 json 路径相关信息
  */
 function getJsonPathInfo(jsonPath) {
   const dirPath = path.dirname(jsonPath)
@@ -20,7 +20,7 @@ function getJsonPathInfo(jsonPath) {
 }
 
 /**
- * check included components
+ * 检测是否包含其他自定义组件
  */
 const checkProps = ['usingComponents', 'componentGenerics']
 async function checkIncludedComponents(jsonPath, componentListMap) {
@@ -41,7 +41,7 @@ async function checkIncludedComponents(jsonPath, componentListMap) {
 
       value = _.transformPath(value, path.sep)
 
-      // check relative path
+      // 检查相对路径
       const componentPath = `${path.join(dirPath, value)}.json`
       // eslint-disable-next-line no-await-in-loop
       const isExists = await _.checkFileExists(componentPath)
@@ -52,7 +52,7 @@ async function checkIncludedComponents(jsonPath, componentListMap) {
     }
   }
 
-  // checked
+  // 进入存储
   componentListMap.wxmlFileList.push(`${fileBase}.wxml`)
   componentListMap.wxssFileList.push(`${fileBase}.wxss`)
   componentListMap.jsonFileList.push(`${fileBase}.json`)
@@ -68,7 +68,7 @@ module.exports = async function (entry) {
     jsonFileList: [],
     jsFileList: [],
 
-    jsFileMap: {}, // for webpack entry
+    jsFileMap: {}, // 为 webpack entry 所用
   }
 
   const isExists = await _.checkFileExists(entry)

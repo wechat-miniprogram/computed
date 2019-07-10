@@ -16,15 +16,15 @@ module.exports = {
 
   isDev,
   isWatch,
-  srcPath: src,
-  distPath: isDev ? dev : dist,
+  srcPath: src, // 源目录
+  distPath: isDev ? dev : dist, // 目标目录
 
-  demoSrc,
-  demoDist,
+  demoSrc, // demo 源目录
+  demoDist, // demo 目标目录
 
   wxss: {
-    less: false, // compile wxss with less
-    sourcemap: false, // source map for less
+    less: false, // 使用 less 来编写 wxss
+    sourcemap: false, // 生成 less sourcemap
   },
 
   webpack: {
@@ -34,7 +34,7 @@ module.exports = {
       libraryTarget: 'commonjs2',
     },
     target: 'node',
-    externals: [nodeExternals()], // ignore node_modules
+    externals: [nodeExternals()], // 忽略 node_modules
     module: {
       rules: [{
         test: /\.js$/i,
@@ -56,11 +56,12 @@ module.exports = {
     optimization: {
       minimize: false,
     },
-    // devtool: 'nosources-source-map', // source map for js
+    // devtool: 'nosources-source-map', // 生成 js sourcemap
     performance: {
       hints: 'warning',
       assetFilter: assetFilename => assetFilename.endsWith('.js')
     }
   },
-  copy: ['./wxml', './wxss', './wxs', './images'],
+
+  copy: ['./images'], // 将会复制到目标目录
 }
