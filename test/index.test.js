@@ -1,88 +1,103 @@
 const _ = require('./utils')
 const computedBehavior = require('../src/index')
 
-test('computed: setData', () => {
-  let componentId = _.load({
-    template: '<view>{{a}}-{{b}}-{{c}}</view>',
+test('watch basics', () => {
+  let funcTriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}</view>',
     behaviors: [computedBehavior],
-    properties: {
-      c: {
-        type: Number,
-        value: 0,
-      },
-    },
     data: {
-      a: 0,
+      a: 1,
+      b: 2,
+      c: 3,
     },
-    computed: {
-      b() {
-        return this.data.a + 100
-      },
+    watch: {
+      'a, b': function (a, b) {
+        funcTriggeringCount++
+        this.setData({
+          c: a + b
+        })
+      }
     },
   })
-  let component = _.render(componentId)
+  const component = _.render(componentId)
 
-  expect(_.match(component.dom, '<wx-view>0-100-0</wx-view>')).toBe(true)
+  expect(_.match(component.dom, '<wx-view>1+2=3</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(0)
 
-  component.setData({a: 1})
-  expect(_.match(component.dom, '<wx-view>1-101-0</wx-view>')).toBe(true)
+  component.setData({a: 10})
+  expect(_.match(component.dom, '<wx-view>10+2=12</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(1)
 
-  component.setData({a: 9})
-  expect(_.match(component.dom, '<wx-view>9-109-0</wx-view>')).toBe(true)
+  component.setData({b: 20})
+  expect(_.match(component.dom, '<wx-view>10+20=30</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(2)
 
-  component.setData({c: 88})
-  expect(_.match(component.dom, '<wx-view>9-109-88</wx-view>')).toBe(true)
+  component.setData({a: 100, b: 200})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(3)
+
+  component.setData({c: -1})
+  expect(_.match(component.dom, '<wx-view>100+200=-1</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(3)
 })
 
-test('computed: properties', async () => {
-  let observeNewVal = 0
-  let observeOldVal = 0
-  let componentId1 = _.load({
-    template: '<view>{{a}}-{{b}}</view>',
+test('watch data path', () => {
+  let func1TriggeringCount = 0
+  let func2TriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a.d}}+{{b[0]}}={{c}}</view>',
     behaviors: [computedBehavior],
-    properties: {
-      a: {
-        type: Number,
-        value: 0,
-        observer(newVal, oldVal) {
-          observeNewVal = newVal
-          observeOldVal = oldVal
-        },
-      },
-    },
-    computed: {
-      b() {
-        return this.data.a + 100
-      },
-    },
-  })
-  let componentId2 = _.load({
-    template: '<comp id="child" a="{{a}}"></comp>',
-    usingComponents: {
-      'comp': componentId1,
-    },
     data: {
-      a: 0,
+      a: {d: 1},
+      b: [2],
+      c: 3,
+    },
+    watch: {
+      a() {
+        func1TriggeringCount++
+      },
+      ' a.d  ,b[0] ': function (ad, b0) {
+        func2TriggeringCount++
+        this.setData({
+          c: ad + b0
+        })
+      }
     },
   })
-  let component = _.render(componentId2)
+  const component = _.render(componentId)
 
-  expect(_.match(component.dom, '<comp><wx-view>0-100</wx-view></comp>')).toBe(true)
-  expect(observeNewVal).toBe(0)
-  expect(observeOldVal).toBe(0)
-  
-  component.setData({a: 1})
-  expect(_.match(component.dom, '<comp><wx-view>1-101</wx-view></comp>')).toBe(true)
-  expect(observeNewVal).toBe(1)
-  expect(observeOldVal).toBe(0)
+  expect(_.match(component.dom, '<wx-view>1+2=3</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(0)
+  expect(func2TriggeringCount).toBe(0)
 
-  component.setData({a: 9})
-  expect(_.match(component.dom, '<comp><wx-view>9-109</wx-view></comp>')).toBe(true)
-  expect(observeNewVal).toBe(9)
-  expect(observeOldVal).toBe(1)
+  component.setData({a: {d: 10}})
+  expect(_.match(component.dom, '<wx-view>10+2=12</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(1)
 
-  component.querySelector('#child').setData({a: 100})
-  expect(_.match(component.dom, '<comp><wx-view>100-200</wx-view></comp>')).toBe(true)
-  expect(observeNewVal).toBe(100)
-  expect(observeOldVal).toBe(9)
+  component.setData({b: [20]})
+  expect(_.match(component.dom, '<wx-view>10+20=30</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(2)
+
+  component.setData({'a.d': 100})
+  expect(_.match(component.dom, '<wx-view>100+20=120</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(3)
+
+  component.setData({'b[0]': 200})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(4)
+
+  component.setData({'a.e': -1})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(4)
+
+  component.setData({'b[2]': -1})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(4)
 })
