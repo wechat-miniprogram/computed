@@ -14,10 +14,10 @@ const setDataOnPath = function (data, path, value) {
   let cur = data
   path.forEach((s, index) => {
     if (typeof s === 'number') {
-      if (!(cur instanceof Array)) {
+      if (!(cur[s] instanceof Array)) {
         cur[s] = []
       }
-    } else if (typeof cur !== 'object' || cur === null) {
+    } else if (typeof cur[s] !== 'object' || cur[s] === null) {
       cur[s] = {}
     }
     if (index === path.length - 1) {
@@ -51,7 +51,7 @@ exports.behavior = Behavior({
     }
 
     // initialize status, executed on created
-    let initFuncs = []
+    const initFuncs = []
     defFields.methods._initComputedWatchInfo = function () {
       if (this._computedWatchInfo) return
       this._computedWatchInfo = {
@@ -61,7 +61,6 @@ exports.behavior = Behavior({
         originalSetData: this.setData
       }
       initFuncs.forEach((func) => func.call(this))
-      initFuncs = null
     }
 
     // handling computed
@@ -71,14 +70,15 @@ exports.behavior = Behavior({
       const updateMethod = computedDef[targetField]
       // update value and calculate related paths
       const updateValueAndRelatedPaths = function () {
-        if (!this._computedWatchInfo.computedNeedUpdate[targetField]) return
+        if (!this._computedWatchInfo.computedNeedUpdate[targetField]) return false
         const relatedPaths = []
         const val = updateMethod(dataTracer.create(this.data, relatedPaths))
-        this._computedWatchInfo.originalSetData.call(this, {
+        this.setData({
           [targetField]: val
         })
         this._computedWatchInfo.computedRelatedPaths[targetField] = relatedPaths
         this._computedWatchInfo.computedNeedUpdate[targetField] = false
+        return true
       }
       // calculate value on registration
       const relatedPaths = []
@@ -97,9 +97,15 @@ exports.behavior = Behavior({
       observersItems.push({
         fields: '**',
         observer() {
-          computedUpdaters.forEach((func) => {
-            func.call(this)
-          })
+          if (!this._computedWatchInfo) return
+          let changed
+          do {
+            changed = false
+            // eslint-disable-next-line no-loop-func
+            computedUpdaters.forEach((func) => {
+              if (func.call(this)) changed = true
+            })
+          } while (changed)
         }
       })
       // hooks setData to get which fields are actually updated
@@ -136,6 +142,7 @@ exports.behavior = Behavior({
       observersItems.push({
         fields: watchPath,
         observer() {
+          if (!this._computedWatchInfo) return
           const oldVal = this._computedWatchInfo.watchCurVal[watchPath]
           const curVal = paths.map((path) => getDataOnPath(this.data, path))
           this._computedWatchInfo.watchCurVal[watchPath] = curVal

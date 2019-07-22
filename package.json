@@ -10,7 +10,7 @@
 		"dist": "npm run build",
 		"clean-dev": "gulp clean --develop",
 		"clean": "gulp clean",
-		"test": "jest ./test/* --silent --bail",
+		"test": "jest ./test/* --bail",
 		"coverage": "jest ./test/* --coverage --bail",
 		"lint": "eslint \"src/**/*.js\"",
 		"lint-tools": "eslint \"tools/**/*.js\" --rule \"import/no-extraneous-dependencies: false\""

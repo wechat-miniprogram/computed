@@ -42,7 +42,7 @@ test('watch basics', () => {
   expect(funcTriggeringCount).toBe(3)
 })
 
-test('watch data path', () => {
+test('watch data paths', () => {
   let func1TriggeringCount = 0
   let func2TriggeringCount = 0
   const componentId = _.load({
@@ -100,4 +100,181 @@ test('watch data path', () => {
   expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
   expect(func1TriggeringCount).toBe(1)
   expect(func2TriggeringCount).toBe(4)
+})
+
+test('computed basics', () => {
+  let func1TriggeringCount = 0
+  let func2TriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}, {{a}}*2={{d}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: 1,
+      b: 2,
+    },
+    computed: {
+      c(data) {
+        func1TriggeringCount++
+        return data.a + data.b
+      },
+      d(data) {
+        func2TriggeringCount++
+        return data.a * 2
+      }
+    }
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view>1+2=3, 1*2=2</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(1)
+
+  component.setData({a: 10})
+  expect(_.match(component.dom, '<wx-view>10+2=12, 10*2=20</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(2)
+  expect(func2TriggeringCount).toBe(2)
+
+  component.setData({b: 20})
+  expect(_.match(component.dom, '<wx-view>10+20=30, 10*2=20</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(3)
+  expect(func2TriggeringCount).toBe(2)
+
+  component.setData({a: 100, b: 200})
+  expect(_.match(component.dom, '<wx-view>100+200=300, 100*2=200</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(4)
+  expect(func2TriggeringCount).toBe(3)
+})
+
+test('computed chains', () => {
+  let func1TriggeringCount = 0
+  let func2TriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}, {{a}}+{{c}}={{d}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: 1,
+      b: 2,
+    },
+    computed: {
+      c(data) {
+        func1TriggeringCount++
+        return data.a + data.b
+      },
+      d(data) {
+        func2TriggeringCount++
+        return data.a + data.c
+      }
+    }
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view>1+2=3, 1+3=4</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(1)
+
+  component.setData({a: 10})
+  expect(_.match(component.dom, '<wx-view>10+2=12, 10+12=22</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(2)
+  expect(func2TriggeringCount).toBe(2)
+
+  component.setData({b: 20})
+  expect(_.match(component.dom, '<wx-view>10+20=30, 10+30=40</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(3)
+  expect(func2TriggeringCount).toBe(3)
+
+  component.setData({a: 100, b: 200})
+  expect(_.match(component.dom, '<wx-view>100+200=300, 100+300=400</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(4)
+  expect(func2TriggeringCount).toBe(4)
+})
+
+test('computed conditions', () => {
+  let funcTriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a}}, {{b}}, {{c}}, {{d}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: 0,
+      b: 1,
+      c: 2,
+    },
+    computed: {
+      d(data) {
+        funcTriggeringCount++
+        return data.a ? data.b : data.c
+      }
+    }
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view>0, 1, 2, 2</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(1)
+
+  component.setData({b: 10})
+  expect(_.match(component.dom, '<wx-view>0, 10, 2, 2</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(1)
+
+  component.setData({c: 20})
+  expect(_.match(component.dom, '<wx-view>0, 10, 20, 20</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(2)
+
+  component.setData({a: -1})
+  expect(_.match(component.dom, '<wx-view>-1, 10, 20, 10</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(3)
+
+  component.setData({b: 100})
+  expect(_.match(component.dom, '<wx-view>-1, 100, 20, 100</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(4)
+
+  component.setData({c: 200})
+  expect(_.match(component.dom, '<wx-view>-1, 100, 200, 100</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(4)
+})
+
+test('computed data paths', () => {
+  let funcTriggeringCount = 0
+  const componentId = _.load({
+    template: '<view>{{a.d}}+{{b[0]}}={{c[1].f}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: {d: 1},
+      b: [2],
+    },
+    computed: {
+      'c[1]': function (data) {
+        funcTriggeringCount++
+        return {
+          f: data.a.d + data.b[0]
+        }
+      }
+    },
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view>1+2=3</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(1)
+
+  component.setData({a: {d: 10}})
+  expect(_.match(component.dom, '<wx-view>10+2=12</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(2)
+
+  component.setData({b: [20]})
+  expect(_.match(component.dom, '<wx-view>10+20=30</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(3)
+
+  component.setData({'a.d': 100})
+  expect(_.match(component.dom, '<wx-view>100+20=120</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(4)
+
+  component.setData({'b[0]': 200})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(5)
+
+  component.setData({'a.e': -1})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(5)
+
+  component.setData({'b[2]': -1})
+  expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
+  expect(funcTriggeringCount).toBe(5)
 })
