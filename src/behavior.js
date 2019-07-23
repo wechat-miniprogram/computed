@@ -12,7 +12,9 @@ const getDataOnPath = function (data, path) {
 
 const setDataOnPath = function (data, path, value) {
   let cur = data
-  path.forEach((s, index) => {
+  let index = 0
+  while (index < path.length - 1) {
+    const s = path[index++]
     if (typeof s === 'number') {
       if (!(cur[s] instanceof Array)) {
         cur[s] = []
@@ -20,13 +22,9 @@ const setDataOnPath = function (data, path, value) {
     } else if (typeof cur[s] !== 'object' || cur[s] === null) {
       cur[s] = {}
     }
-    if (index === path.length - 1) {
-      cur[s] = value
-      return false
-    }
     cur = cur[s]
-    return undefined
-  })
+  }
+  cur[path[index]] = value
 }
 
 exports.behavior = Behavior({
@@ -55,10 +53,8 @@ exports.behavior = Behavior({
     defFields.methods._initComputedWatchInfo = function () {
       if (this._computedWatchInfo) return
       this._computedWatchInfo = {
-        computedRelatedPaths: {},
-        computedNeedUpdate: {},
+        computedRelatedPathValues: {},
         watchCurVal: {},
-        originalSetData: this.setData
       }
       initFuncs.forEach((func) => func.call(this))
     }
@@ -70,24 +66,35 @@ exports.behavior = Behavior({
       const updateMethod = computedDef[targetField]
       // update value and calculate related paths
       const updateValueAndRelatedPaths = function () {
-        if (!this._computedWatchInfo.computedNeedUpdate[targetField]) return false
-        const relatedPaths = []
-        const val = updateMethod(dataTracer.create(this.data, relatedPaths))
+        const oldPathValues = this._computedWatchInfo.computedRelatedPathValues[targetField]
+        let needUpdate = false
+        for (let i = 0; i < oldPathValues.length; i++) {
+          const {path, value: oldVal} = oldPathValues[i]
+          const curVal = getDataOnPath(this.data, path)
+          if (oldVal !== curVal) {
+            needUpdate = true
+            break
+          }
+        }
+        if (!needUpdate) return false
+        const relatedPathValues = []
+        const val = updateMethod(dataTracer.create(this.data, relatedPathValues))
         this.setData({
           [targetField]: val
         })
-        this._computedWatchInfo.computedRelatedPaths[targetField] = relatedPaths
-        this._computedWatchInfo.computedNeedUpdate[targetField] = false
+        this._computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValues
         return true
       }
       // calculate value on registration
-      const relatedPaths = []
-      const val = updateMethod(dataTracer.create(defFields.data, relatedPaths))
+      const relatedPathValuesOnDef = []
+      const val = updateMethod(dataTracer.create(defFields.data, relatedPathValuesOnDef))
       setDataOnPath(defFields.data, targetPath, val)
       initFuncs.push(function () {
-        // here re-use same relatedPaths for all component instances
-        this._computedWatchInfo.computedRelatedPaths[targetField] = relatedPaths
-        this._computedWatchInfo.computedNeedUpdate[targetField] = false
+        const pathValues = relatedPathValuesOnDef.map(({path}) => ({
+          path,
+          value: getDataOnPath(this.data, path)
+        }))
+        this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
       })
       // calculate value on setData
       computedUpdaters.push(updateValueAndRelatedPaths)
@@ -106,26 +113,6 @@ exports.behavior = Behavior({
               if (func.call(this)) changed = true
             })
           } while (changed)
-        }
-      })
-      // hooks setData to get which fields are actually updated
-      initFuncs.push(function () {
-        this.setData = function (...args) {
-          const dataExpr = args[0]
-          const {computedRelatedPaths, computedNeedUpdate} = this._computedWatchInfo
-          Object.keys(computedRelatedPaths).forEach((targetField) => {
-            if (computedNeedUpdate[targetField]) return
-            const relatedPaths = computedRelatedPaths[targetField]
-            Object.keys(dataExpr).forEach((key) => {
-              const relatedPath = dataPath.parseSingleDataPath(key).join('\n')
-              if (relatedPaths.indexOf(relatedPath) >= 0) {
-                computedNeedUpdate[targetField] = true
-                return false
-              }
-              return undefined
-            })
-          })
-          this._computedWatchInfo.originalSetData.apply(this, args)
         }
       })
     }
@@ -169,7 +156,5 @@ exports.behavior = Behavior({
         defFields.observers[item.fields] = item.observer
       })
     }
-
-    // defFields.methods._computedWatchSetData =
   },
 })

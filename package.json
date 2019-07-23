@@ -1,6 +1,6 @@
 {
 	"name": "miniprogram-computed",
-	"version": "2.0.0-alpha.1",
+	"version": "2.0.0-beta.1",
 	"description": "Miniprogram custom component extend behavior",
 	"main": "miniprogram_dist/index.js",
 	"scripts": {

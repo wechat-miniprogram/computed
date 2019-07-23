@@ -1,4 +1,4 @@
-const wrapData = (data, relatedPaths, basePath) => {
+const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== 'object' || data === null) return data
   const propDef = {}
   Object.keys(data).forEach((key) => {
@@ -7,8 +7,11 @@ const wrapData = (data, relatedPaths, basePath) => {
       get() {
         if (!keyWrapper) {
           const keyPath = basePath.concat(key)
-          relatedPaths.push(keyPath.join('\n'))
-          keyWrapper = wrapData(data[key], relatedPaths, keyPath)
+          relatedPathValues.push({
+            path: keyPath,
+            value: data[key]
+          })
+          keyWrapper = wrapData(data[key], relatedPathValues, keyPath)
         }
         return keyWrapper
       },
@@ -20,4 +23,4 @@ const wrapData = (data, relatedPaths, basePath) => {
   return Object.create(Object.prototype, propDef)
 }
 
-exports.create = (data, relatedPaths) => wrapData(data, relatedPaths, [])
+exports.create = (data, relatedPathValues) => wrapData(data, relatedPathValues, [])
