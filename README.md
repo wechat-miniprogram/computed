@@ -1,6 +1,6 @@
 # computed
 
-小程序自定义组件扩展 behavior，计算属性 `computed` 和监听器 `watch` 的实现。
+小程序自定义组件扩展 behavior，计算属性 `computed` 和监听器 `watch` 的实现。在 data 或者 properties 改变时，会重新计算 `computed` 字段并触发 `watch` 监听器。
 
 > 此 behavior 依赖开发者工具的 npm 构建。具体详情可查阅[官方 npm 文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)。
 
@@ -88,6 +88,8 @@ Component({
 <view>SUM = {{sum}}</view>
 <button bindtap="onTap">click</button>
 ```
+
+或者，你也可以直接体验一下这个代码片段：[https://developers.weixin.qq.com/s/kKu4U9mX78a8](https://developers.weixin.qq.com/s/kKu4U9mX78a8)
 
 ## ^1.0.0 与 ^2.0.0 版本差异
 

@@ -1,6 +1,9 @@
 const dataPath = require('./data-path')
 const dataTracer = require('./data-tracer')
 
+const TYPES = [String, Number, Boolean, Object, Array]
+const TYPE_DEFAULT_VALUES = ['', 0, false, null, []]
+
 const getDataOnPath = function (data, path) {
   let ret = data
   path.forEach((s) => {
@@ -25,6 +28,32 @@ const setDataOnPath = function (data, path, value) {
     cur = cur[s]
   }
   cur[path[index]] = value
+}
+
+const getDataDefinition = function (data, properties) {
+  const ret = {}
+  Object.keys(data).forEach((key) => {
+    ret[key] = data[key]
+  })
+  if (properties) {
+    Object.keys(properties).forEach((key) => {
+      let value = null
+      const def = properties[key]
+      const typeIndex = TYPES.indexOf(def)
+      if (typeIndex >= 0) {
+        value = TYPE_DEFAULT_VALUES[typeIndex]
+      } else if (def.value) {
+        value = def.value
+      } else {
+        const typeIndex = TYPES.indexOf(def.type)
+        if (typeIndex >= 0) {
+          value = TYPE_DEFAULT_VALUES[typeIndex]
+        }
+      }
+      ret[key] = value
+    })
+  }
+  return ret
 }
 
 exports.behavior = Behavior({
@@ -87,7 +116,8 @@ exports.behavior = Behavior({
       }
       // calculate value on registration
       const relatedPathValuesOnDef = []
-      const val = updateMethod(dataTracer.create(defFields.data, relatedPathValuesOnDef))
+      const initData = getDataDefinition(defFields.data, defFields.properties)
+      const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
       setDataOnPath(defFields.data, targetPath, val)
       initFuncs.push(function () {
         const pathValues = relatedPathValuesOnDef.map(({path}) => ({

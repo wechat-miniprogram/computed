@@ -6,8 +6,13 @@ test('watch basics', () => {
   const componentId = _.load({
     template: '<view>{{a}}+{{b}}={{c}}</view>',
     behaviors: [computedBehavior],
+    properties: {
+      a: {
+        type: Number,
+        value: 1,
+      }
+    },
     data: {
-      a: 1,
       b: 2,
       c: 3,
     },
@@ -40,6 +45,47 @@ test('watch basics', () => {
   component.setData({c: -1})
   expect(_.match(component.dom, '<wx-view>100+200=-1</wx-view>')).toBe(true)
   expect(funcTriggeringCount).toBe(3)
+})
+
+test('watch property changes', () => {
+  let funcTriggeringCount = 0
+  const innerComponentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}</view>',
+    behaviors: [computedBehavior],
+    properties: {
+      a: {
+        type: Number,
+        value: -1,
+      },
+      b: String,
+    },
+    watch: {
+      'a, b': function (a, b) {
+        funcTriggeringCount++
+        this.setData({
+          c: a + Number(b || 0)
+        })
+      }
+    },
+  })
+  const outerComponentId = _.load({
+    usingComponents: {
+      inner: innerComponentId,
+    },
+    data: {
+      a: 1,
+      b: 2,
+    },
+    template: '<inner a="{{a}}" b="{{b}}"></inner>',
+  })
+  const component = _.render(outerComponentId)
+
+  expect(_.match(component.dom, '<inner><wx-view>1+2=3</wx-view></inner>')).toBe(true)
+  expect(funcTriggeringCount).toBe(1)
+
+  component.setData({a: 100, b: 200})
+  expect(_.match(component.dom, '<inner><wx-view>100+200=300</wx-view></inner>')).toBe(true)
+  expect(funcTriggeringCount).toBe(2)
 })
 
 test('watch data paths', () => {
@@ -108,8 +154,13 @@ test('computed basics', () => {
   const componentId = _.load({
     template: '<view>{{a}}+{{b}}={{c}}, {{a}}*2={{d}}</view>',
     behaviors: [computedBehavior],
+    properties: {
+      a: {
+        type: Number,
+        value: 1,
+      }
+    },
     data: {
-      a: 1,
       b: 2,
     },
     computed: {
@@ -143,6 +194,45 @@ test('computed basics', () => {
   expect(_.match(component.dom, '<wx-view>100+200=300, 100*2=200</wx-view>')).toBe(true)
   expect(func1TriggeringCount).toBe(4)
   expect(func2TriggeringCount).toBe(3)
+})
+
+test('computed property changes', () => {
+  let funcTriggeringCount = 0
+  const innerComponentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}</view>',
+    behaviors: [computedBehavior],
+    properties: {
+      a: {
+        type: Number,
+        value: -1,
+      },
+      b: String,
+    },
+    computed: {
+      c(data) {
+        funcTriggeringCount++
+        return data.a + data.b
+      }
+    },
+  })
+  const outerComponentId = _.load({
+    usingComponents: {
+      inner: innerComponentId,
+    },
+    data: {
+      a: 1,
+      b: 2,
+    },
+    template: '<inner a="{{a}}" b="{{b}}"></inner>',
+  })
+  const component = _.render(outerComponentId)
+
+  expect(_.match(component.dom, '<inner><wx-view>1+2=3</wx-view></inner>')).toBe(true)
+  expect(funcTriggeringCount).toBe(2)
+
+  component.setData({a: 100, b: 200})
+  expect(_.match(component.dom, '<inner><wx-view>100+200=300</wx-view></inner>')).toBe(true)
+  expect(funcTriggeringCount).toBe(3)
 })
 
 test('computed chains', () => {
