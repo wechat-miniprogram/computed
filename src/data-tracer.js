@@ -1,5 +1,6 @@
 const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== 'object' || data === null) return data
+  const isArray = data instanceof Array
   const propDef = {}
   Object.keys(data).forEach((key) => {
     let keyWrapper = null
@@ -20,7 +21,13 @@ const wrapData = (data, relatedPathValues, basePath) => {
       }
     }
   })
-  return Object.create(Object.prototype, propDef)
+  if (isArray) {
+    propDef.length = {
+      value: data.length
+    }
+  }
+  const proto = isArray ? Array.prototype : Object.prototype
+  return Object.create(proto, propDef)
 }
 
 exports.create = (data, relatedPathValues) => wrapData(data, relatedPathValues, [])

@@ -370,3 +370,40 @@ test('computed data paths', () => {
   expect(_.match(component.dom, '<wx-view>100+200=300</wx-view>')).toBe(true)
   expect(funcTriggeringCount).toBe(5)
 })
+
+test('computed array read operations', () => {
+  const componentId = _.load({
+    template: '<view>{{r}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: ['a', 'b', 'c'],
+    },
+    computed: {
+      r(data) {
+        const oriArr = ['a', 'b', 'c']
+        expect(data.a.filter((item, index) => {
+          expect(item).toBe(oriArr[index])
+          return true
+        }).join()).toBe('a,b,c')
+        data.a.forEach((item, index) => {
+          expect(item).toBe(oriArr[index])
+        })
+        expect(data.a.includes('b')).toBe(true)
+        expect(data.a.indexOf('b')).toBe(1)
+        expect(data.a.indexOf('b')).toBe(1)
+        expect(data.a.map((item, index) => {
+          expect(item).toBe(oriArr[index])
+          return item + '1'
+        }).join()).toBe('a1,b1,c1')
+        expect(data.a.reduce((res, item, index) => {
+          expect(item).toBe(oriArr[index])
+          return res + item
+        }, '')).toBe('abc')
+        return ''
+      }
+    },
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view></wx-view>')).toBe(true)
+})
