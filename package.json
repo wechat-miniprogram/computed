@@ -1,7 +1,7 @@
 {
 	"name": "miniprogram-computed",
-	"version": "2.0.1",
-	"description": "Miniprogram custom component extend behavior",
+	"version": "2.0.2",
+	"description": "Computed & watch - wechat miniprogram custom component extend behavior",
 	"main": "miniprogram_dist/index.js",
 	"scripts": {
 		"dev": "gulp dev --develop",
