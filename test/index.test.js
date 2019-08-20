@@ -158,13 +158,15 @@ test('computed basics', () => {
       a: {
         type: Number,
         value: 1,
-      }
+      },
+      nullProp: null,
     },
     data: {
       b: 2,
     },
     computed: {
       c(data) {
+        expect(data.nullProp).toBe(null)
         func1TriggeringCount++
         return data.a + data.b
       },

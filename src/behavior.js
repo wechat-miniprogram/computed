@@ -1,8 +1,8 @@
 const dataPath = require('./data-path')
 const dataTracer = require('./data-tracer')
 
-const TYPES = [String, Number, Boolean, Object, Array]
-const TYPE_DEFAULT_VALUES = ['', 0, false, null, []]
+const TYPES = [String, Number, Boolean, Object, Array, null]
+const TYPE_DEFAULT_VALUES = ['', 0, false, null, [], null]
 
 const getDataOnPath = function (data, path) {
   let ret = data

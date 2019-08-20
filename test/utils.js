@@ -12,9 +12,9 @@ simulate.load = function (componentPath, ...args) {
 
 module.exports = simulate
 
-// adjust the simulated wx api 
+// adjust the simulated wx api
 const oldGetSystemInfoSync = global.wx.getSystemInfoSync
-global.wx.getSystemInfoSync = function() {
+global.wx.getSystemInfoSync = function () {
   const res = oldGetSystemInfoSync()
   res.SDKVersion = '2.4.1'
 
