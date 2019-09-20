@@ -44,7 +44,7 @@ const wrapData = (data, relatedPathValues, basePath) => {
 exports.create = (data, relatedPathValues) => wrapData(data, relatedPathValues, [])
 
 exports.unwrap = (wrapped) => {
-  if (typeof wrapped !== 'object' || wrapped === null) {
+  if (typeof wrapped !== 'object' || wrapped === null || typeof wrapped.__rawObject__ !== 'object') {
     return wrapped
   }
   return wrapped.__rawObject__
