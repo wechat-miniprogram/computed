@@ -18,16 +18,34 @@ const wrapData = (data, relatedPathValues, basePath) => {
       },
       set() {
         throw new Error('Setting data is not allowed')
-      }
+      },
+      enumerable: true
     }
   })
   if (isArray) {
     propDef.length = {
-      value: data.length
+      value: data.length,
+      enumerable: false
     }
+  }
+  propDef.__rawObject__ = {
+    get() {
+      return data
+    },
+    set() {
+      throw new Error('Setting data is not allowed')
+    },
+    enumerable: false
   }
   const proto = isArray ? Array.prototype : Object.prototype
   return Object.create(proto, propDef)
 }
 
 exports.create = (data, relatedPathValues) => wrapData(data, relatedPathValues, [])
+
+exports.unwrap = (wrapped) => {
+  if (typeof wrapped !== 'object' || wrapped === null) {
+    return wrapped
+  }
+  return wrapped.__rawObject__
+}

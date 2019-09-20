@@ -118,7 +118,7 @@ exports.behavior = Behavior({
       const relatedPathValuesOnDef = []
       const initData = getDataDefinition(defFields.data, defFields.properties)
       const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
-      setDataOnPath(defFields.data, targetPath, val)
+      setDataOnPath(defFields.data, targetPath, dataTracer.unwrap(val))
       initFuncs.push(function () {
         const pathValues = relatedPathValuesOnDef.map(({path}) => ({
           path,
