@@ -407,3 +407,28 @@ test('computed array read operations', () => {
 
   expect(_.match(component.dom, '<wx-view></wx-view>')).toBe(true)
 })
+
+test('computed object tracer', () => {
+  const componentId = _.load({
+    template: '<view>{{newArr[0] + newArr[1]}}</view><view>{{newObj.f0 + newObj.f1}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      arr: [1, 2],
+      obj: {
+        f0: 10,
+        f1: 20,
+      }
+    },
+    computed: {
+      newArr(data) {
+        return data.arr
+      },
+      newObj(data) {
+        return data.obj
+      },
+    },
+  })
+  const component = _.render(componentId)
+
+  expect(_.match(component.dom, '<wx-view>3</wx-view><wx-view>30</wx-view>')).toBe(true)
+})
