@@ -40,23 +40,37 @@ const parseIdent = function (path, state) {
 }
 
 const parseSinglePath = function (path, state) {
-  const ret = [parseIdent(path, state)]
+  const paths = [parseIdent(path, state)]
+  const options = {
+    deepCmp: false
+  }
   while (state.index < state.length) {
     const ch = path[state.index]
     if (ch === '[') {
       state.index++
-      ret.push(parseArrIndex(path, state))
+      paths.push(parseArrIndex(path, state))
       const nextCh = path[state.index]
       if (nextCh !== ']') throwParsingError(path, state.index)
       state.index++
     } else if (ch === '.') {
       state.index++
-      ret.push(parseIdent(path, state))
+      const ch = path[state.index]
+      if (ch === '*') {
+        state.index++
+        const ch = path[state.index]
+        if (ch === '*') {
+          state.index++
+          options.deepCmp = true
+          break
+        }
+        throwParsingError(path, state.index)
+      }
+      paths.push(parseIdent(path, state))
     } else {
       break
     }
   }
-  return ret
+  return {path: paths, options}
 }
 
 const parseMultiPaths = function (path, state) {
@@ -75,6 +89,8 @@ const parseMultiPaths = function (path, state) {
     } else if (splitted) {
       splitted = false
       ret.push(parseSinglePath(path, state))
+    } else {
+      throwParsingError(path, state.index)
     }
   }
   return ret

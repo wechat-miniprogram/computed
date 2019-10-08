@@ -1,3 +1,5 @@
+const deepClone = require('rfdc')({proto: true})
+const deepEqual = require('fast-deep-equal')
 const dataPath = require('./data-path')
 const dataTracer = require('./data-tracer')
 
@@ -91,7 +93,7 @@ exports.behavior = Behavior({
     // handling computed
     const computedUpdaters = []
     Object.keys(computedDef).forEach((targetField) => {
-      const targetPath = dataPath.parseSingleDataPath(targetField)
+      const {path: targetPath} = dataPath.parseSingleDataPath(targetField)
       const updateMethod = computedDef[targetField]
       // update value and calculate related paths
       const updateValueAndRelatedPaths = function () {
@@ -152,7 +154,10 @@ exports.behavior = Behavior({
       const paths = dataPath.parseMultiDataPaths(watchPath)
       // record the original value of watch targets
       initFuncs.push(function () {
-        const curVal = paths.map((path) => getDataOnPath(this.data, path))
+        const curVal = paths.map(({path, options}) => {
+          const val = getDataOnPath(this.data, path)
+          return options.deepCmp ? deepClone(val) : val
+        })
         this._computedWatchInfo.watchCurVal[watchPath] = curVal
       })
       // add watch observer
@@ -161,16 +166,29 @@ exports.behavior = Behavior({
         observer() {
           if (!this._computedWatchInfo) return
           const oldVal = this._computedWatchInfo.watchCurVal[watchPath]
-          const curVal = paths.map((path) => getDataOnPath(this.data, path))
+          const originalCurValWithOptions = paths.map(({path, options}) => {
+            const val = getDataOnPath(this.data, path)
+            return {
+              val,
+              options,
+            }
+          })
+          const curVal = originalCurValWithOptions.map(({val, options}) => (
+            options.deepCmp ? deepClone(val) : val
+          ))
           this._computedWatchInfo.watchCurVal[watchPath] = curVal
           let changed = false
           for (let i = 0; i < curVal.length; i++) {
-            if (oldVal[i] !== curVal[i]) {
+            const options = paths[i].options
+            const deepCmp = options.deepCmp
+            if (deepCmp ? !deepEqual(oldVal[i], curVal[i]) : oldVal[i] !== curVal[i]) {
               changed = true
               break
             }
           }
-          if (changed) watchDef[watchPath].apply(this, curVal)
+          if (changed) {
+            watchDef[watchPath].apply(this, originalCurValWithOptions.map(({val}) => val))
+          }
         }
       })
     })
