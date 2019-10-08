@@ -60,6 +60,7 @@
 		"webpack-node-externals": "^1.7.2"
 	},
 	"dependencies": {
-		"fast-deep-equal": "^2.0.1"
+		"fast-deep-equal": "^2.0.1",
+		"rfdc": "^1.1.4"
 	}
 }

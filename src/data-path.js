@@ -1,13 +1,7 @@
 const WHITE_SPACE_CHAR_REGEXP = /^\s/
-const OPT_KEY_LIST = ['deepCmp', 'dc']
 
 const throwParsingError = function (path, index) {
   throw new Error('Parsing data path "' + path + '" failed at char "' + path[index] + '" (index ' + index + ')')
-}
-
-const testOptKey = function (key) {
-  if (OPT_KEY_LIST.indexOf(key) >= 0) return
-  throw new Error('Unrecorgnized data path option: ' + key)
 }
 
 const parseArrIndex = function (path, state) {
@@ -45,27 +39,11 @@ const parseIdent = function (path, state) {
   return path.slice(startIndex, state.index)
 }
 
-const parseOpts = function (path, state, options) {
-  const key = parseIdent(path, state)
-  testOptKey(key)
-  options[key] = true
-  // while (state.index < state.length) {
-  //   const ch = path[state.index]
-  //   if (ch === '-') {
-  //     state.index++
-  //     const key = parseIdent(path, state)
-  //     testOptKey(key)
-  //     options[key] = true
-  //   } else {
-  //     break
-  //   }
-  // }
-  return options
-}
-
 const parseSinglePath = function (path, state) {
   const paths = [parseIdent(path, state)]
-  const options = {}
+  const options = {
+    deepCmp: false
+  }
   while (state.index < state.length) {
     const ch = path[state.index]
     if (ch === '[') {
@@ -76,11 +54,18 @@ const parseSinglePath = function (path, state) {
       state.index++
     } else if (ch === '.') {
       state.index++
+      const ch = path[state.index]
+      if (ch === '*') {
+        state.index++
+        const ch = path[state.index]
+        if (ch === '*') {
+          state.index++
+          options.deepCmp = true
+          break
+        }
+        throwParsingError(path, state.index)
+      }
       paths.push(parseIdent(path, state))
-    } else if (ch === ':') {
-      state.index++
-      parseOpts(path, state, options)
-      break
     } else {
       break
     }
@@ -104,6 +89,8 @@ const parseMultiPaths = function (path, state) {
     } else if (splitted) {
       splitted = false
       ret.push(parseSinglePath(path, state))
+    } else {
+      throwParsingError(path, state.index)
     }
   }
   return ret

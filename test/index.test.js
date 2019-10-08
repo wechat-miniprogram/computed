@@ -160,15 +160,16 @@ test('watch data deep comparison', () => {
         a: 1,
         b: 2,
       },
+      c: 3,
     },
     watch: {
       obj() {
         func1TriggeringCount++
       },
-      'obj:dc': function () {
+      'obj.b': function () {
         func2TriggeringCount++
       },
-      'obj:deepCmp': function (obj) {
+      'obj.**': function (obj) {
         func3TriggeringCount++
         this.setData({
           c: obj.a + obj.b
@@ -183,17 +184,23 @@ test('watch data deep comparison', () => {
   expect(func2TriggeringCount).toBe(0)
   expect(func3TriggeringCount).toBe(0)
 
-  component.setData({obj: {a: 10}})
+  component.setData({obj: {a: 10, b: 2}})
   expect(_.match(component.dom, '<wx-view>10+2=12</wx-view>')).toBe(true)
   expect(func1TriggeringCount).toBe(1)
-  expect(func2TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(0)
   expect(func3TriggeringCount).toBe(1)
 
-  component.setData({obj: {b: 2}})
+  component.setData({'obj.b': 2})
   expect(_.match(component.dom, '<wx-view>10+2=12</wx-view>')).toBe(true)
-  expect(func1TriggeringCount).toBe(2)
-  expect(func2TriggeringCount).toBe(1)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(0)
   expect(func3TriggeringCount).toBe(1)
+
+  component.setData({'obj.a': 100})
+  expect(_.match(component.dom, '<wx-view>100+2=102</wx-view>')).toBe(true)
+  expect(func1TriggeringCount).toBe(1)
+  expect(func2TriggeringCount).toBe(0)
+  expect(func3TriggeringCount).toBe(2)
 })
 
 test('computed basics', () => {
