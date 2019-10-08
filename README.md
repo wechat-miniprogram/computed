@@ -8,15 +8,15 @@
 
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-1. 安装 computed：
+你可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/kKu4U9mX78a8](https://developers.weixin.qq.com/s/kKu4U9mX78a8)
+
+### 安装
 
 ```
 npm install --save miniprogram-computed
 ```
 
-2. 作为 behavior 引入。
-
-使用 `computed` ：
+### computed 基本用法
 
 ```js
 const computedBehavior = require('miniprogram-computed')
@@ -52,7 +52,7 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
-使用 `watch` ：
+### watch 基本用法
 
 ```js
 const computedBehavior = require('miniprogram-computed')
@@ -89,8 +89,6 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
-或者，你也可以直接体验一下这个代码片段：[https://developers.weixin.qq.com/s/kKu4U9mX78a8](https://developers.weixin.qq.com/s/kKu4U9mX78a8)
-
 ## ^1.0.0 与 ^2.0.0 版本差异
 
 这个 behavior 的 ^1.0.0 版本和 ^2.0.0 版本有较大差异。 ^2.0.0 版本基于小程序基础库 2.6.1 开始支持的 observers 定义段实现，具有较好的性能。以下是版本之间主要区别的比较。
@@ -101,13 +99,51 @@ Component({
 | 支持 `watch` 定义段 | 否 | 是 |
 | 性能 | 相对较差 | 相对较好 |
 
-## 我应该使用 computed 还是 watch ？
+## 常见问题说明
+
+### 我应该使用 computed 还是 watch ？
 
 从原理上说， `watch` 的性能比 `computed` 更好；但 `computed` 的用法更简洁干净。
 
 此外， `computed` 字段状态只能依赖于 `data` 和其他 `computed` 字段，不能访问 `this` 。如果不可避免要访问 `this` ，则必须使用 `watch` 代替。
 
-## watch 和小程序基础库本身的 observers 有什么区别？
+### watch 和小程序基础库本身的 observers 有什么区别？
 
 * 无论字段是否真的改变， `observers` 都会被触发，而 `watch` 只在字段值改变了的时候触发，并且触发时带有参数。
-* 目前 `watch` 还不支持 `**` 通配符。
+
+### 关于 ** 通配符
+
+在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers）。
+
+```js
+const computedBehavior = require('miniprogram-computed')
+
+Component({
+  behaviors: [computedBehavior],
+  data: {
+    obj: {
+      a: 1,
+      b: 2,
+    }
+  },
+  watch: {
+    'obj.**': function(obj) {
+      this.setData({
+        sum: obj.a + obj.b
+      })
+    },
+  },
+  methods: {
+    onTap() {
+      this.setData({
+        'obj.a': 10
+      })
+    }
+  }
+})
+```
+
+除此以外：
+
+* 对于没有使用 `**` 通配符的字段，在 `watch` 检查值是否发生变化时，只会进行粗略的浅比较（使用 `===` ）；
+* 对于使用了 `**` 通配符的字段，则会进行深比较，来尝试精确检测对象是否真的发生了变化，这要求对象字段不能包含循环（类似于 `JSON.stringify` ）。
