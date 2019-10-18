@@ -113,7 +113,7 @@ Component({
 
 ### 关于 ** 通配符
 
-在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers）。
+在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers）。[示例代码片段](https://developers.weixin.qq.com/s/frOEpcm27Ac7)
 
 ```js
 const computedBehavior = require('miniprogram-computed')
