@@ -8,7 +8,7 @@
 
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-你可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/kKu4U9mX78a8](https://developers.weixin.qq.com/s/kKu4U9mX78a8)
+你可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/gXK31mmZ73dd](https://developers.weixin.qq.com/s/gXK31mmZ73dd)
 
 ### 安装
 
