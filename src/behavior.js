@@ -69,12 +69,15 @@ exports.behavior = Behavior({
     const watchDef = defFields.watch || {}
 
     const observersItems = []
+
     if (!defFields.methods) {
       defFields.methods = {}
     }
+
     if (!defFields.data) {
       defFields.data = {}
     }
+
     if (defFields.methods._initComputedWatchInfo) {
       throw new Error('Please do not use this behavior more than once in a single component')
     }

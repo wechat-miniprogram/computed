@@ -1,1 +1,6 @@
-<comp prop-a="{{propA}}" bindupdate="onUpdate"></comp>
+<view class="wrapper">
+  <computed-example />
+</view>
+<view class="wrapper">
+  <watch-example />
+</view>

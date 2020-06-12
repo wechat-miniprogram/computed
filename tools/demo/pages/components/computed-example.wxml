@@ -1,0 +1,5 @@
+<view>computed example</view>
+<view>A = {{a}}</view>
+<view>B = {{b}}</view>
+<view>SUM = {{sum}}</view>
+<button bindtap="onTap">update</button>

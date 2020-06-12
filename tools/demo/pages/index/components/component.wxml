@@ -1,7 +1,0 @@
-<view>data: {{a}}</view>
-<view>computed: {{b}}</view>
-<view>computed: {{c}}</view>
-<view>prop: {{propA}}</view>
-<view>computed: {{propB}}</view>
-<button bindtap="onTap">click</button>
-<button bindtap="onTap2">update prop</button>
