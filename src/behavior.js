@@ -6,6 +6,10 @@ const dataTracer = require('./data-tracer')
 const TYPES = [String, Number, Boolean, Object, Array, null]
 const TYPE_DEFAULT_VALUES = ['', 0, false, null, [], null]
 
+const computedUpdaters = []
+const observersItems = []
+let definition
+
 const getDataOnPath = function (data, path) {
   let ret = data
   path.forEach((s) => {
@@ -60,82 +64,90 @@ const getDataDefinition = function (data, properties) {
 
 exports.behavior = Behavior({
   lifetimes: {
+    attached() {
+      this.setData(this.data)
+    },
     created() {
+      const computedDef = definition.computed || {}
+      const watchDef = definition.watch || {}
+
+      if (!this.data) {
+        this.data = {}
+      }
+      // initialize status, executed on created
+      const initFuncs = []
+      if (this._initComputedWatchInfo) {
+        throw new Error('Please do not use this behavior more than once in a single component')
+      }
+
+      // handling computed
+      Object.keys(computedDef).forEach((targetField) => {
+        const {path: targetPath} = dataPath.parseSingleDataPath(targetField)
+        const updateMethod = computedDef[targetField]
+
+        const relatedPathValuesOnDef = []
+        const initData = getDataDefinition(this.data, definition.properties)
+        const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
+        setDataOnPath(this.data, targetPath, dataTracer.unwrap(val))
+        initFuncs.push(function () {
+          const pathValues = relatedPathValuesOnDef.map(({path}) => ({
+            path,
+            values: getDataOnPath(this.data, path)
+          }))
+          this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
+        })
+        const updateValueAndRelatedPaths = function () {
+          const oldPathValues = this._computedWatchInfo.computedRelatedPathValues[targetField]
+          let needUpdate = false
+          for (let i = 0; i < oldPathValues.length; i++) {
+            const {path, value: oldVal} = oldPathValues[i]
+
+            const curVal = getDataOnPath(this.data, path)
+            if (oldVal !== curVal) {
+              needUpdate = true
+              break
+            }
+          }
+          if (!needUpdate) return false
+          const relatedPathValues = []
+          const val = updateMethod(dataTracer.create(this.data, relatedPathValues))
+          this.setData({
+            [targetField]: val
+          })
+          this._computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValues
+          return true
+        }
+        computedUpdaters.push(updateValueAndRelatedPaths)
+      })
+
+      // handling watch
+      Object.keys(watchDef).forEach((watchPath) => {
+        const paths = dataPath.parseMultiDataPaths(watchPath)
+        // record the original value of watch targets
+        initFuncs.push(function () {
+          const curVal = paths.map(({path, options}) => {
+            const val = getDataOnPath(this.data, path)
+            return options.deepCmp ? deepClone(val) : val
+          })
+          this._computedWatchInfo.watchCurVal[watchPath] = curVal
+        })
+      })
+      this._initComputedWatchInfo = function () {
+        if (this._computedWatchInfo) return
+        this._computedWatchInfo = {
+          computedRelatedPathValues: {},
+          watchCurVal: {},
+        }
+        initFuncs.forEach((func) => func.call(this))
+      }
       this._initComputedWatchInfo()
     }
   },
   definitionFilter(defFields) {
-    const computedDef = defFields.computed || {}
-    const watchDef = defFields.watch || {}
-
-    const observersItems = []
-
-    if (!defFields.methods) {
-      defFields.methods = {}
-    }
-
-    if (!defFields.data) {
-      defFields.data = {}
-    }
-
-    if (defFields.methods._initComputedWatchInfo) {
-      throw new Error('Please do not use this behavior more than once in a single component')
-    }
-
-    // initialize status, executed on created
-    const initFuncs = []
-    defFields.methods._initComputedWatchInfo = function () {
-      if (this._computedWatchInfo) return
-      this._computedWatchInfo = {
-        computedRelatedPathValues: {},
-        watchCurVal: {},
-      }
-      initFuncs.forEach((func) => func.call(this))
-    }
-
-    // handling computed
-    const computedUpdaters = []
-    Object.keys(computedDef).forEach((targetField) => {
-      const {path: targetPath} = dataPath.parseSingleDataPath(targetField)
-      const updateMethod = computedDef[targetField]
-      // update value and calculate related paths
-      const updateValueAndRelatedPaths = function () {
-        const oldPathValues = this._computedWatchInfo.computedRelatedPathValues[targetField]
-        let needUpdate = false
-        for (let i = 0; i < oldPathValues.length; i++) {
-          const {path, value: oldVal} = oldPathValues[i]
-          const curVal = getDataOnPath(this.data, path)
-          if (oldVal !== curVal) {
-            needUpdate = true
-            break
-          }
-        }
-        if (!needUpdate) return false
-        const relatedPathValues = []
-        const val = updateMethod(dataTracer.create(this.data, relatedPathValues))
-        this.setData({
-          [targetField]: val
-        })
-        this._computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValues
-        return true
-      }
-      // calculate value on registration
-      const relatedPathValuesOnDef = []
-      const initData = getDataDefinition(defFields.data, defFields.properties)
-      const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
-      setDataOnPath(defFields.data, targetPath, dataTracer.unwrap(val))
-      initFuncs.push(function () {
-        const pathValues = relatedPathValuesOnDef.map(({path}) => ({
-          path,
-          value: getDataOnPath(this.data, path)
-        }))
-        this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
-      })
-      // calculate value on setData
-      computedUpdaters.push(updateValueAndRelatedPaths)
-    })
-    if (computedUpdaters.length) {
-      // add a single observer for all computed fields
+    definition = defFields
+    const computedDef = definition.computed || {}
+    const watchDef = definition.watch || {}
+    if (computedDef) {
       observersItems.push({
         fields: '**',
         observer() {
@@ -151,52 +163,41 @@ exports.behavior = Behavior({
         }
       })
     }
-
-    // handling watch
-    Object.keys(watchDef).forEach((watchPath) => {
-      const paths = dataPath.parseMultiDataPaths(watchPath)
-      // record the original value of watch targets
-      initFuncs.push(function () {
-        const curVal = paths.map(({path, options}) => {
-          const val = getDataOnPath(this.data, path)
-          return options.deepCmp ? deepClone(val) : val
+    if (watchDef) {
+      Object.keys(watchDef).forEach((watchPath) => {
+        const paths = dataPath.parseMultiDataPaths(watchPath)
+        observersItems.push({
+          fields: watchPath,
+          observer() {
+            if (!this._computedWatchInfo) return
+            const oldVal = this._computedWatchInfo.watchCurVal[watchPath]
+            const originalCurValWithOptions = paths.map(({path, options}) => {
+              const val = getDataOnPath(this.data, path)
+              return {
+                val,
+                options,
+              }
+            })
+            const curVal = originalCurValWithOptions.map(({val, options}) => (
+              options.deepCmp ? deepClone(val) : val
+            ))
+            this._computedWatchInfo.watchCurVal[watchPath] = curVal
+            let changed = false
+            for (let i = 0; i < curVal.length; i++) {
+              const options = paths[i].options
+              const deepCmp = options.deepCmp
+              if (deepCmp ? !deepEqual(oldVal[i], curVal[i]) : oldVal[i] !== curVal[i]) {
+                changed = true
+                break
+              }
+            }
+            if (changed) {
+              watchDef[watchPath].apply(this, originalCurValWithOptions.map(({val}) => val))
+            }
+          }
         })
-        this._computedWatchInfo.watchCurVal[watchPath] = curVal
       })
-      // add watch observer
-      observersItems.push({
-        fields: watchPath,
-        observer() {
-          if (!this._computedWatchInfo) return
-          const oldVal = this._computedWatchInfo.watchCurVal[watchPath]
-          const originalCurValWithOptions = paths.map(({path, options}) => {
-            const val = getDataOnPath(this.data, path)
-            return {
-              val,
-              options,
-            }
-          })
-          const curVal = originalCurValWithOptions.map(({val, options}) => (
-            options.deepCmp ? deepClone(val) : val
-          ))
-          this._computedWatchInfo.watchCurVal[watchPath] = curVal
-          let changed = false
-          for (let i = 0; i < curVal.length; i++) {
-            const options = paths[i].options
-            const deepCmp = options.deepCmp
-            if (deepCmp ? !deepEqual(oldVal[i], curVal[i]) : oldVal[i] !== curVal[i]) {
-              changed = true
-              break
-            }
-          }
-          if (changed) {
-            watchDef[watchPath].apply(this, originalCurValWithOptions.map(({val}) => val))
-          }
-        }
-      })
-    })
-
-    // register to observers
+    }
     if (typeof defFields.observers !== 'object') {
       defFields.observers = {}
     }
