@@ -1,5 +1,7 @@
+
 const _ = require('./utils')
 const computedBehavior = require('../src/index')
+const behaviorA = require('./tools/behaviorA')
 
 test('watch basics', () => {
   let funcTriggeringCount = 0
@@ -232,7 +234,7 @@ test('computed basics', () => {
     }
   })
   const component = _.render(componentId)
-
+  component.triggerLifeTime('attached')
   expect(_.match(component.dom, '<wx-view>1+2=3, 1*2=2</wx-view>')).toBe(true)
   expect(func1TriggeringCount).toBe(1)
   expect(func2TriggeringCount).toBe(1)
@@ -314,7 +316,7 @@ test('computed chains', () => {
     }
   })
   const component = _.render(componentId)
-
+  component.triggerLifeTime('attached')
   expect(_.match(component.dom, '<wx-view>1+2=3, 1+3=4</wx-view>')).toBe(true)
   expect(func1TriggeringCount).toBe(1)
   expect(func2TriggeringCount).toBe(1)
@@ -353,6 +355,7 @@ test('computed conditions', () => {
     }
   })
   const component = _.render(componentId)
+  component.triggerLifeTime('attached')
 
   expect(_.match(component.dom, '<wx-view>0, 1, 2, 2</wx-view>')).toBe(true)
   expect(funcTriggeringCount).toBe(1)
@@ -397,6 +400,7 @@ test('computed data paths', () => {
     },
   })
   const component = _.render(componentId)
+  component.triggerLifeTime('attached')
 
   expect(_.match(component.dom, '<wx-view>1+2=3</wx-view>')).toBe(true)
   expect(funcTriggeringCount).toBe(1)
@@ -459,7 +463,7 @@ test('computed array read operations', () => {
     },
   })
   const component = _.render(componentId)
-
+  component.triggerLifeTime('attached')
   expect(_.match(component.dom, '<wx-view></wx-view>')).toBe(true)
 })
 
@@ -484,6 +488,46 @@ test('computed object tracer', () => {
     },
   })
   const component = _.render(componentId)
+  component.triggerLifeTime('attached')
 
   expect(_.match(component.dom, '<wx-view>3</wx-view><wx-view>30</wx-view>')).toBe(true)
+})
+
+test('computed behaviors data', () => {
+  const componentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}</view>',
+    behaviors: [behaviorA, computedBehavior],
+    data: {
+      a: 1
+    },
+    computed: {
+      c(data) {
+        return data.a + data.b
+      },
+
+    },
+  })
+  const component = _.render(componentId)
+  component.triggerLifeTime('attached')
+  expect(_.match(component.dom, '<wx-view>1+2=3</wx-view>')).toBe(true)
+})
+
+
+test('computed behaviors data deep comparison', () => {
+  const componentId = _.load({
+    template: '<view>{{a}}+{{c.d}}+{{c.e[0]}}={{f}}</view>',
+    behaviors: [behaviorA, computedBehavior],
+    data: {
+      a: 1
+    },
+    computed: {
+      f(data) {
+        return data.a + data.c.d + data.c.e[0]
+      },
+
+    },
+  })
+  const component = _.render(componentId)
+  component.triggerLifeTime('attached')
+  expect(_.match(component.dom, '<wx-view>1+3+1=5</wx-view>')).toBe(true)
 })

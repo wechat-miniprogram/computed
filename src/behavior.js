@@ -6,8 +6,8 @@ const dataTracer = require('./data-tracer')
 const TYPES = [String, Number, Boolean, Object, Array, null]
 const TYPE_DEFAULT_VALUES = ['', 0, false, null, [], null]
 
-const computedUpdaters = []
-const observersItems = []
+let computedUpdaters = []
+let observersItems = []
 let definition
 
 const getDataOnPath = function (data, path) {
@@ -68,9 +68,10 @@ exports.behavior = Behavior({
       this.setData(this.data)
     },
     created() {
+      computedUpdaters = []
+      observersItems = []
       const computedDef = definition.computed || {}
       const watchDef = definition.watch || {}
-
       if (!this.data) {
         this.data = {}
       }
@@ -84,7 +85,6 @@ exports.behavior = Behavior({
       Object.keys(computedDef).forEach((targetField) => {
         const {path: targetPath} = dataPath.parseSingleDataPath(targetField)
         const updateMethod = computedDef[targetField]
-
         const relatedPathValuesOnDef = []
         const initData = getDataDefinition(this.data, definition.properties)
         const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
@@ -92,7 +92,7 @@ exports.behavior = Behavior({
         initFuncs.push(function () {
           const pathValues = relatedPathValuesOnDef.map(({path}) => ({
             path,
-            values: getDataOnPath(this.data, path)
+            value: getDataOnPath(this.data, path)
           }))
           this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
         })
@@ -101,7 +101,6 @@ exports.behavior = Behavior({
           let needUpdate = false
           for (let i = 0; i < oldPathValues.length; i++) {
             const {path, value: oldVal} = oldPathValues[i]
-
             const curVal = getDataOnPath(this.data, path)
             if (oldVal !== curVal) {
               needUpdate = true
@@ -119,6 +118,7 @@ exports.behavior = Behavior({
         }
         computedUpdaters.push(updateValueAndRelatedPaths)
       })
+
 
       // handling watch
       Object.keys(watchDef).forEach((watchPath) => {
@@ -143,6 +143,7 @@ exports.behavior = Behavior({
       this._initComputedWatchInfo()
     }
   },
+
   definitionFilter(defFields) {
     definition = defFields
     const computedDef = definition.computed || {}
