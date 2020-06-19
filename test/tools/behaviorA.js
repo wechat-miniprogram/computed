@@ -8,7 +8,7 @@ module.exports = Behavior({
   },
   attached() {
     this.setData({
-      f: 10
+      attachedData: 10
     })
   }
 })

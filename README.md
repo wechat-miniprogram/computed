@@ -33,8 +33,6 @@ npm run dev // 构建 dev 版本
 构建完毕后，根目录下的 `/tools/demo` 即为小程序代码根目录，可以将此 demo 导入开发者工具中进行体验。
 
 
-
-
 ### computed 基本用法
 
 ```js
