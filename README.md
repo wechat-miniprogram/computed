@@ -6,15 +6,34 @@
 
 ## 使用方法
 
+### 方式一 代码片段
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-你可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/gXK31mmZ73dd](https://developers.weixin.qq.com/s/gXK31mmZ73dd)
+可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/gXK31mmZ73dd](https://developers.weixin.qq.com/s/gXK31mmZ73dd)
 
-### 安装
+体验该代码片段前，需要先安装并构建相对应的 npm 包。
 
 ```
 npm install --save miniprogram-computed
 ```
+
+### 方式二 本地构建
+将本仓库 clone 到本地，进入根目录进行安装 npm 依赖。
+
+```
+npm install
+```
+
+安装完成后执行
+
+```
+npm run dev // 构建 dev 版本
+```
+
+构建完毕后，根目录下的 `/tools/demo` 即为小程序代码根目录，可以将此 demo 导入开发者工具中进行体验。
+
+
+
 
 ### computed 基本用法
 

@@ -6,4 +6,9 @@ module.exports = Behavior({
       e: [1, 2, 3]
     },
   },
+  attached() {
+    this.setData({
+      f: 10
+    })
+  }
 })

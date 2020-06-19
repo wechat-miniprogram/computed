@@ -531,3 +531,24 @@ test('computed behaviors data deep comparison', () => {
   component.triggerLifeTime('attached')
   expect(_.match(component.dom, '<wx-view>1+3+1=5</wx-view>')).toBe(true)
 })
+
+test('computed behavior lifetimes', () => {
+  const componentId = _.load({
+    template: '<view>{{a}}+{{f}}={{g}}</view>',
+    behaviors: [behaviorA, computedBehavior],
+    data: {
+      a: 1
+    },
+    computed: {
+      g(data) {
+        return data.a + data.f
+      },
+
+    },
+  })
+  const component = _.render(componentId)
+  component.triggerLifeTime('attached')
+  expect(_.match(component.dom, '<wx-view>1+10=11</wx-view>')).toBe(true)
+})
+
+
