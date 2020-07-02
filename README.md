@@ -9,7 +9,7 @@
 ### 方式一 代码片段
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/gXK31mmZ73dd](https://developers.weixin.qq.com/s/gXK31mmZ73dd)
+可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/HOoouxml75iW](https://developers.weixin.qq.com/s/HOoouxml75iW)
 
 体验该代码片段前，需要先安装并构建相对应的 npm 包。
 
@@ -18,7 +18,7 @@ npm install --save miniprogram-computed
 ```
 
 ### 方式二 本地构建
-将本仓库 clone 到本地，进入根目录进行安装 npm 依赖。
+将本仓库 clone 到本地，进入根目录安装 npm 依赖。
 
 ```
 npm install
@@ -36,10 +36,12 @@ npm run dev // 构建 dev 版本
 ### computed 基本用法
 
 ```js
+// component.js
 const computedBehavior = require('miniprogram-computed')
+const behaviorTest = require('./behavior-test') // 引入自定义 behavior
 
 Component({
-  behaviors: [computedBehavior],
+  behaviors: [behaviorTest, computedBehavior],
   data: {
     a: 1,
     b: 1,
@@ -48,7 +50,7 @@ Component({
     sum(data) {
       // 注意： computed 函数中不能访问 this ，只有 data 对象可供访问
       // 这个函数的返回值会被设置到 this.data.sum 字段中
-      return data.a + data.b
+      return data.a + data.b + data.c // data.c 为自定义 behavior 数据段
     },
   },
   methods: {
@@ -58,6 +60,15 @@ Component({
         b: this.data.a + this.data.b,
       })
     }
+  }
+})
+```
+
+```js
+//behavior-test.js
+module.exports = Behavior({
+  data: {
+    c: 2,
   }
 })
 ```
@@ -106,17 +117,41 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
-## ^1.0.0 与 ^2.0.0 版本差异
 
-这个 behavior 的 ^1.0.0 版本和 ^2.0.0 版本有较大差异。 ^2.0.0 版本基于小程序基础库 2.6.1 开始支持的 observers 定义段实现，具有较好的性能。以下是版本之间主要区别的比较。
 
-| 项目 | ^1.0.0 | ^2.0.0 |
-| ---- | ------ | ------ |
-| 支持的基础库最低版本 | 2.2.3 | 2.6.1 |
-| 支持 `watch` 定义段 | 否 | 是 |
-| 性能 | 相对较差 | 相对较好 |
+## ^3.0.0 与 ^1.0.0、 ^2.0.0 版本的差异
+
+### ^3.0.0 版本
+
+* 支持 mobx-miniprogram 扩展库引入的数据段。
+
+* 对自定义 behavior 数据段使用 computed 时，支持在初始化视图中进行数据渲染。
+
+* 基于 proxy 更新了 computed 数据追踪的实现方式，computed 依赖的数据路径追踪初始化操作，延后到组件的 created 阶段 。
+
+### ^2.0.0 版本
+
+基于小程序基础库 2.6.1 开始支持的 observers 定义段实现，具有较好的性能。
+
+以下是版本之间主要区别的比较。
+
+| 项目 | ^1.0.0 | ^2.0.0 | ^3.0.0 |
+| ---- | ------ | ------ | ------ |
+| 支持的基础库最低版本 | 2.2.3 | 2.6.1 | 2.6.1 |
+| 支持 `watch` 定义段 | 否 | 是 | 是 |
+| 性能 | 相对较差 | 相对较好 | 相对较好 |
+| 支持 `mobx-miniprogram` 扩展库 | 不支持 | 不支持 | 支持 |
+| 支持自定义 `behavior` 数据字段 / 初始化视图渲染 | 不支持 / 不支持 | 支持 / 不支持 | 支持 / 支持 |
+
+
 
 ## 常见问题说明
+
+### 如何搭配 `mobx-miniprogram` 等扩展库使用？
+
+* 方式一：可见代码片段：[https://developers.weixin.qq.com/s/HOoouxml75iW](https://developers.weixin.qq.com/s/HOoouxml75iW)
+
+* 方式二：通过上面的方式二构建小程序体验
 
 ### 我应该使用 computed 还是 watch ？
 

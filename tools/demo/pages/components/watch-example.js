@@ -1,24 +1,23 @@
 const computedBehavior = require('../../components/index')
-
+const behaviorTest = require('./behavior')
 Component({
-  behaviors: [computedBehavior],
+  behaviors: [behaviorTest, computedBehavior],
   data: {
     a: 1,
-    b: 1,
-    sum: 2,
+    sum: 1001
   },
   watch: {
-    'a, b': function (a, b) {
+    'a, behaviorTestData': function (a, behaviorTestData) {
       this.setData({
-        sum: a + b
+        sum: a + behaviorTestData
       })
     },
   },
   methods: {
     onTap() {
       this.setData({
-        a: this.data.b,
-        b: this.data.a + this.data.b,
+        a: this.data.a + 1,
+        behaviorTestData: this.data.behaviorTestData + 1,
       })
     }
   }

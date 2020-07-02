@@ -6,9 +6,6 @@ const dataTracer = require('./data-tracer')
 const TYPES = [String, Number, Boolean, Object, Array, null]
 const TYPE_DEFAULT_VALUES = ['', 0, false, null, [], null]
 
-let computedUpdaters = []
-let observersItems = []
-let definition
 
 const getDataOnPath = function (data, path) {
   let ret = data
@@ -68,10 +65,11 @@ exports.behavior = Behavior({
       this.setData(this.data)
     },
     created() {
-      computedUpdaters = []
-      observersItems = []
-      const computedDef = definition.computed || {}
-      const watchDef = definition.watch || {}
+      const {__definition__} = this
+      this.__computedUpdaters__ = []
+      const definition = __definition__()
+      const computedDef = definition.computedDef || {}
+      const watchDef = definition.watchDef || {}
       if (!this.data) {
         this.data = {}
       }
@@ -116,7 +114,7 @@ exports.behavior = Behavior({
           this._computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValues
           return true
         }
-        computedUpdaters.push(updateValueAndRelatedPaths)
+        this.__computedUpdaters__.push(updateValueAndRelatedPaths)
       })
 
 
@@ -145,9 +143,13 @@ exports.behavior = Behavior({
   },
 
   definitionFilter(defFields) {
-    definition = defFields
-    const computedDef = definition.computed || {}
-    const watchDef = definition.watch || {}
+    const computedDef = defFields.computed || {}
+    const watchDef = defFields.watch || {}
+    const observersItems = []
+    defFields.methods.__definition__ = () => ({
+      computedDef: defFields.computed,
+      watchDef: defFields.watch,
+    })
     if (computedDef) {
       observersItems.push({
         fields: '**',
@@ -157,7 +159,7 @@ exports.behavior = Behavior({
           do {
             changed = false
             // eslint-disable-next-line no-loop-func
-            computedUpdaters.forEach((func) => {
+            this.__computedUpdaters__.forEach((func) => {
               if (func.call(this)) changed = true
             })
           } while (changed)
