@@ -4,8 +4,6 @@ const wrapData = (data, relatedPathValues, basePath) => {
     return {}
   }
 
-  // const isArray = data instanceof Array
-
   const handler = {
     get(obj, key) {
       if (key === '__rawObject__') return data

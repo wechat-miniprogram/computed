@@ -1,15 +1,6 @@
 {
-  "name": "minicode-test-1563370215268",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "dependencies": {
-    "miniprogram-computed": "^2.1.1"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+	"dependencies": {
+		"fast-deep-equal": "^2.0.1",
+		"rfdc": "^1.1.4"
+	}
 }

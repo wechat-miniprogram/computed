@@ -13,3 +13,9 @@
 ## 2.1.0
 
 * 支持 watch 的 `.**` 语法
+
+## 3.0.0
+
+* 修复 computed 中使用自定义 behavior 数据段时，初始化视图的 computed data 不渲染的问题。
+* 支持 mobx-miniprogram 扩展库。
+* 更新 computed  数据追踪方式。

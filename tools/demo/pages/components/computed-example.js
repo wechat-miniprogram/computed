@@ -1,21 +1,35 @@
 const computedBehavior = require('../../components/index')
-
+import { storeBindingsBehavior } from 'mobx-miniprogram-bindings'
+import { store } from './store'
+const behaviorTest = require('./behavior')
 Component({
-  behaviors: [computedBehavior],
+  behaviors: [behaviorTest, storeBindingsBehavior, computedBehavior],
   data: {
     a: 1,
     b: 1,
   },
+  storeBindings: {
+    store,
+    fields: {
+      numA: (store) => store.numA,
+      numB: (store) => store.numB,
+    },
+    actions: {
+      buttonTap: 'update'
+    },
+  },
   computed: {
-    sum: function (data) {
-      return data.a + data.b
+    sum(data) {
+      return data.numA + data.numB + data.a + data.b + data.behaviorTestData
     },
   },
   methods: {
     onTap() {
+      this.buttonTap()
       this.setData({
-        a: this.data.b,
-        b: this.data.a + this.data.b,
+        a: this.data.a + 1,
+        b: this.data.b + 1,
+        behaviorTestData: this.data.behaviorTestData + 1,
       })
     }
   }
