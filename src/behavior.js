@@ -16,23 +16,6 @@ const getDataOnPath = function (data, path) {
   return ret
 }
 
-const setDataOnPath = function (data, path, value) {
-  let cur = data
-  let index = 0
-  while (index < path.length - 1) {
-    const s = path[index++]
-    if (typeof s === 'number') {
-      if (!(cur[s] instanceof Array)) {
-        cur[s] = []
-      }
-    } else if (typeof cur[s] !== 'object' || cur[s] === null) {
-      cur[s] = {}
-    }
-    cur = cur[s]
-  }
-  cur[path[index]] = value
-}
-
 const getDataDefinition = function (data, properties) {
   const ret = {}
   Object.keys(data).forEach((key) => {
@@ -62,38 +45,21 @@ const getDataDefinition = function (data, properties) {
 exports.behavior = Behavior({
   lifetimes: {
     attached() {
-      this.setData(this.data)
-    },
-    created() {
-      const {__definition__} = this
-      this.__computedUpdaters__ = []
-      const definition = __definition__()
-      const computedDef = definition.computedDef || {}
-      const watchDef = definition.watchDef || {}
-      if (!this.data) {
-        this.data = {}
-      }
-      // initialize status, executed on created
-      const initFuncs = []
-      if (this._initComputedWatchInfo) {
-        throw new Error('Please do not use this behavior more than once in a single component')
-      }
+      const {_computedWatchDefinition} = this
+      const computedDef = _computedWatchDefinition().computedDef || {}
 
       // handling computed
+      const setDataObj = {}
       Object.keys(computedDef).forEach((targetField) => {
-        const {path: targetPath} = dataPath.parseSingleDataPath(targetField)
         const updateMethod = computedDef[targetField]
         const relatedPathValuesOnDef = []
-        const initData = getDataDefinition(this.data, definition.properties)
-        const val = updateMethod(dataTracer.create(initData, relatedPathValuesOnDef))
-        setDataOnPath(this.data, targetPath, dataTracer.unwrap(val))
-        initFuncs.push(function () {
-          const pathValues = relatedPathValuesOnDef.map(({path}) => ({
-            path,
-            value: getDataOnPath(this.data, path)
-          }))
-          this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
-        })
+        const val = updateMethod(dataTracer.create(this.data, relatedPathValuesOnDef))
+        const pathValues = relatedPathValuesOnDef.map(({path}) => ({
+          path,
+          value: getDataOnPath(this.data, path)
+        }))
+        setDataObj[targetField] = val
+        this._computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
         const updateValueAndRelatedPaths = function () {
           const oldPathValues = this._computedWatchInfo.computedRelatedPathValues[targetField]
           let needUpdate = false
@@ -117,6 +83,18 @@ exports.behavior = Behavior({
         this.__computedUpdaters__.push(updateValueAndRelatedPaths)
       })
 
+      this.setData(setDataObj)
+    },
+
+    created() {
+      const {_computedWatchDefinition} = this
+      const watchDef = _computedWatchDefinition().watchDef || {}
+      // initialize status, executed on created
+      const initFuncs = []
+      if (this._initComputedWatchInfo) {
+        throw new Error('Please do not use this behavior more than once in a single component')
+      }
+      this.__computedUpdaters__ = []
 
       // handling watch
       Object.keys(watchDef).forEach((watchPath) => {
@@ -146,7 +124,8 @@ exports.behavior = Behavior({
     const computedDef = defFields.computed || {}
     const watchDef = defFields.watch || {}
     const observersItems = []
-    defFields.methods.__definition__ = () => ({
+    if (!defFields.methods) defFields.methods = {}
+    defFields.methods._computedWatchDefinition = () => ({
       computedDef: defFields.computed,
       watchDef: defFields.watch,
     })

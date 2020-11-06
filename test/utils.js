@@ -1,5 +1,6 @@
 const path = require('path')
 const simulate = require('miniprogram-simulate')
+const exparser = require('miniprogram-exparser')
 
 const config = require('../tools/config')
 
@@ -10,6 +11,7 @@ simulate.load = function (componentPath, ...args) {
   return oldLoad(componentPath, ...args)
 }
 
+simulate.exparser = exparser
 module.exports = simulate
 
 // adjust the simulated wx api
