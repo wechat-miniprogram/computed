@@ -552,3 +552,25 @@ test('computed behavior lifetimes', () => {
   expect(_.match(component.dom, '<wx-view>1+10=11</wx-view>')).toBe(true)
 })
 
+test('computed with wildcard observers', () => {
+  const componentId = _.load({
+    template: '<view>{{c}}</view>',
+    behaviors: [computedBehavior],
+    data: {
+      a: 1
+    },
+    computed: {
+      b(data) {
+        return data.a
+      },
+    },
+    observers: {
+      '**': function () {
+        if (!this.data.c) this.setData({c: 2})
+      }
+    }
+  })
+  const component = _.render(componentId)
+  component.triggerLifeTime('attached')
+  expect(_.match(component.dom, '<wx-view>2</wx-view>')).toBe(true)
+})

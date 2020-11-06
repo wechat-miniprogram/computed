@@ -157,7 +157,15 @@ exports.behavior = Behavior({
       defFields.observers.push(...observersItems)
     } else {
       observersItems.forEach((item) => {
-        defFields.observers[item.fields] = item.observer
+        const f = defFields.observers[item.fields]
+        if (!f) {
+          defFields.observers[item.fields] = item.observer
+        } else {
+          defFields.observers[item.fields] = function () {
+            item.observer.call(this)
+            f.call(this)
+          }
+        }
       })
     }
   },
