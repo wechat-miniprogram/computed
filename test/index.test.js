@@ -270,7 +270,7 @@ test('computed property changes', () => {
     computed: {
       c(data) {
         funcTriggeringCount++
-        return data.a + data.b
+        return data.a + Number(data.b)
       }
     },
   })

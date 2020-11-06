@@ -1,15 +1,12 @@
 const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== 'object' || data === null) return data
-  if ('__wxValue__' in data) {
-    return {}
-  }
 
   const handler = {
     get(obj, key) {
       if (key === '__rawObject__') return data
       let keyWrapper = null
       const keyPath = basePath.concat(key)
-      const value = data[key] === undefined ? {__wxValue__: undefined} : data[key]
+      const value = data[key]
       relatedPathValues.push({
         path: keyPath,
         value,
