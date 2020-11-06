@@ -3,42 +3,12 @@ const deepEqual = require('fast-deep-equal')
 const dataPath = require('./data-path')
 const dataTracer = require('./data-tracer')
 
-const TYPES = [String, Number, Boolean, Object, Array, null]
-const TYPE_DEFAULT_VALUES = ['', 0, false, null, [], null]
-
-
 const getDataOnPath = function (data, path) {
   let ret = data
   path.forEach((s) => {
     if (typeof ret !== 'object' || ret === null) ret = undefined
     else ret = ret[s]
   })
-  return ret
-}
-
-const getDataDefinition = function (data, properties) {
-  const ret = {}
-  Object.keys(data).forEach((key) => {
-    ret[key] = data[key]
-  })
-  if (properties) {
-    Object.keys(properties).forEach((key) => {
-      let value = null
-      const def = properties[key]
-      const typeIndex = TYPES.indexOf(def)
-      if (typeIndex >= 0) {
-        value = TYPE_DEFAULT_VALUES[typeIndex]
-      } else if (def.value) {
-        value = def.value
-      } else {
-        const typeIndex = TYPES.indexOf(def.type)
-        if (typeIndex >= 0) {
-          value = TYPE_DEFAULT_VALUES[typeIndex]
-        }
-      }
-      ret[key] = value
-    })
-  }
   return ret
 }
 

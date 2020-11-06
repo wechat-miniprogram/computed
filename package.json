@@ -53,7 +53,7 @@
 		"gulp-rename": "^1.4.0",
 		"gulp-sourcemaps": "^2.6.5",
 		"jest": "^23.5.0",
-		"miniprogram-simulate": "^1.0.7",
+		"miniprogram-simulate": "^1.2.8",
 		"through2": "^2.0.3",
 		"vinyl": "^2.2.0",
 		"webpack": "^4.29.5",
