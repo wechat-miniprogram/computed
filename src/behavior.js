@@ -106,11 +106,7 @@ exports.behavior = Behavior({
           if (!this._computedWatchInfo) return
           let changed
           do {
-            changed = false
-            // eslint-disable-next-line no-loop-func
-            this.__computedUpdaters__.forEach((func) => {
-              if (func.call(this)) changed = true
-            })
+            changed = this.__computedUpdaters__.some(func => func.call(this))
           } while (changed)
         }
       })
