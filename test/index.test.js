@@ -1,7 +1,8 @@
-
 const _ = require('./utils')
 const computedBehavior = require('../src/index')
 const behaviorA = require('./tools/behaviorA')
+const behaviorWithComputed = require('./tools/behaviorWithComputed')
+const behaviorWithWatch = require('./tools/behaviorWithWatch')
 
 test('watch basics', () => {
   let funcTriggeringCount = 0
@@ -573,4 +574,42 @@ test('computed with wildcard observers', () => {
   const component = _.render(componentId)
   component.triggerLifeTime('attached')
   expect(_.match(component.dom, '<wx-view>2</wx-view>')).toBe(true)
+})
+
+test.skip('behavior with computed data', () => {
+  const componentId = _.load({
+    template: '<view>{{a}}+{{b}}={{c}}={{d}}</view>',
+    behaviors: [computedBehavior, behaviorWithComputed],
+    data: {
+      a: 1
+    },
+    computed: {
+      c(data) {
+        return data.a + data.b
+      }
+    }
+  })
+  const component = _.render(componentId)
+  component.triggerLifeTime('attached')
+  expect(_.match(component.dom, '<wx-view>1+3=4=4</wx-view>')).toBe(true)
+})
+
+test.skip('behavior with watch', () => {
+  const componentId = _.load({
+    template: '<view>{{a}}={{b}}={{c}}</view>',
+    behaviors: [computedBehavior, behaviorWithWatch],
+    data: {
+      a: 0,
+    },
+    watch: {
+      'a': function (a) {
+        this.setData({ b: a })
+      }
+    },
+  })
+  const component = _.render(componentId)
+  expect(_.match(component.dom, '<wx-view>0=0=0</wx-view>')).toBe(true)
+
+  component.setData({a: 1})
+  expect(_.match(component.dom, '<wx-view>1=1=1</wx-view>')).toBe(true)
 })

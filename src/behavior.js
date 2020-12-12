@@ -3,6 +3,7 @@ const deepEqual = require('fast-deep-equal')
 const dataPath = require('./data-path')
 const dataTracer = require('./data-tracer')
 
+const behaviorComputedWatchDefs = {}
 const getDataOnPath = function (data, path) {
   let ret = data
   path.forEach((s) => {
@@ -93,12 +94,25 @@ exports.behavior = Behavior({
   definitionFilter(defFields) {
     const computedDef = defFields.computed || {}
     const watchDef = defFields.watch || {}
+    if (defFields.is) {
+      behaviorComputedWatchDefs[defFields.is] = {
+        computedDef,
+        watchDef,
+      }
+    }
     const observersItems = []
     if (!defFields.methods) defFields.methods = {}
-    defFields.methods._computedWatchDefinition = () => ({
-      computedDef: defFields.computed,
-      watchDef: defFields.watch,
-    })
+    defFields.methods._computedWatchDefinition = () => (defFields.behaviors || [])
+      .reduce(({computedDef, watchDef}, behaviorId) => {
+        const dependedComputedWatchDefinition = behaviorComputedWatchDefs[behaviorId] || {}
+        return {
+          computedDef: Object.assign(dependedComputedWatchDefinition.computedDef || {}, computedDef),
+          watchDef: Object.assign(dependedComputedWatchDefinition.watchDef || {}, watchDef),
+        }
+      }, {
+        computedDef,
+        watchDef,
+      })
     if (computedDef) {
       observersItems.push({
         fields: '**',
