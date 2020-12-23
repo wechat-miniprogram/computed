@@ -1,0 +1,1 @@
+export { behavior as default } from './behavior'
