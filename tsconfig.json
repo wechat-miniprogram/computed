@@ -8,6 +8,7 @@
         "lib": ["ES6", "ES7", "dom"],
         "preserveConstEnums": true,
         "sourceMap": true,
+        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true
     },
     "include": ["src/**/*.ts"]
