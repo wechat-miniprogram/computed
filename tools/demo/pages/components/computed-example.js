@@ -1,4 +1,4 @@
-const computedBehavior = require('../../components/index')
+import computedBehavior from '../../components/index'
 import { storeBindingsBehavior } from 'mobx-miniprogram-bindings'
 import { store } from './store'
 const behaviorTest = require('./behavior')
