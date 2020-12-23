@@ -117,7 +117,35 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
+### Typescript支持
+由于通过behavior的方式引入不能获得类型支持, 因此为了获得类型的支持, 可以使用一个辅助组件构造器:
+```ts
+import { ComputedComponent } from 'miniprogram-computed'
 
+ComputedComponent({
+    data: {
+    a: 1,
+    b: 1,
+    sum: 2,
+  },
+  watch: {
+    'a, b': function(a, b) {
+      this.setData({
+        sum: a + b
+      })
+    },
+  },
+  computed: {
+    sum(data) {
+      // 注意： computed 函数中不能访问 this ，只有 data 对象可供访问
+      // 这个函数的返回值会被设置到 this.data.sum 字段中
+      return data.a + data.b + data.sum // data.c 为自定义 behavior 数据段
+    },
+  }
+})
+```
+当使用该构造器的时候, 编译器可以给`computed`和`watch`提供自动提示和类型支持.
+**注意: 当使用该构造器的时候, 无需手动加入 `computedBehavior`, 该构造器会自动引入该behavior**
 
 ## ^3.0.0 与 ^1.0.0、 ^2.0.0 版本的差异
 
