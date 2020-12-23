@@ -37,7 +37,7 @@ module.exports = {
     externals: [nodeExternals()], // 忽略 node_modules
     module: {
       rules: [{
-        test: /\.js$/i,
+        test: /\.ts$/i,
         use: [
           'babel-loader',
           'eslint-loader'
@@ -47,7 +47,7 @@ module.exports = {
     },
     resolve: {
       modules: [src, 'node_modules'],
-      extensions: ['.js', '.json'],
+      extensions: ['.ts', '.json'],
     },
     plugins: [
       new webpack.DefinePlugin({}),

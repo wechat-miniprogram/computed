@@ -27,7 +27,7 @@ async function checkIncludedComponents(jsonPath, componentListMap) {
   const json = _.readJson(jsonPath)
   if (!json) throw new Error(`json is not valid: "${jsonPath}"`)
 
-  const {dirPath, fileName, fileBase} = getJsonPathInfo(jsonPath)
+  const { dirPath, fileName, fileBase } = getJsonPathInfo(jsonPath)
 
   for (let i = 0, len = checkProps.length; i < len; i++) {
     const checkProp = checkProps[i]
@@ -57,6 +57,7 @@ async function checkIncludedComponents(jsonPath, componentListMap) {
   componentListMap.wxssFileList.push(`${fileBase}.wxss`)
   componentListMap.jsonFileList.push(`${fileBase}.json`)
   componentListMap.jsFileList.push(`${fileBase}.js`)
+  componentListMap.tsFileList.push(`${fileBase}.ts`)
 
   componentListMap.jsFileMap[fileBase] = `${path.join(dirPath, fileName)}.js`
 }
@@ -67,17 +68,17 @@ module.exports = async function (entry) {
     wxssFileList: [],
     jsonFileList: [],
     jsFileList: [],
+    tsFileList: [],
 
     jsFileMap: {}, // 为 webpack entry 所用
   }
-
   const isExists = await _.checkFileExists(entry)
   if (!isExists) {
-    const {dirPath, fileName, fileBase} = getJsonPathInfo(entry)
-
-    componentListMap.jsFileList.push(`${fileBase}.js`)
-    componentListMap.jsFileMap[fileBase] = `${path.join(dirPath, fileName)}.js`
-
+    const { dirPath, fileName, fileBase } = getJsonPathInfo(entry)
+    
+    componentListMap.tsFileList.push(`${fileBase}.ts`)
+    // componentListMap.tsFileMap[fileBase] = `${path.join(dirPath, fileName)}.ts`
+    
     return componentListMap
   }
 

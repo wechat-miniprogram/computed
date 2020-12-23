@@ -24,12 +24,12 @@ const distPath = config.distPath
 function wxss(wxssFileList) {
   if (!wxssFileList.length) return false
 
-  return gulp.src(wxssFileList, {cwd: srcPath, base: srcPath})
+  return gulp.src(wxssFileList, { cwd: srcPath, base: srcPath })
     .pipe(checkWxss.start()) // 开始处理 import
     .pipe(gulpif(wxssConfig.less && wxssConfig.sourcemap, sourcemaps.init()))
-    .pipe(gulpif(wxssConfig.less, less({paths: [srcPath]})))
+    .pipe(gulpif(wxssConfig.less, less({ paths: [srcPath] })))
     .pipe(checkWxss.end()) // 结束处理 import
-    .pipe(rename({extname: '.wxss'}))
+    .pipe(rename({ extname: '.wxss' }))
     .pipe(gulpif(wxssConfig.less && wxssConfig.sourcemap, sourcemaps.write('./')))
     .pipe(_.logger(wxssConfig.less ? 'generate' : undefined))
     .pipe(gulp.dest(distPath))
@@ -76,6 +76,47 @@ function js(jsFileMap, scope) {
     webpack(webpackConfig).run(webpackCallback)
   }
 }
+/**
+ * 获取 ts 流
+ */
+function ts(tsFileMap, scope) {
+  const webpackConfig = config.webpack
+  const webpackCallback = (err, stats) => {
+    if (!err) {
+      // eslint-disable-next-line no-console
+      console.log(stats.toString({
+        assets: true,
+        cached: false,
+        colors: true,
+        children: false,
+        errors: true,
+        warnings: true,
+        version: true,
+        modules: false,
+        publicPath: true,
+      }))
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(err)
+    }
+  }
+
+  webpackConfig.entry = tsFileMap
+  webpackConfig.output.path = distPath
+  // console.log('=======log tsFileMap', tsFileMap, distPath)
+  if (scope.webpackWatcherTS) {
+    scope.webpackWatcherTS.close()
+    scope.webpackWatcherTS = null
+  }
+
+  if (config.isWatch) {
+    scope.webpackWatcherTS = webpack(webpackConfig).watch({
+      ignored: /node_modules/,
+    }, webpackCallback)
+  } else {
+    webpack(webpackConfig).run(webpackCallback)
+  }
+}
 
 /**
  * 拷贝文件
@@ -83,7 +124,7 @@ function js(jsFileMap, scope) {
 function copy(copyFileList) {
   if (!copyFileList.length) return false
 
-  return gulp.src(copyFileList, {cwd: srcPath, base: srcPath})
+  return gulp.src(copyFileList, { cwd: srcPath, base: srcPath })
     .pipe(_.logger())
     .pipe(gulp.dest(distPath))
 }
@@ -98,13 +139,13 @@ function install() {
     const packageJson = _.readJson(path.resolve(__dirname, '../package.json'))
     const dependencies = packageJson.dependencies || {}
 
-    await _.writeFile(demoPackageJsonPath, JSON.stringify({dependencies}, null, '\t')) // write dev demo's package.json
+    await _.writeFile(demoPackageJsonPath, JSON.stringify({ dependencies }, null, '\t')) // write dev demo's package.json
   }, () => {
     const demoDist = config.demoDist
     const demoPackageJsonPath = path.join(demoDist, 'package.json')
 
     return gulp.src(demoPackageJsonPath)
-      .pipe(gulpInstall({production: true}))
+      .pipe(gulpInstall({ production: true }))
   })
 }
 
@@ -127,7 +168,7 @@ class BuildTask {
     /**
      * 清空目标目录
      */
-    gulp.task(`${id}-clean-dist`, () => gulp.src(distPath, {read: false, allowEmpty: true}).pipe(clean()))
+    gulp.task(`${id}-clean-dist`, () => gulp.src(distPath, { read: false, allowEmpty: true }).pipe(clean()))
 
     /**
      * 拷贝 demo 到目标目录
@@ -142,7 +183,7 @@ class BuildTask {
         const demoSrc = config.demoSrc
         const demoDist = config.demoDist
 
-        return gulp.src('**/*', {cwd: demoSrc, base: demoSrc})
+        return gulp.src('**/*', { cwd: demoSrc, base: demoSrc })
           .pipe(gulp.dest(demoDist))
       }
 
@@ -230,6 +271,20 @@ class BuildTask {
 
       return done()
     })
+    /**
+   * 生成 ts 文件到目标目录
+   */
+    gulp.task(`${id}-component-ts`, done => {
+      const tsFileList = this.componentListMap.tsFileList
+
+      if (tsFileList &&
+        tsFileList.length &&
+        !_.compareArray(this.cachedComponentListMap.tsFileList, tsFileList)) {
+        ts(this.componentListMap.tsFileList, this)
+      }
+
+      return done()
+    })
 
     /**
      * 拷贝相关资源到目标目录
@@ -253,14 +308,14 @@ class BuildTask {
     /**
      * 监听 json 变化
      */
-    gulp.task(`${id}-watch-json`, () => gulp.watch(this.componentListMap.jsonFileList, {cwd: srcPath, base: srcPath}, gulp.series(`${id}-component-check`, gulp.parallel(`${id}-component-wxml`, `${id}-component-wxss`, `${id}-component-js`, `${id}-component-json`))))
+    gulp.task(`${id}-watch-json`, () => gulp.watch(this.componentListMap.jsonFileList, { cwd: srcPath, base: srcPath }, gulp.series(`${id}-component-check`, gulp.parallel(`${id}-component-wxml`, `${id}-component-wxss`, `${id}-component-js`, `${id}-component-json`))))
 
     /**
      * 监听 wxml 变化
      */
     gulp.task(`${id}-watch-wxml`, () => {
       this.cachedComponentListMap.wxmlFileList = null
-      return gulp.watch(this.componentListMap.wxmlFileList, {cwd: srcPath, base: srcPath}, gulp.series(`${id}-component-wxml`))
+      return gulp.watch(this.componentListMap.wxmlFileList, { cwd: srcPath, base: srcPath }, gulp.series(`${id}-component-wxml`))
     })
 
     /**
@@ -268,7 +323,15 @@ class BuildTask {
      */
     gulp.task(`${id}-watch-wxss`, () => {
       this.cachedComponentListMap.wxssFileList = null
-      return gulp.watch('**/*.wxss', {cwd: srcPath, base: srcPath}, gulp.series(`${id}-component-wxss`))
+      return gulp.watch('**/*.wxss', { cwd: srcPath, base: srcPath }, gulp.series(`${id}-component-wxss`))
+    })
+
+    /**
+     * 监听 ts 变化
+     */
+    gulp.task(`${id}-watch-ts`, () => {
+      this.cachedComponentListMap.tsFileList = null
+      return gulp.watch('**/*.ts', { cwd: srcPath, base: srcPath }, gulp.series(`${id}-component-ts`))
     })
 
     /**
@@ -279,7 +342,7 @@ class BuildTask {
       const copyFileList = copyList.map(dir => path.join(dir, '**/*'))
       const watchCallback = filePath => copy([filePath])
 
-      return gulp.watch(copyFileList, {cwd: srcPath, base: srcPath})
+      return gulp.watch(copyFileList, { cwd: srcPath, base: srcPath })
         .on('change', watchCallback)
         .on('add', watchCallback)
         .on('unlink', watchCallback)
@@ -291,10 +354,10 @@ class BuildTask {
     gulp.task(`${id}-watch-demo`, () => {
       const demoSrc = config.demoSrc
       const demoDist = config.demoDist
-      const watchCallback = filePath => gulp.src(filePath, {cwd: demoSrc, base: demoSrc})
+      const watchCallback = filePath => gulp.src(filePath, { cwd: demoSrc, base: demoSrc })
         .pipe(gulp.dest(demoDist))
 
-      return gulp.watch('**/*', {cwd: demoSrc, base: demoSrc})
+      return gulp.watch('**/*', { cwd: demoSrc, base: demoSrc })
         .on('change', watchCallback)
         .on('add', watchCallback)
         .on('unlink', watchCallback)
@@ -308,9 +371,9 @@ class BuildTask {
     /**
      * 构建相关任务
      */
-    gulp.task(`${id}-build`, gulp.series(`${id}-clean-dist`, `${id}-component-check`, gulp.parallel(`${id}-component-wxml`, `${id}-component-wxss`, `${id}-component-js`, `${id}-component-json`, `${id}-copy`)))
+    gulp.task(`${id}-build`, gulp.series(`${id}-clean-dist`, `${id}-component-check`, gulp.parallel(`${id}-component-wxml`, `${id}-component-wxss`, `${id}-component-ts`, `${id}-component-json`, `${id}-copy`)))
 
-    gulp.task(`${id}-watch`, gulp.series(`${id}-build`, `${id}-demo`, `${id}-install`, gulp.parallel(`${id}-watch-wxml`, `${id}-watch-wxss`, `${id}-watch-json`, `${id}-watch-copy`, `${id}-watch-install`, `${id}-watch-demo`)))
+    gulp.task(`${id}-watch`, gulp.series(`${id}-build`, `${id}-demo`, `${id}-install`, gulp.parallel(`${id}-watch-wxml`, `${id}-watch-wxss`, `${id}-watch-json`, `${id}-watch-copy`, `${id}-watch-install`, `${id}-watch-demo`, `${id}-watch-ts`)))
 
     gulp.task(`${id}-dev`, gulp.series(`${id}-build`, `${id}-demo`, `${id}-install`))
 
