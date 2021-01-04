@@ -1,7 +1,7 @@
 import path from "path";
 import simulate from "miniprogram-simulate";
 import exparser from "miniprogram-exparser";
-import { ComputedComponent } from "../src/type";
+import { ComputedComponent } from "../src/index";
 
 const oldLoad = simulate.load;
 
@@ -14,12 +14,3 @@ export default {
   } as typeof ComputedComponent,
   exparser,
 };
-
-// // adjust the simulated wx api
-// const oldGetSystemInfoSync = global.wx.getSystemInfoSync
-// global.wx.getSystemInfoSync = function () {
-//   const res = oldGetSystemInfoSync()
-//   res.SDKVersion = '2.4.1'
-
-//   return res
-// }

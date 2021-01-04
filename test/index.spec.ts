@@ -361,28 +361,28 @@ describe("computed behavior", () => {
       true
     );
     expect(func1TriggeringCount).toBe(1);
-    expect(func2TriggeringCount).toBe(1);
+    expect(func2TriggeringCount).toBe(2);
 
     component.setData({ a: 10 });
     expect(
       _.match(component.dom!, "<wx-view>10+2=12, 10+12=22</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(2);
-    expect(func2TriggeringCount).toBe(2);
+    expect(func2TriggeringCount).toBe(3);
 
     component.setData({ b: 20 });
     expect(
       _.match(component.dom!, "<wx-view>10+20=30, 10+30=40</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(3);
-    expect(func2TriggeringCount).toBe(3);
+    expect(func2TriggeringCount).toBe(4);
 
     component.setData({ a: 100, b: 200 });
     expect(
       _.match(component.dom!, "<wx-view>100+200=300, 100+300=400</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(4);
-    expect(func2TriggeringCount).toBe(4);
+    expect(func2TriggeringCount).toBe(5);
   });
 
   test("computed conditions", () => {

@@ -28,18 +28,12 @@ export const behavior = Behavior({
   lifetimes: {
     attached(this: BehaviorExtend) {
       const { computedDef = {} } = this.__definition__();
-      if (!this.data) {
-        this.data = {};
-      }
-      // const setDataObj = {}
 
       // handling computed
-      // 1. push to initFuncs
-      // 2. push to computedUpdaters
+      const setDataObj = {};
       Object.keys(computedDef).forEach((targetField) => {
         const updateMethod = computedDef[targetField];
         const relatedPathValuesOnDef = [];
-        // const initData = { ...this.data }
         const val = updateMethod(
           dataTracer.create(this.data, relatedPathValuesOnDef)
         );
@@ -49,10 +43,7 @@ export const behavior = Behavior({
           value: dataPath.getDataOnPath(this.data, path),
         }));
 
-        this.data[targetField] = val;
-
-        // const { path: targetPath } = dataPath.parseSingleDataPath(targetField)
-        // dataPath.setDataOnPath(this.data, targetPath, dataTracer.unwrap(val))
+        setDataObj[targetField] = val;
         this._computedWatchInfo.computedRelatedPathValues[
           targetField
         ] = pathValues;
@@ -88,7 +79,7 @@ export const behavior = Behavior({
         this.__computedUpdaters__.push(updateValueAndRelatedPaths);
       });
 
-      this.setData(this.data);
+      this.setData(setDataObj);
     },
     created(this: BehaviorExtend) {
       const { watchDef = {} } = this.__definition__();
