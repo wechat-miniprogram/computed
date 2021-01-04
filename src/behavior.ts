@@ -93,7 +93,6 @@ export const behavior = Behavior({
       this.__computedUpdaters__ = [];
 
       // handling watch
-      // 1. push to initFuncs
       Object.keys(watchDef).forEach((watchPath) => {
         const paths = dataPath.parseMultiDataPaths(watchPath);
         // record the original value of watch targets
@@ -154,9 +153,6 @@ export const behavior = Behavior({
             // get curVal
             const originalCurValWithOptions = paths.map(({ path, options }) => {
               const val = dataPath.getDataOnPath(this.data, path);
-              // if (path.includes('categories')) {
-              //     console.log(path, ', val:', val, ', ', JSON.stringify(this.data))
-              // }
               return { val, options };
             });
             const curVal = originalCurValWithOptions.map(({ val, options }) =>
@@ -196,7 +192,6 @@ export const behavior = Behavior({
       defFields.observers = {};
     }
     observersItems.forEach((item) => {
-      // defFields.observers[item.fields] = item.observer
       const f = defFields.observers[item.fields];
       if (!f) {
         defFields.observers[item.fields] = item.observer;

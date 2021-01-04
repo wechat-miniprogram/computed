@@ -108,16 +108,6 @@ const parseEOF = function (path, state) {
   if (state.index < state.length) throwParsingError(path, state.index);
 };
 
-// export function parseSingleDataPath(path: string) {
-//     const state = {
-//         length: path.length,
-//         index: 0
-//     }
-//     const ret = parseSinglePath(path, state)
-//     parseEOF(path, state)
-//     return ret
-// }
-
 export function parseMultiDataPaths(path: string) {
   const state = {
     length: path.length,
@@ -136,20 +126,3 @@ export const getDataOnPath = function (data, path) {
   });
   return ret;
 };
-
-// export const setDataOnPath = function (data, path, value) {
-//     let cur = data
-//     let index = 0
-//     while (index < path.length - 1) {
-//         const s = path[index++]
-//         if (typeof s === 'number') {
-//             if (!(cur[s] instanceof Array)) {
-//                 cur[s] = []
-//             }
-//         } else if (typeof cur[s] !== 'object' || cur[s] === null) {
-//             cur[s] = {}
-//         }
-//         cur = cur[s]
-//     }
-//     cur[path[index]] = value
-// }
