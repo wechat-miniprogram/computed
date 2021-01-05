@@ -21,12 +21,12 @@ export const behavior = Behavior({
   lifetimes: {
     attached(this: BehaviorExtend) {
       this.setData({
-        _computedWatchInit: 'attached',
+        _computedWatchInit: "attached",
       });
     },
     created(this: BehaviorExtend) {
       this.setData({
-        _computedWatchInit: 'created',
+        _computedWatchInit: "created",
       });
     },
   },
@@ -40,8 +40,8 @@ export const behavior = Behavior({
     observersItems.push({
       fields: "_computedWatchInit",
       observer(this: BehaviorExtend) {
-        const status = this.data._computedWatchInit
-        if (status === 'created') {
+        const status = this.data._computedWatchInit;
+        if (status === "created") {
           // init data fields
           computedWatchInfo = {
             computedUpdaters: [],
@@ -61,7 +61,7 @@ export const behavior = Behavior({
               computedWatchInfo.watchCurVal[watchPath] = curVal;
             });
           }
-        } else if (status === 'attached') {
+        } else if (status === "attached") {
           // handling computed
           // 1. push to initFuncs
           // 2. push to computedUpdaters
@@ -90,8 +90,8 @@ export const behavior = Behavior({
 
               // will be invoked when setData is called
               const updateValueAndRelatedPaths = () => {
-                const oldPathValues = computedWatchInfo
-                  .computedRelatedPathValues[targetField];
+                const oldPathValues =
+                  computedWatchInfo.computedRelatedPathValues[targetField];
                 let needUpdate = false;
                 // check whether its dependency updated
                 for (let i = 0; i < oldPathValues.length; i++) {
@@ -116,12 +116,14 @@ export const behavior = Behavior({
                 ] = relatedPathValues;
                 return true;
               };
-              computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths);
+              computedWatchInfo.computedUpdaters.push(
+                updateValueAndRelatedPaths
+              );
             });
           }
         }
       },
-    })
+    });
 
     if (computedDef) {
       observersItems.push({
@@ -131,7 +133,9 @@ export const behavior = Behavior({
 
           let changed: boolean;
           do {
-            changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this));
+            changed = computedWatchInfo.computedUpdaters.some((func) =>
+              func.call(this)
+            );
           } while (changed);
         },
       });
@@ -187,7 +191,7 @@ export const behavior = Behavior({
       defFields.observers = {};
     }
     if (Array.isArray(defFields.observers)) {
-      defFields.observers.push(...observersItems)
+      defFields.observers.push(...observersItems);
     } else {
       observersItems.forEach((item) => {
         // defFields.observers[item.fields] = item.observer
