@@ -1,4 +1,5 @@
 import _ from "./utils";
+import { BehaviorWithComputed } from "../src";
 import computedBehavior from "../src";
 
 const behaviorA = Behavior({
@@ -361,28 +362,28 @@ describe("computed behavior", () => {
       true
     );
     expect(func1TriggeringCount).toBe(1);
-    expect(func2TriggeringCount).toBe(2);
+    expect(func2TriggeringCount).toBe(1);
 
     component.setData({ a: 10 });
     expect(
       _.match(component.dom!, "<wx-view>10+2=12, 10+12=22</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(2);
-    expect(func2TriggeringCount).toBe(3);
+    expect(func2TriggeringCount).toBe(2);
 
     component.setData({ b: 20 });
     expect(
       _.match(component.dom!, "<wx-view>10+20=30, 10+30=40</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(3);
-    expect(func2TriggeringCount).toBe(4);
+    expect(func2TriggeringCount).toBe(3);
 
     component.setData({ a: 100, b: 200 });
     expect(
       _.match(component.dom!, "<wx-view>100+200=300, 100+300=400</wx-view>")
     ).toBe(true);
     expect(func1TriggeringCount).toBe(4);
-    expect(func2TriggeringCount).toBe(5);
+    expect(func2TriggeringCount).toBe(4);
   });
 
   test("computed conditions", () => {
@@ -646,5 +647,133 @@ describe("computed behavior", () => {
     const component = _.render(componentId);
     component.triggerLifeTime("attached");
     expect(_.match(component.dom!, "<wx-view>2</wx-view>")).toBe(true);
+  });
+
+  test("multiple usage in a single component", () => {
+    let a1TriggerCount = 0;
+    let a2TriggerCount = 0;
+    let b1TriggerCount = 0;
+    let b2TriggerCount = 0;
+    let c1TriggerCount = 0;
+    let c2TriggerCount = 0;
+    const behA = BehaviorWithComputed({
+      data: {
+        a1: 1
+      },
+      computed: {
+        a2(data) {
+          a2TriggerCount += 1;
+          return data.a1 * 2;
+        }
+      },
+      watch: {
+        a1() {
+          a1TriggerCount += 1;
+        }
+      },
+      attached() {
+        this.setData({
+          a1: 3,
+        })
+      },
+    });
+    const behB = BehaviorWithComputed({
+      behaviors: [behA],
+      data: {
+        b1: 10,
+      },
+      computed: {
+        b2(data) {
+          b2TriggerCount += 1;
+          return data.a2 + data.b1 * 2;
+        }
+      },
+      watch: {
+        b1() {
+          b1TriggerCount += 1;
+        }
+      },
+      attached() {
+        this.setData({
+          b1: 30,
+        })
+      },
+    });
+    const componentId = _.load({
+      template: "<view>{{a2}} {{b2}} {{c2}}</view>",
+      behaviors: [behB, computedBehavior],
+      data: {
+        c1: 100,
+      },
+      computed: {
+        c2(data) {
+          c2TriggerCount += 1;
+          return data.b2 + data.c1 * 2;
+        }
+      },
+      watch: {
+        c1() {
+          c1TriggerCount += 1;
+        }
+      },
+      attached() {
+        this.setData({
+          c1: 300,
+        })
+      },
+    });
+    const component = _.render(componentId);
+    component.triggerLifeTime("attached");
+    expect(_.match(component.dom!, "<wx-view>6 66 666</wx-view>")).toBe(true);
+    expect(a1TriggerCount).toBe(1);
+    expect(a2TriggerCount).toBe(2);
+    expect(b1TriggerCount).toBe(1);
+    expect(b2TriggerCount).toBe(3);
+    expect(c1TriggerCount).toBe(1);
+    expect(c2TriggerCount).toBe(4);
+  });
+
+  test("multiple usage in a single component (with conflicted computed fields)", () => {
+    let c1TriggerCount = 0;
+    let c2TriggerCount = 0;
+    const behA = BehaviorWithComputed({
+      data: {
+        a: 1
+      },
+      computed: {
+        c(data) {
+          c1TriggerCount += 1;
+          return data.a * 2;
+        },
+      },
+      attached() {
+        this.setData({
+          a: 2,
+        })
+      },
+    });
+    const componentId = _.load({
+      template: "<view>{{c}}</view>",
+      behaviors: [behA, computedBehavior],
+      data: {
+        b: 10,
+      },
+      computed: {
+        c(data) {
+          c2TriggerCount += 1;
+          return data.b * 2;
+        }
+      },
+      attached() {
+        this.setData({
+          b: 20,
+        })
+      },
+    });
+    const component = _.render(componentId);
+    component.triggerLifeTime("attached");
+    expect(_.match(component.dom!, "<wx-view>40</wx-view>")).toBe(true);
+    expect(c1TriggerCount).toBe(2);
+    expect(c2TriggerCount).toBe(2);
   });
 });

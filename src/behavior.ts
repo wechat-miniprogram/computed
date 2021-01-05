@@ -7,12 +7,6 @@ import * as dataTracer from "./data-tracer";
 const deepClone = rfdc({ proto: true });
 
 interface BehaviorExtend {
-  _computedWatchInfo: {
-    computedUpdaters: Array<() => boolean>;
-    computedRelatedPathValues: Record<string, any>;
-    watchCurVal: Record<string, any>;
-  };
-  _computedWatchDefinition(): any;
   // original
   data: Record<string, any>;
   setData(d: Record<string, any>): void;
@@ -26,99 +20,14 @@ interface ObserversItem {
 export const behavior = Behavior({
   lifetimes: {
     attached(this: BehaviorExtend) {
-      const { computedDef = {} } = this._computedWatchDefinition();
-      if (!this.data) {
-        this.data = {};
-      }
-      
-      // handling computed
-      // 1. push to initFuncs
-      // 2. push to computedUpdaters
-      const setDataObj: Record<string, any> = {}
-      Object.keys(computedDef).forEach((targetField) => {
-        const updateMethod = computedDef[targetField];
-        const relatedPathValuesOnDef = [];
-        const val = updateMethod(
-          dataTracer.create(this.data, relatedPathValuesOnDef)
-        );
-
-        const pathValues = relatedPathValuesOnDef.map(({ path }) => ({
-          path,
-          value: dataPath.getDataOnPath(this.data, path),
-        }));
-
-        setDataObj[targetField] = val;
-
-        this._computedWatchInfo.computedRelatedPathValues[
-          targetField
-        ] = pathValues;
-
-        // will be invoked when setData is called
-        const updateValueAndRelatedPaths = () => {
-          const oldPathValues = this._computedWatchInfo
-            .computedRelatedPathValues[targetField];
-          let needUpdate = false;
-          // check whether its dependency updated
-          for (let i = 0; i < oldPathValues.length; i++) {
-            const { path, value: oldVal } = oldPathValues[i];
-            const curVal = dataPath.getDataOnPath(this.data, path);
-            if (oldVal !== curVal) {
-              needUpdate = true;
-              break;
-            }
-          }
-          if (!needUpdate) return false;
-
-          const relatedPathValues = [];
-          const val = updateMethod(
-            dataTracer.create(this.data, relatedPathValues)
-          );
-          this.setData({
-            [targetField]: val,
-          });
-          this._computedWatchInfo.computedRelatedPathValues[
-            targetField
-          ] = relatedPathValues;
-          return true;
-        };
-        this._computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths);
+      this.setData({
+        _computedWatchInit: 'attached',
       });
-
-      this.setData(setDataObj);
     },
     created(this: BehaviorExtend) {
-      const { watchDef = {} } = this._computedWatchDefinition();
-      // initialize status, executed on created
-      const initFuncs: Array<(...args: any[]) => void> = [];
-      if (this._computedWatchInfo) {
-        throw new Error(
-          "Please do not use this behavior more than once in a single component"
-        );
-      }
-
-      // handling watch
-      // 1. push to initFuncs
-      Object.keys(watchDef).forEach((watchPath) => {
-        const paths = dataPath.parseMultiDataPaths(watchPath);
-        // record the original value of watch targets
-        initFuncs.push(() => {
-          const curVal = paths.map(({ path, options }) => {
-            const val = dataPath.getDataOnPath(this.data, path);
-            return options.deepCmp ? deepClone(val) : val;
-          });
-          this._computedWatchInfo.watchCurVal[watchPath] = curVal;
-        });
+      this.setData({
+        _computedWatchInit: 'created',
       });
-
-      // init
-      if (!this._computedWatchInfo) {
-        this._computedWatchInfo = {
-          computedUpdaters: [],
-          computedRelatedPathValues: {},
-          watchCurVal: {},
-        };
-        initFuncs.forEach((func) => func.call(this));
-      }
     },
   },
 
@@ -126,22 +35,103 @@ export const behavior = Behavior({
     const computedDef = defFields.computed;
     const watchDef = defFields.watch;
     const observersItems: ObserversItem[] = [];
+    let computedWatchInfo = null;
 
-    if (!defFields.methods) defFields.methods = {};
-    defFields.methods._computedWatchDefinition = () => ({
-      computedDef: defFields.computed,
-      watchDef: defFields.watch,
-    });
+    observersItems.push({
+      fields: "_computedWatchInit",
+      observer(this: BehaviorExtend) {
+        const status = this.data._computedWatchInit
+        if (status === 'created') {
+          // init data fields
+          computedWatchInfo = {
+            computedUpdaters: [],
+            computedRelatedPathValues: {},
+            watchCurVal: {},
+          };
+          // handling watch
+          // 1. push to initFuncs
+          if (watchDef) {
+            Object.keys(watchDef).forEach((watchPath) => {
+              const paths = dataPath.parseMultiDataPaths(watchPath);
+              // record the original value of watch targets
+              const curVal = paths.map(({ path, options }) => {
+                const val = dataPath.getDataOnPath(this.data, path);
+                return options.deepCmp ? deepClone(val) : val;
+              });
+              computedWatchInfo.watchCurVal[watchPath] = curVal;
+            });
+          }
+        } else if (status === 'attached') {
+          // handling computed
+          // 1. push to initFuncs
+          // 2. push to computedUpdaters
+          if (computedDef) {
+            Object.keys(computedDef).forEach((targetField) => {
+              const updateMethod = computedDef[targetField];
+              const relatedPathValuesOnDef = [];
+              const val = updateMethod(
+                dataTracer.create(this.data, relatedPathValuesOnDef)
+              );
+
+              const pathValues = relatedPathValuesOnDef.map(({ path }) => ({
+                path,
+                value: dataPath.getDataOnPath(this.data, path),
+              }));
+
+              // here we can do small setDatas
+              // because observer handlers will force grouping small setDatas together
+              this.setData({
+                [targetField]: val,
+              });
+
+              computedWatchInfo.computedRelatedPathValues[
+                targetField
+              ] = pathValues;
+
+              // will be invoked when setData is called
+              const updateValueAndRelatedPaths = () => {
+                const oldPathValues = computedWatchInfo
+                  .computedRelatedPathValues[targetField];
+                let needUpdate = false;
+                // check whether its dependency updated
+                for (let i = 0; i < oldPathValues.length; i++) {
+                  const { path, value: oldVal } = oldPathValues[i];
+                  const curVal = dataPath.getDataOnPath(this.data, path);
+                  if (oldVal !== curVal) {
+                    needUpdate = true;
+                    break;
+                  }
+                }
+                if (!needUpdate) return false;
+
+                const relatedPathValues = [];
+                const val = updateMethod(
+                  dataTracer.create(this.data, relatedPathValues)
+                );
+                this.setData({
+                  [targetField]: val,
+                });
+                computedWatchInfo.computedRelatedPathValues[
+                  targetField
+                ] = relatedPathValues;
+                return true;
+              };
+              computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths);
+            });
+          }
+        }
+      },
+    })
 
     if (computedDef) {
       observersItems.push({
         fields: "**",
         observer(this: BehaviorExtend) {
-          if (!this._computedWatchInfo) return;
+          if (!computedWatchInfo) return;
 
           let changed: boolean;
           do {
-            changed = this._computedWatchInfo.computedUpdaters.some((func) => func.call(this));
+            changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this));
           } while (changed);
         },
       });
@@ -153,8 +143,8 @@ export const behavior = Behavior({
         observersItems.push({
           fields: watchPath,
           observer(this: BehaviorExtend) {
-            if (!this._computedWatchInfo) return;
-            const oldVal = this._computedWatchInfo.watchCurVal[watchPath];
+            if (!computedWatchInfo) return;
+            const oldVal = computedWatchInfo.watchCurVal[watchPath];
 
             // get new watching field value
             const originalCurValWithOptions = paths.map(({ path, options }) => {
@@ -164,7 +154,7 @@ export const behavior = Behavior({
             const curVal = originalCurValWithOptions.map(({ val, options }) =>
               options.deepCmp ? deepClone(val) : val
             );
-            this._computedWatchInfo.watchCurVal[watchPath] = curVal;
+            computedWatchInfo.watchCurVal[watchPath] = curVal;
 
             // compare
             let changed = false;
@@ -196,7 +186,7 @@ export const behavior = Behavior({
     if (typeof defFields.observers !== "object") {
       defFields.observers = {};
     }
-    if (defFields.observers instanceof Array) {
+    if (Array.isArray(defFields.observers)) {
       defFields.observers.push(...observersItems)
     } else {
       observersItems.forEach((item) => {

@@ -41,7 +41,7 @@ type ComputedOptions<
     >
   >;
 
-export function ComputedComponent<
+export function ComponentWithComputed<
   TData extends WechatMiniprogram.Component.DataOption,
   TProperty extends WechatMiniprogram.Component.PropertyOption,
   TMethod extends WechatMiniprogram.Component.MethodOption,
@@ -61,11 +61,36 @@ export function ComputedComponent<
     TCustomInstanceProperty
   >
 ): string {
-  if (!Array.isArray(options)) {
-    // assume that no other behaviors
+  if (!Array.isArray(options.behaviors)) {
     options.behaviors = [];
   }
-
-  options.behaviors.push(behavior);
+  options.behaviors.unshift(behavior);
   return Component(options);
+}
+
+export function BehaviorWithComputed<
+  TData extends WechatMiniprogram.Behavior.DataOption,
+  TProperty extends WechatMiniprogram.Behavior.PropertyOption,
+  TMethod extends WechatMiniprogram.Behavior.MethodOption,
+  TWatch extends Record<string, (...args: any[]) => void>,
+  TComputed extends Record<
+    string,
+    (data: TData & { [K in keyof TProperty]: any }) => any
+  >,
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}
+>(
+  options: ComputedOptions<
+    TData,
+    TProperty,
+    TMethod,
+    TWatch,
+    TComputed,
+    TCustomInstanceProperty
+  >
+): string {
+  if (!Array.isArray(options.behaviors)) {
+    options.behaviors = [];
+  }
+  options.behaviors.unshift(behavior);
+  return Behavior(options);
 }
