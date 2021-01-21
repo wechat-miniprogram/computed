@@ -11,7 +11,7 @@
 ### 方式一 代码片段
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/XsLN6wmB7InO](https://developers.weixin.qq.com/s/XsLN6wmB7InO)
+可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/UqMytwmF7Gni](https://developers.weixin.qq.com/s/UqMytwmF7Gni)
 
 体验该代码片段前，需要先安装并构建相对应的 npm 包。
 

@@ -30,7 +30,7 @@ module.exports = {
   webpack: {
     mode: 'production',
     output: {
-      filename: '[name].js',
+      filename: 'index.js',
       libraryTarget: 'commonjs2',
     },
     target: 'node',
