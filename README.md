@@ -4,12 +4,14 @@
 
 > 此 behavior 依赖开发者工具的 npm 构建。具体详情可查阅[官方 npm 文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)。
 
+> 4.0.0 大版本变更了最基本的接口名。旧版文档可以参考对应版本的 git tag 中的 README ，如 [v3.1.1](https://github.com/wechat-miniprogram/computed/tree/v3.1.1) tag 。
+
 ## 使用方法
 
 ### 方式一 代码片段
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/HOoouxml75iW](https://developers.weixin.qq.com/s/HOoouxml75iW)
+可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/XsLN6wmB7InO](https://developers.weixin.qq.com/s/XsLN6wmB7InO)
 
 体验该代码片段前，需要先安装并构建相对应的 npm 包。
 
@@ -37,7 +39,7 @@ npm run dev // 构建 dev 版本
 
 ```js
 // component.js
-const computedBehavior = require('miniprogram-computed')
+const computedBehavior = require('miniprogram-computed').behavior
 const behaviorTest = require('./behavior-test') // 引入自定义 behavior
 
 Component({
@@ -83,7 +85,7 @@ module.exports = Behavior({
 ### watch 基本用法
 
 ```js
-const computedBehavior = require('miniprogram-computed')
+const computedBehavior = require('miniprogram-computed').behavior
 
 Component({
   behaviors: [computedBehavior],
@@ -117,13 +119,15 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
-### Typescript支持
-由于通过behavior的方式引入不能获得类型支持, 因此为了获得类型的支持, 可以使用一个辅助组件构造器:
+### TypeScript支持
+
+由于通过behavior的方式引入不能获得类型支持, 因此为了获得类型的支持, 可以使用一个辅助组件构造器：
+
 ```ts
-import { ComputedComponent } from 'miniprogram-computed'
+import { ComponentWithComputed } from 'miniprogram-computed'
 
 ComputedComponent({
-    data: {
+  data: {
     a: 1,
     b: 1,
     sum: 2,
@@ -144,10 +148,20 @@ ComputedComponent({
   }
 })
 ```
-当使用该构造器的时候, 编译器可以给`computed`和`watch`提供自动提示和类型支持.
-**注意: 当使用该构造器的时候, 无需手动加入 `computedBehavior`, 该构造器会自动引入该behavior**
 
-## ^3.0.0 与 ^1.0.0、 ^2.0.0 版本的差异
+当使用该构造器的时候, 编译器可以给 `computed` 和 `watch` 提供自动提示和类型支持。
+
+**注意: 当使用该构造器的时候, 无需手动加入 `computedBehavior` , 该构造器会自动引入该 behavior 。**
+
+（类似地，也有 `BehaviorWithComputed` 构造器对应于 `Bahavior` 。）
+
+## ^4.0.0 与 ^1.0.0、 ^2.0.0、 ^3.0.0 版本的差异
+
+### ^4.0.0 版本
+
+* 变更了最基本的接口。
+
+* 新增简单的 TypeScript 支持。
 
 ### ^3.0.0 版本
 
@@ -163,7 +177,7 @@ ComputedComponent({
 
 以下是版本之间主要区别的比较。
 
-| 项目 | ^1.0.0 | ^2.0.0 | ^3.0.0 |
+| 项目 | ^1.0.0 | ^2.0.0 | ^3.0.0 和 ^4.0.0 |
 | ---- | ------ | ------ | ------ |
 | 支持的基础库最低版本 | 2.2.3 | 2.6.1 | 2.6.1 |
 | 支持 `watch` 定义段 | 否 | 是 | 是 |
@@ -171,15 +185,7 @@ ComputedComponent({
 | 支持 `mobx-miniprogram` 扩展库 | 不支持 | 不支持 | 支持 |
 | 支持自定义 `behavior` 数据字段 / 初始化视图渲染 | 不支持 / 不支持 | 支持 / 不支持 | 支持 / 支持 |
 
-
-
 ## 常见问题说明
-
-### 如何搭配 `mobx-miniprogram` 等扩展库使用？
-
-* 方式一：可见代码片段：[https://developers.weixin.qq.com/s/HOoouxml75iW](https://developers.weixin.qq.com/s/HOoouxml75iW)
-
-* 方式二：通过上面的方式二构建小程序体验
 
 ### 我应该使用 computed 还是 watch ？
 
@@ -193,10 +199,10 @@ ComputedComponent({
 
 ### 关于 ** 通配符
 
-在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers）。[示例代码片段](https://developers.weixin.qq.com/s/frOEpcm27Ac7)
+在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers ）。
 
 ```js
-const computedBehavior = require('miniprogram-computed')
+const computedBehavior = require('miniprogram-computed').behavior
 
 Component({
   behaviors: [computedBehavior],
