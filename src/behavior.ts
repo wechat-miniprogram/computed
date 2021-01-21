@@ -81,7 +81,7 @@ export const behavior = Behavior({
               // here we can do small setDatas
               // because observer handlers will force grouping small setDatas together
               this.setData({
-                [targetField]: val,
+                [targetField]: dataTracer.unwrap(val),
               });
 
               computedWatchInfo.computedRelatedPathValues[
@@ -109,7 +109,7 @@ export const behavior = Behavior({
                   dataTracer.create(this.data, relatedPathValues)
                 );
                 this.setData({
-                  [targetField]: val,
+                  [targetField]: dataTracer.unwrap(val),
                 });
                 computedWatchInfo.computedRelatedPathValues[
                   targetField

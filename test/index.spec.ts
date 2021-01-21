@@ -1,6 +1,6 @@
 import _ from "./utils";
 import { BehaviorWithComputed } from "../src";
-import computedBehavior from "../src";
+import { behavior as computedBehavior } from "../src";
 
 const behaviorA = Behavior({
   data: {

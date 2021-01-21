@@ -55,7 +55,7 @@
 		"gulp-typescript": "^6.0.0-alpha.1",
 		"jest": "^25.5.4",
 		"miniprogram-exparser": "^2.11.2",
-		"miniprogram-simulate": "^1.2.8",
+		"miniprogram-simulate": "^1.2.9",
 		"prettier": "2.0.1",
 		"through2": "^2.0.3",
 		"ts-jest": "^26.4.4",
