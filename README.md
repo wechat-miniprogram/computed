@@ -126,7 +126,7 @@ Component({
 ```ts
 import { ComponentWithComputed } from 'miniprogram-computed'
 
-ComputedComponent({
+ComponentWithComputed({
   data: {
     a: 1,
     b: 1,
