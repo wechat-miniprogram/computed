@@ -19,3 +19,8 @@
 * 修复 computed 中使用自定义 behavior 数据段时，初始化视图的 computed data 不渲染的问题。
 * 支持 mobx-miniprogram 扩展库。
 * 更新 computed  数据追踪方式。
+
+## 4.0.0
+
+* 使用 TypeScript 重构。
+* 优化部分生命周期逻辑。
