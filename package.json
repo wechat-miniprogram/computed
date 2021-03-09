@@ -1,6 +1,6 @@
 {
 	"name": "miniprogram-computed",
-	"version": "4.0.2",
+	"version": "4.0.3",
 	"description": "Computed & watch - wechat miniprogram custom component extend behavior",
 	"main": "miniprogram_dist/index.js",
 	"scripts": {
@@ -31,6 +31,7 @@
 		"@babel/preset-typescript": "^7.8.3",
 		"@types/jest": "^26.0.14",
 		"@types/rfdc": "^1.1.0",
+		"@types/wechat-miniprogram": "^3.0.0",
 		"@typescript-eslint/eslint-plugin": "^2.23.0",
 		"@typescript-eslint/parser": "^2.23.0",
 		"babel-loader": "^8.0.6",
@@ -65,7 +66,6 @@
 		"webpack-node-externals": "^1.7.2"
 	},
 	"dependencies": {
-		"@types/wechat-miniprogram": "^3.0.0",
 		"fast-deep-equal": "^2.0.1",
 		"rfdc": "^1.1.4"
 	}
