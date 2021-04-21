@@ -10,12 +10,21 @@ interface BehaviorExtend {
   // original
   data: Record<string, any>;
   setData(d: Record<string, any>): void;
+  _computedWatchInfo: Record<string, ComputedWatchInfo>;
 }
 
 interface ObserversItem {
   fields: string;
   observer(): void;
 }
+
+interface ComputedWatchInfo {
+  computedUpdaters: Array<any>;
+  computedRelatedPathValues: Record<string, any>;
+  watchCurVal: Record<string, any>;
+}
+
+let computedWatchDefIdInc = 0;
 
 export const behavior = Behavior({
   lifetimes: {
@@ -35,7 +44,7 @@ export const behavior = Behavior({
     const computedDef = defFields.computed;
     const watchDef = defFields.watch;
     const observersItems: ObserversItem[] = [];
-    let computedWatchInfo = null;
+    const computedWatchDefId = computedWatchDefIdInc++;
 
     observersItems.push({
       fields: "_computedWatchInit",
@@ -43,11 +52,13 @@ export const behavior = Behavior({
         const status = this.data._computedWatchInit;
         if (status === "created") {
           // init data fields
-          computedWatchInfo = {
+          const computedWatchInfo = {
             computedUpdaters: [],
             computedRelatedPathValues: {},
             watchCurVal: {},
           };
+          if (!this._computedWatchInfo) this._computedWatchInfo = {};
+          this._computedWatchInfo[computedWatchDefId] = computedWatchInfo;
           // handling watch
           // 1. push to initFuncs
           if (watchDef) {
@@ -65,6 +76,7 @@ export const behavior = Behavior({
           // handling computed
           // 1. push to initFuncs
           // 2. push to computedUpdaters
+          const computedWatchInfo = this._computedWatchInfo[computedWatchDefId];
           if (computedDef) {
             Object.keys(computedDef).forEach((targetField) => {
               const updateMethod = computedDef[targetField];
@@ -129,6 +141,8 @@ export const behavior = Behavior({
       observersItems.push({
         fields: "**",
         observer(this: BehaviorExtend) {
+          if (!this._computedWatchInfo) return;
+          const computedWatchInfo = this._computedWatchInfo[computedWatchDefId];
           if (!computedWatchInfo) return;
 
           let changed: boolean;
@@ -147,6 +161,10 @@ export const behavior = Behavior({
         observersItems.push({
           fields: watchPath,
           observer(this: BehaviorExtend) {
+            if (!this._computedWatchInfo) return;
+            const computedWatchInfo = this._computedWatchInfo[
+              computedWatchDefId
+            ];
             if (!computedWatchInfo) return;
             const oldVal = computedWatchInfo.watchCurVal[watchPath];
 
