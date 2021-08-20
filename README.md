@@ -4,7 +4,7 @@
 
 > 此 behavior 依赖开发者工具的 npm 构建。具体详情可查阅[官方 npm 文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)。
 
-> 4.0.0 大版本变更了最基本的接口名。旧版文档可以参考对应版本的 git tag 中的 README ，如 [v3.1.1](https://github.com/wechat-miniprogram/computed/tree/v3.1.1) tag 。
+注意： 4.0.0 大版本变更了最基本的接口名，升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。旧版文档可以参考对应版本的 git tag 中的 README ，如 [v3.1.1](https://github.com/wechat-miniprogram/computed/tree/v3.1.1) tag 。
 
 ## 使用方法
 
