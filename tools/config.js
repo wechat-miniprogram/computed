@@ -10,6 +10,7 @@ const demoDist = path.resolve(__dirname, '../miniprogram_dev')
 const src = path.resolve(__dirname, '../src')
 const dev = path.join(demoDist, 'components')
 const dist = path.resolve(__dirname, '../miniprogram_dist')
+const typeDeclare = path.resolve(__dirname, "../types")
 
 module.exports = {
   entry: ['index'],
@@ -21,6 +22,8 @@ module.exports = {
 
   demoSrc, // demo 源目录
   demoDist, // demo 目标目录
+
+  typeDeclare, // d.ts 目录
 
   wxss: {
     less: false, // 使用 less 来编写 wxss

@@ -4,12 +4,18 @@
         "module": "commonjs",
         "noImplicitAny": false,
         "removeComments": true,
-        "target": "es2017",
-        "lib": ["ES6", "ES7", "dom"],
+        "target": "ESNext",
+        "lib": ["ESNext"],
         "preserveConstEnums": true,
         "sourceMap": true,
         "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "declaration": true,
+        "declarationDir": "./types",
+        "emitDeclarationOnly": true,
+        "skipLibCheck": true,
     },
-    "include": ["src/**/*.ts"]
+    "include": [
+        "./src/**/*.ts"
+    ],
 }
