@@ -1,6 +1,7 @@
 .idea
 .DS_Store
 package-lock.json
+.vscode/
 
 logs
 *.log
@@ -14,3 +15,6 @@ docs
 miniprogram_dev
 node_modules
 coverage
+gulpfile.js
+jest.config.js
+
