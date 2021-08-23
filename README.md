@@ -156,6 +156,12 @@ ComponentWithComputed({
 
 （类似地，也有 `BehaviorWithComputed` 构造器对应于 `Bahavior` 。）
 
+**关于 TS 兼容问题**
+
+若在小程序中用 `TypeScript` 进行开发并使用到了 `Component` 构造器。这时定义 `computed` 或 `watch` 字段会出现类型报错。  
+
+针对此问题，推荐使用 `ComponentWithComputed` 构造器代替 `Component` 构造器。
+
 **关于类型声明**
 
 在 `4.0.5` 版本之前，并未提供相关的 `.d.ts` 类型声明。
