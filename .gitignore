@@ -13,3 +13,4 @@ miniprogram_dev
 node_modules
 coverage
 .vscode/
+swc_dist/
