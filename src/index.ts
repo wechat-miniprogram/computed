@@ -8,9 +8,9 @@ type ComputedInstance<
   M extends WechatMiniprogram.Component.MethodOption,
   C extends Record<string, (data: D & { [K in keyof P]: any }) => any>,
   TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>
-  > = WechatMiniprogram.Component.Instance<D, P, M, TCustomProperty> & {
-    data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any };
-  };
+> = WechatMiniprogram.Component.Instance<D, P, M, TCustomProperty> & {
+  data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any };
+};
 
 type ComputedOptions<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -22,15 +22,15 @@ type ComputedOptions<
     (data: TData & { [K in keyof TProperty]: any }) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}
-  > = (Partial<WechatMiniprogram.Component.Data<TData>> &
-    Partial<WechatMiniprogram.Component.Property<TProperty>> &
-    Partial<WechatMiniprogram.Component.Method<TMethod>> &
-    Partial<WechatMiniprogram.Component.OtherOption> &
-    Partial<WechatMiniprogram.Component.Lifetimes> & {
-      watch?: TWatch;
-      computed?: TComputed;
-      template?: string;
-    }) &
+> = (Partial<WechatMiniprogram.Component.Data<TData>> &
+  Partial<WechatMiniprogram.Component.Property<TProperty>> &
+  Partial<WechatMiniprogram.Component.Method<TMethod>> &
+  Partial<WechatMiniprogram.Component.OtherOption> &
+  Partial<WechatMiniprogram.Component.Lifetimes> & {
+    watch?: TWatch;
+    computed?: TComputed;
+    template?: string;
+  }) &
   ThisType<
     ComputedInstance<
       TData,

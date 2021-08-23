@@ -3,7 +3,7 @@
 	"version": "4.0.5",
 	"description": "Computed & watch - wechat miniprogram custom component extend behavior",
 	"main": "miniprogram_dist/index.js",
-    "types": "./types/index.d.ts",
+	"types": "./types/index.d.ts",
 	"scripts": {
 		"dev": "gulp dev --develop",
 		"watch": "gulp watch --develop --watch",
@@ -15,8 +15,8 @@
 		"coverage": "jest ./test/* --coverage --bail",
 		"lint": "eslint \"src/**/*.js\"",
 		"lint-tools": "eslint \"tools/**/*.js\" --rule \"import/no-extraneous-dependencies: false\"",
-        "dts": "tsc"
-    },
+		"dts": "tsc"
+	},
 	"miniprogram": "miniprogram_dist",
 	"repository": {
 		"type": "git",

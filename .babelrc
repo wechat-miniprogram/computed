@@ -20,7 +20,7 @@
                 "targets": {
                     "chrome": "67"
                 },
-                "loose": false,
+                "loose": true,
                 "useBuiltIns": "usage",
                 "corejs": {
                     "version": 3,
