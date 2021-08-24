@@ -8,5 +8,5 @@ module.exports = config({
     path: __dirname + "/swc_dist",
   },
   mode: "production",
-
+  target: "node",
 });

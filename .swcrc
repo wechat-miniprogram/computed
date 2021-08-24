@@ -1,4 +1,5 @@
 {
+
     "jsc": {
         "parser": {
             "syntax": "typescript",
@@ -9,7 +10,7 @@
         "transform": null,
         "target": "es5",
         "loose": true,
-        "externalHelpers": true,
+        "externalHelpers": false,
         "keepClassNames": false,
         "minify": {
             "compress": {

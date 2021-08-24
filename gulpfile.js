@@ -24,3 +24,4 @@ gulp.task('watch', gulp.series(`${id}-watch`))
 gulp.task('dev', gulp.series(`${id}-dev`))
 // build for publish
 gulp.task('default', gulp.series(`${id}-default`))
+gulp.task('swc_build', gulp.series(`${id}-swc_build`))

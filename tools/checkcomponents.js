@@ -1,65 +1,71 @@
-const path = require('path')
+const path = require("path");
 
-const _ = require('./utils')
-const config = require('./config')
+const _ = require("./utils");
+const config = require("./config");
 
-const srcPath = config.srcPath
+const srcPath = config.srcPath;
 
 /**
  * 获取 json 路径相关信息
  */
 function getJsonPathInfo(jsonPath) {
-  const dirPath = path.dirname(jsonPath)
-  const fileName = path.basename(jsonPath, '.json')
-  const relative = path.relative(srcPath, dirPath)
-  const fileBase = path.join(relative, fileName)
+  const dirPath = path.dirname(jsonPath);
+  const fileName = path.basename(jsonPath, ".json");
+  const relative = path.relative(srcPath, dirPath);
+  const fileBase = path.join(relative, fileName);
 
   return {
-    dirPath, fileName, relative, fileBase
-  }
+    dirPath,
+    fileName,
+    relative,
+    fileBase,
+  };
 }
 
 /**
  * 检测是否包含其他自定义组件
  */
-const checkProps = ['usingComponents', 'componentGenerics']
+const checkProps = ["usingComponents", "componentGenerics"];
 async function checkIncludedComponents(jsonPath, componentListMap) {
-  const json = _.readJson(jsonPath)
-  if (!json) throw new Error(`json is not valid: "${jsonPath}"`)
+  const json = _.readJson(jsonPath);
+  if (!json) throw new Error(`json is not valid: "${jsonPath}"`);
 
-  const { dirPath, fileName, fileBase } = getJsonPathInfo(jsonPath)
+  const { dirPath, fileName, fileBase } = getJsonPathInfo(jsonPath);
 
   for (let i = 0, len = checkProps.length; i < len; i++) {
-    const checkProp = checkProps[i]
-    const checkPropValue = json[checkProp] || {}
-    const keys = Object.keys(checkPropValue)
+    const checkProp = checkProps[i];
+    const checkPropValue = json[checkProp] || {};
+    const keys = Object.keys(checkPropValue);
 
     for (let j = 0, jlen = keys.length; j < jlen; j++) {
-      const key = keys[j]
-      let value = typeof checkPropValue[key] === 'object' ? checkPropValue[key].default : checkPropValue[key]
-      if (!value) continue
+      const key = keys[j];
+      let value =
+        typeof checkPropValue[key] === "object"
+          ? checkPropValue[key].default
+          : checkPropValue[key];
+      if (!value) continue;
 
-      value = _.transformPath(value, path.sep)
+      value = _.transformPath(value, path.sep);
 
       // 检查相对路径
-      const componentPath = `${path.join(dirPath, value)}.json`
+      const componentPath = `${path.join(dirPath, value)}.json`;
       // eslint-disable-next-line no-await-in-loop
-      const isExists = await _.checkFileExists(componentPath)
+      const isExists = await _.checkFileExists(componentPath);
       if (isExists) {
         // eslint-disable-next-line no-await-in-loop
-        await checkIncludedComponents(componentPath, componentListMap)
+        await checkIncludedComponents(componentPath, componentListMap);
       }
     }
   }
 
   // 进入存储
-  componentListMap.wxmlFileList.push(`${fileBase}.wxml`)
-  componentListMap.wxssFileList.push(`${fileBase}.wxss`)
-  componentListMap.jsonFileList.push(`${fileBase}.json`)
-  componentListMap.jsFileList.push(`${fileBase}.js`)
-  componentListMap.tsFileList.push(`${fileBase}.ts`)
+  componentListMap.wxmlFileList.push(`${fileBase}.wxml`);
+  componentListMap.wxssFileList.push(`${fileBase}.wxss`);
+  componentListMap.jsonFileList.push(`${fileBase}.json`);
+  componentListMap.jsFileList.push(`${fileBase}.js`);
+  componentListMap.tsFileList.push(`${fileBase}.ts`);
 
-  componentListMap.jsFileMap[fileBase] = `${path.join(dirPath, fileName)}.js`
+  componentListMap.jsFileMap[fileBase] = `${path.join(dirPath, fileName)}.js`;
 }
 
 module.exports = async function (entry) {
@@ -71,18 +77,18 @@ module.exports = async function (entry) {
     tsFileList: [],
 
     jsFileMap: {}, // 为 webpack entry 所用
-  }
-  const isExists = await _.checkFileExists(entry)
+  };
+  const isExists = await _.checkFileExists(entry);
   if (!isExists) {
-    const { dirPath, fileName, fileBase } = getJsonPathInfo(entry)
-    
-    componentListMap.tsFileList.push(`${fileBase}.ts`)
+    const { dirPath, fileName, fileBase } = getJsonPathInfo(entry);
+
+    componentListMap.tsFileList.push(`${fileBase}.ts`);
     // componentListMap.tsFileMap[fileBase] = `${path.join(dirPath, fileName)}.ts`
-    
-    return componentListMap
+
+    return componentListMap;
   }
 
-  await checkIncludedComponents(entry, componentListMap)
+  await checkIncludedComponents(entry, componentListMap);
 
-  return componentListMap
-}
+  return componentListMap;
+};
