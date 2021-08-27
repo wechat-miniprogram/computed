@@ -2,7 +2,7 @@ const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== "object" || data === null) return data;
 
   const handler = {
-    get(obj, key) {
+    get(_obj, key) {
       if (key === "__rawObject__") return data;
       let keyWrapper = null;
       const keyPath = basePath.concat(key);

@@ -20,6 +20,15 @@
     "type": "git",
     "url": "https://github.com/wechat-miniprogram/computed.git"
   },
+  "files": [
+    "src",
+    "miniprogram_dist",
+    "types",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "UPDATE.md"
+  ],
   "author": "wechat-miniprogram",
   "license": "MIT",
   "devDependencies": {
