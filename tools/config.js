@@ -10,6 +10,7 @@ const demoDist = path.resolve(__dirname, "../miniprogram_dev");
 const src = path.resolve(__dirname, "../src");
 const dev = path.join(demoDist, "components");
 const dist = path.resolve(__dirname, "../miniprogram_dist");
+const swcBuildPath = path.resolve(__dirname, "../swc_dist");
 const typeDeclare = path.resolve(__dirname, "../types");
 
 module.exports = {
@@ -19,6 +20,8 @@ module.exports = {
   isWatch,
   srcPath: src, // 源目录
   distPath: isDev ? dev : dist, // 目标目录
+  
+  swcBuildPath,
 
   demoSrc, // demo 源目录
   demoDist, // demo 目标目录

@@ -21,6 +21,8 @@ const gulpEsbuild = require("gulp-esbuild");
 const wxssConfig = config.wxss || {};
 const srcPath = config.srcPath;
 const distPath = config.distPath;
+const swcBuildPath = config.swcBuildPath;
+
 const swcOptions = {
   jsc: {
     parser: {
@@ -432,15 +434,15 @@ class BuildTask {
       return gulp
         .src(path.resolve(srcPath, "*.ts"))
         .pipe(swc(swcOptions))
-        .pipe(gulp.dest(distPath));
+        .pipe(gulp.dest(swcBuildPath));
     });
 
     gulp.task(`${id}-bundle`, () => {
       return gulp
-        .src(path.resolve(distPath, "index.js"))
+        .src(path.resolve(swcBuildPath, "index.js"))
         .pipe(
           gulpEsbuild({
-            outfile: "bundle.js",
+            outfile: "index.js",
             bundle: true,
             format: "cjs",
             minify: true,
