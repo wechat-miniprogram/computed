@@ -1,4 +1,4 @@
-const computedBehavior = require('../../components/index').behavior
+import { behavior as computedBehavior } from '../../computed'
 const behaviorTest = require('./behavior')
 Component({
   behaviors: [behaviorTest, computedBehavior],
