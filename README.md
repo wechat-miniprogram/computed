@@ -12,7 +12,7 @@
 
 需要小程序基础库版本 >= 2.6.1 的环境。
 
-可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/UqMytwmF7Gni](https://developers.weixin.qq.com/s/UqMytwmF7Gni)
+可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/4KYn6TmJ7osP](https://developers.weixin.qq.com/s/4KYn6TmJ7osP)
 
 体验该代码片段前，需要先安装并构建相对应的 npm 包。
 
@@ -34,7 +34,7 @@ npm install
 npm run dev // 构建 dev 版本
 ```
 
-构建完毕后，根目录下的 `miniprogram_dev` 即为小程序代码根目录，可以将此 demo 导入开发者工具中进行体验。
+构建完毕后，根目录下的 `demo` 即为小程序代码根目录，可以将此 demo 导入开发者工具中进行体验。
 
 ### computed 基本用法
 
