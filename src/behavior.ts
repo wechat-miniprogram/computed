@@ -45,7 +45,6 @@ export const behavior = Behavior({
     const watchDef = defFields.watch;
     const observersItems: ObserversItem[] = [];
     const computedWatchDefId = computedWatchDefIdInc++;
-
     observersItems.push({
       fields: "_computedWatchInit",
       observer(this: BehaviorExtend) {
@@ -96,9 +95,8 @@ export const behavior = Behavior({
                 [targetField]: dataTracer.unwrap(val),
               });
 
-              computedWatchInfo.computedRelatedPathValues[
-                targetField
-              ] = pathValues;
+              computedWatchInfo.computedRelatedPathValues[targetField] =
+                pathValues;
 
               // will be invoked when setData is called
               const updateValueAndRelatedPaths = () => {
@@ -123,9 +121,8 @@ export const behavior = Behavior({
                 this.setData({
                   [targetField]: dataTracer.unwrap(val),
                 });
-                computedWatchInfo.computedRelatedPathValues[
-                  targetField
-                ] = relatedPathValues;
+                computedWatchInfo.computedRelatedPathValues[targetField] =
+                  relatedPathValues;
                 return true;
               };
               computedWatchInfo.computedUpdaters.push(
@@ -162,9 +159,8 @@ export const behavior = Behavior({
           fields: watchPath,
           observer(this: BehaviorExtend) {
             if (!this._computedWatchInfo) return;
-            const computedWatchInfo = this._computedWatchInfo[
-              computedWatchDefId
-            ];
+            const computedWatchInfo =
+              this._computedWatchInfo[computedWatchDefId];
             if (!computedWatchInfo) return;
             const oldVal = computedWatchInfo.watchCurVal[watchPath];
 

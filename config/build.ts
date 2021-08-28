@@ -1,6 +1,6 @@
 /**
  * 现在使用 swc 编译 ts 到 es5
- * 通过 esbuild 进行 bundle 
+ * 通过 esbuild 进行 bundle
  * (也可以选择直接使用 swc 一步到位)
  */
 
@@ -24,7 +24,7 @@ const swcOptions = {
       mangle: true,
     },
   },
-  minify: true,
+  minify: false,
   module: {
     type: "commonjs",
     strict: false,
@@ -32,7 +32,7 @@ const swcOptions = {
     lazy: false,
     noInterop: false,
   },
-}
+};
 
 // esbuild 配置
 const esbuildOptions = {
@@ -40,14 +40,14 @@ const esbuildOptions = {
   bundle: true,
   format: "cjs",
   minify: true, // 开启压缩混淆
-}
+};
 
-export interface IBuildConfig {
+export interface BuildConfig {
   swcOptions: any;
   esbuildOptions: any;
 }
 
-export const buildConfig: IBuildConfig = {
+export const buildConfig: BuildConfig = {
   swcOptions,
   esbuildOptions,
-}
+};

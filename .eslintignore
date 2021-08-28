@@ -1,1 +1,5 @@
 node_modules
+types
+demo
+dist
+swc_build

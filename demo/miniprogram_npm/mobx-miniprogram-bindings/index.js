@@ -136,10 +136,14 @@ function _createActions(methods, options) {
 
 function _createDataFieldsReactions(target, options) {
   var store = options.store,
-      fields = options.fields;
+      fields = options.fields,
+      structuralComparison = options.structuralComparison;
+
+  // choose equal method
+
+  var equals = structuralComparison ? _mobxMiniprogram.comparer.structural : undefined;
 
   // setData combination
-
   var pendingSetData = null;
   function applySetData() {
     if (pendingSetData === null) return;
@@ -152,7 +156,7 @@ function _createDataFieldsReactions(target, options) {
       pendingSetData = {};
       wx.nextTick(applySetData);
     }
-    pendingSetData[field] = value;
+    pendingSetData[field] = (0, _mobxMiniprogram.toJS)(value);
   }
 
   // handling fields
@@ -169,6 +173,7 @@ function _createDataFieldsReactions(target, options) {
       }, function (value) {
         scheduleSetData(field, value);
       }, {
+        equals: equals,
         fireImmediately: true
       });
     });
@@ -182,6 +187,7 @@ function _createDataFieldsReactions(target, options) {
         }, function (value) {
           scheduleSetData(field, value);
         }, {
+          equals: equals,
           fireImmediately: true
         });
       }
@@ -196,6 +202,7 @@ function _createDataFieldsReactions(target, options) {
       }, function (value) {
         scheduleSetData(String(field), value);
       }, {
+        equals: equals,
         fireImmediately: true
       });
     });
@@ -248,10 +255,13 @@ var storeBindingsBehavior = exports.storeBindingsBehavior = Behavior({
     if (Array.isArray(storeBindings)) {
       var that = this;
       this._mobxMiniprogramBindings = storeBindings.map(function (item) {
-        return _createDataFieldsReactions(that, item);
+        var ret = _createDataFieldsReactions(that, item);
+        ret.updateStoreBindings();
+        return ret;
       });
     } else {
       this._mobxMiniprogramBindings = _createDataFieldsReactions(this, storeBindings);
+      this._mobxMiniprogramBindings.updateStoreBindings();
     }
   },
   detached: function detached() {

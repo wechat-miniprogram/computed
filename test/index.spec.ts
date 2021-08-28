@@ -658,23 +658,23 @@ describe("computed behavior", () => {
     let c2TriggerCount = 0;
     const behA = BehaviorWithComputed({
       data: {
-        a1: 1
+        a1: 1,
       },
       computed: {
         a2(data) {
           a2TriggerCount += 1;
           return data.a1 * 2;
-        }
+        },
       },
       watch: {
         a1() {
           a1TriggerCount += 1;
-        }
+        },
       },
       attached() {
         this.setData({
           a1: 3,
-        })
+        });
       },
     });
     const behB = BehaviorWithComputed({
@@ -686,17 +686,17 @@ describe("computed behavior", () => {
         b2(data) {
           b2TriggerCount += 1;
           return data.a2 + data.b1 * 2;
-        }
+        },
       },
       watch: {
         b1() {
           b1TriggerCount += 1;
-        }
+        },
       },
       attached() {
         this.setData({
           b1: 30,
-        })
+        });
       },
     });
     const componentId = _.load({
@@ -709,17 +709,17 @@ describe("computed behavior", () => {
         c2(data) {
           c2TriggerCount += 1;
           return data.b2 + data.c1 * 2;
-        }
+        },
       },
       watch: {
         c1() {
           c1TriggerCount += 1;
-        }
+        },
       },
       attached() {
         this.setData({
           c1: 300,
-        })
+        });
       },
     });
     const component = _.render(componentId);
@@ -738,7 +738,7 @@ describe("computed behavior", () => {
     let c2TriggerCount = 0;
     const behA = BehaviorWithComputed({
       data: {
-        a: 1
+        a: 1,
       },
       computed: {
         c(data) {
@@ -749,7 +749,7 @@ describe("computed behavior", () => {
       attached() {
         this.setData({
           a: 2,
-        })
+        });
       },
     });
     const componentId = _.load({
@@ -762,12 +762,12 @@ describe("computed behavior", () => {
         c(data) {
           c2TriggerCount += 1;
           return data.b * 2;
-        }
+        },
       },
       attached() {
         this.setData({
           b: 20,
-        })
+        });
       },
     });
     const component = _.render(componentId);

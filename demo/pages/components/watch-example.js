@@ -1,16 +1,16 @@
-import { behavior as computedBehavior } from '../../computed'
-const behaviorTest = require('./behavior')
+import { behavior as computedBehavior } from "../../computed/index";
+const behaviorTest = require("./behavior");
 Component({
   behaviors: [behaviorTest, computedBehavior],
   data: {
     a: 1,
-    sum: 1001
+    sum: 1001,
   },
   watch: {
-    'a, behaviorTestData': function (a, behaviorTestData) {
+    "a, behaviorTestData": function (a, behaviorTestData) {
       this.setData({
-        sum: a + behaviorTestData
-      })
+        sum: a + behaviorTestData,
+      });
     },
   },
   methods: {
@@ -18,7 +18,7 @@ Component({
       this.setData({
         a: this.data.a + 1,
         behaviorTestData: this.data.behaviorTestData + 1,
-      })
-    }
-  }
-})
+      });
+    },
+  },
+});

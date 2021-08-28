@@ -1,11 +1,11 @@
-import { baseConfig, IBaseConfig } from './base'
-import { buildConfig, IBuildConfig  } from './build'
+import { baseConfig, BaseConfig } from "./base";
+import { buildConfig, BuildConfig } from "./build";
 
-interface IConfig extends IBaseConfig, IBuildConfig { }
+interface Config extends BaseConfig, BuildConfig {}
 
-const config: IConfig = {
+const config: Config = {
   ...baseConfig,
   ...buildConfig,
-}
+};
 
 export default config;
