@@ -22,6 +22,7 @@ interface ComputedWatchInfo {
   computedUpdaters: Array<any>;
   computedRelatedPathValues: Record<string, any>;
   watchCurVal: Record<string, any>;
+  _triggerFromComputedAttached: Record<string, boolean>;
 }
 
 let computedWatchDefIdInc = 0;
@@ -55,6 +56,7 @@ export const behavior = Behavior({
             computedUpdaters: [],
             computedRelatedPathValues: {},
             watchCurVal: {},
+            _triggerFromComputedAttached: {},
           };
           if (!this._computedWatchInfo) this._computedWatchInfo = {};
           this._computedWatchInfo[computedWatchDefId] = computedWatchInfo;
@@ -94,7 +96,7 @@ export const behavior = Behavior({
               this.setData({
                 [targetField]: dataTracer.unwrap(val),
               });
-
+              computedWatchInfo._triggerFromComputedAttached[targetField] = true;
               computedWatchInfo.computedRelatedPathValues[targetField] =
                 pathValues;
 
@@ -153,6 +155,7 @@ export const behavior = Behavior({
     }
 
     if (watchDef) {
+
       Object.keys(watchDef).forEach((watchPath) => {
         const paths = dataPath.parseMultiDataPaths(watchPath);
         observersItems.push({
@@ -162,6 +165,19 @@ export const behavior = Behavior({
             const computedWatchInfo =
               this._computedWatchInfo[computedWatchDefId];
             if (!computedWatchInfo) return;
+            // (issue #58) ignore watch func when trigger by computed attached
+            if (Object.keys(computedWatchInfo._triggerFromComputedAttached).length) {
+              const pathsMap: Record<string, boolean> = {}
+              paths.forEach((path) => pathsMap[path.path[0]] = true);
+              for (let computedVal in computedWatchInfo._triggerFromComputedAttached) {
+                if (computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(computedVal)) {
+                  if (pathsMap[computedVal]) {
+                    computedWatchInfo._triggerFromComputedAttached[computedVal] = false;
+                    return
+                  }
+                }
+              }
+            }
             const oldVal = computedWatchInfo.watchCurVal[watchPath];
 
             // get new watching field value
@@ -204,6 +220,7 @@ export const behavior = Behavior({
     if (typeof defFields.observers !== "object") {
       defFields.observers = {};
     }
+
     if (Array.isArray(defFields.observers)) {
       defFields.observers.push(...observersItems);
     } else {

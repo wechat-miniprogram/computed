@@ -776,4 +776,53 @@ describe("computed behavior", () => {
     expect(c1TriggerCount).toBe(2);
     expect(c2TriggerCount).toBe(2);
   });
+
+  test("ignore watch func when trigger by computed attached", () => {
+    let cTriggerCount = 0;
+    let dTriggerCount = 0;
+    const behA = BehaviorWithComputed({
+      data: {
+        a: 1,
+      },
+      computed: {
+        d(data) {
+          return 10
+        },
+        c(data) {
+          return data.b * 2;
+        },
+      },
+      watch: {
+        c() {
+          cTriggerCount += 1;
+        },
+        d() {
+          dTriggerCount += 1;
+        },
+      },
+      attached() {
+        this.setData({
+          a: 2,
+        });
+      },
+    });
+    const componentId = _.load({
+      template: "<view>{{c}}</view>",
+      behaviors: [behA, computedBehavior],
+      data: {
+        b: 10,
+      },
+      attached() {
+        this.setData({
+          b: 20,
+        });
+      },
+    });
+    const component = _.render(componentId);
+    component.triggerLifeTime("attached");
+    expect(_.match(component.dom!, "<wx-view>40</wx-view>")).toBe(true);
+    expect(cTriggerCount).toBe(0);
+    expect(dTriggerCount).toBe(0);
+
+  })
 });

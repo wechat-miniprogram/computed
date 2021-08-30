@@ -3,12 +3,12 @@ const WHITE_SPACE_CHAR_REGEXP = /^\s/;
 const throwParsingError = function (path, index) {
   throw new Error(
     'Parsing data path "' +
-      path +
-      '" failed at char "' +
-      path[index] +
-      '" (index ' +
-      index +
-      ")"
+    path +
+    '" failed at char "' +
+    path[index] +
+    '" (index ' +
+    index +
+    ")"
   );
 };
 

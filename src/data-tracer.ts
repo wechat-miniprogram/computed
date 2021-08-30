@@ -1,6 +1,5 @@
 const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== "object" || data === null) return data;
-
   const handler = {
     get(_obj, key) {
       if (key === "__rawObject__") return data;
@@ -22,6 +21,7 @@ const wrapData = (data, relatedPathValues, basePath) => {
 export function create(data, relatedPathValues) {
   return wrapData(data, relatedPathValues, []);
 }
+
 export function unwrap(wrapped) {
   if (
     typeof wrapped !== "object" ||
