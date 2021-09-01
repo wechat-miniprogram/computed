@@ -821,7 +821,7 @@ describe("computed behavior", () => {
     const component = _.render(componentId);
     component.triggerLifeTime("attached");
     expect(_.match(component.dom!, "<wx-view>40</wx-view>")).toBe(true);
-    expect(cTriggerCount).toBe(0);
+    expect(cTriggerCount).toBe(1);
     expect(dTriggerCount).toBe(0);
 
   })

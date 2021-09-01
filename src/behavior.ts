@@ -171,7 +171,7 @@ export const behavior = Behavior({
               paths.forEach((path) => pathsMap[path.path[0]] = true);
               for (let computedVal in computedWatchInfo._triggerFromComputedAttached) {
                 if (computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(computedVal)) {
-                  if (pathsMap[computedVal]) {
+                  if (pathsMap[computedVal] && computedWatchInfo._triggerFromComputedAttached[computedVal]) {
                     computedWatchInfo._triggerFromComputedAttached[computedVal] = false;
                     return
                   }

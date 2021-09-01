@@ -6,8 +6,14 @@ Component({
     a: 1,
     sum: 1001,
   },
+  computed: {
+    b(data) {
+      return data.a
+    }
+  },
   watch: {
-    "a, behaviorTestData": function (a, behaviorTestData) {
+    "a, behaviorTestData, b": function (a, behaviorTestData) {
+      console.log("123")
       this.setData({
         sum: a + behaviorTestData,
       });
