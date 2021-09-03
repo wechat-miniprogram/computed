@@ -94,3 +94,20 @@ export function BehaviorWithComputed<
   options.behaviors.unshift(behavior);
   return Behavior(options);
 }
+
+// data tracer mode
+export enum DataTracerMode {
+  Auto,
+  Proxy,
+  DefineProperty,
+}
+
+let currentDataTracerMode = DataTracerMode.Auto;
+
+export const getCurrentDataTracerMode = () => {
+  return currentDataTracerMode;
+};
+
+export const setCurrentDataTracerMode = (mode: DataTracerMode) => {
+  currentDataTracerMode = mode;
+};
