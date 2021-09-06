@@ -42,7 +42,7 @@
         "useSummerCompiler": false
     },
     "compileType": "miniprogram",
-    "libVersion": "2.19.2",
+    "libVersion": "2.19.3",
     "appid": "wx1a116dcfe0c2de16",
     "projectname": "computed-watch",
     "debugOptions": {

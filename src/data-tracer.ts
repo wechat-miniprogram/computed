@@ -1,3 +1,6 @@
+import ProxyPolyfillBuilder from "proxy-polyfill/src/proxy";
+const ProxyPolyfill = ProxyPolyfillBuilder();
+
 const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== "object" || data === null) return data;
   const handler = {
@@ -14,7 +17,16 @@ const wrapData = (data, relatedPathValues, basePath) => {
       return keyWrapper;
     },
   };
-  const propDef = new Proxy(data, handler);
+  // for test
+  // const Proxy = undefined;
+
+  let propDef;
+  try {
+    propDef = new Proxy(data, handler);
+  } catch (e) {
+    // console.log("[miniprogram-computed]: use Proxy Polyfill");
+    propDef = new ProxyPolyfill(data, handler);
+  }
   return propDef;
 };
 

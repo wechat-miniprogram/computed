@@ -59,12 +59,13 @@
     "prettier": "^2.0.1",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
-    "typescript": "^4.0.3"
+    "typescript": "^4.0.3",
+    "proxy-polyfill": "^0.3.2"
   },
   "dependencies": {
+    "@types/wechat-miniprogram": "^3.0.0",
     "fast-deep-equal": "^2.0.1",
-    "rfdc": "^1.1.4",
-    "@types/wechat-miniprogram": "^3.0.0"
+    "rfdc": "^1.1.4"
   },
   "husky": {
     "hooks": {

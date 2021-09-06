@@ -39,7 +39,8 @@ const esbuildOptions = {
   outfile: "index.js",
   bundle: true,
   format: "cjs",
-  minify: true, // 开启压缩混淆
+  minify: true,
+  external: ["rfdc", "fast-deep-equal"]
 };
 
 export interface BuildConfig {

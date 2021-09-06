@@ -22,3 +22,10 @@ export declare function ComponentWithComputed<TData extends WechatMiniprogram.Co
 export declare function BehaviorWithComputed<TData extends WechatMiniprogram.Behavior.DataOption, TProperty extends WechatMiniprogram.Behavior.PropertyOption, TMethod extends WechatMiniprogram.Behavior.MethodOption, TWatch extends Record<string, (...args: any[]) => void>, TComputed extends Record<string, (data: TData & {
     [K in keyof TProperty]: any;
 }) => any>, TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}>(options: ComputedOptions<TData, TProperty, TMethod, TWatch, TComputed, TCustomInstanceProperty>): string;
+export declare enum DataTracerMode {
+    Auto = 0,
+    Proxy = 1,
+    DefineProperty = 2
+}
+export declare const getCurrentDataTracerMode: () => DataTracerMode;
+export declare const setCurrentDataTracerMode: (mode: DataTracerMode) => void;
