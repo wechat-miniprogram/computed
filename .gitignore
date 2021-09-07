@@ -1,5 +1,5 @@
 .idea
-.vscode/
+.vscode
 .DS_Store
 package-lock.json
 
@@ -11,4 +11,4 @@ yarn-error.log*
 
 node_modules
 coverage
-swc_dist
+swc_build
