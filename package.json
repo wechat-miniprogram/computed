@@ -1,6 +1,6 @@
 {
   "name": "miniprogram-computed",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Computed & watch - wechat miniprogram custom component extend behavior",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
