@@ -3,7 +3,6 @@
         "baseUrl": ".",
         "module": "commonjs",
         "noImplicitAny": false,
-        "removeComments": true,
         "target": "ESNEXT",
         "lib": ["ESNEXT"],
         "preserveConstEnums": true,

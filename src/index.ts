@@ -1,6 +1,6 @@
-import { behavior } from "./behavior";
+import { behavior } from './behavior'
 
-export { behavior } from "./behavior";
+export { behavior } from './behavior'
 
 type ComputedInstance<
   D extends WechatMiniprogram.Component.DataOption,
@@ -62,10 +62,10 @@ export function ComponentWithComputed<
   >
 ): string {
   if (!Array.isArray(options.behaviors)) {
-    options.behaviors = [];
+    options.behaviors = []
   }
-  options.behaviors.unshift(behavior);
-  return Component(options);
+  options.behaviors.unshift(behavior)
+  return Component(options)
 }
 
 export function BehaviorWithComputed<
@@ -89,10 +89,10 @@ export function BehaviorWithComputed<
   >
 ): string {
   if (!Array.isArray(options.behaviors)) {
-    options.behaviors = [];
+    options.behaviors = []
   }
-  options.behaviors.unshift(behavior);
-  return Behavior(options);
+  options.behaviors.unshift(behavior)
+  return Behavior(options)
 }
 
 // data tracer mode
@@ -102,12 +102,12 @@ export enum DataTracerMode {
   DefineProperty,
 }
 
-let currentDataTracerMode = DataTracerMode.Auto;
+let currentDataTracerMode = DataTracerMode.Auto
 
 export const getCurrentDataTracerMode = () => {
-  return currentDataTracerMode;
-};
+  return currentDataTracerMode
+}
 
 export const setCurrentDataTracerMode = (mode: DataTracerMode) => {
-  currentDataTracerMode = mode;
-};
+  currentDataTracerMode = mode
+}

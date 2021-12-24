@@ -3,3 +3,4 @@ types
 demo
 dist
 swc_build
+gulpfile.ts
