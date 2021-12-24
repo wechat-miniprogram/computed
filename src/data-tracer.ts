@@ -4,11 +4,11 @@ const ProxyPolyfill = ProxyPolyfillBuilder();
 const wrapData = (data, relatedPathValues, basePath) => {
   if (typeof data !== "object" || data === null) return data;
   const handler = {
-    get(_obj, key) {
-      if (key === "__rawObject__") return data;
+    get(obj, key) {
+      if (key === "__rawObject__") return obj;
       let keyWrapper = null;
       const keyPath = basePath.concat(key);
-      const value = data[key];
+      const value = obj[key];
       relatedPathValues.push({
         path: keyPath,
         value,
@@ -17,14 +17,10 @@ const wrapData = (data, relatedPathValues, basePath) => {
       return keyWrapper;
     },
   };
-  // for test
-  // const Proxy = undefined;
-
   let propDef;
   try {
     propDef = new Proxy(data, handler);
   } catch (e) {
-    // console.log("[miniprogram-computed]: use Proxy Polyfill");
     propDef = new ProxyPolyfill(data, handler);
   }
   return propDef;
@@ -35,6 +31,10 @@ export function create(data, relatedPathValues) {
 }
 
 export function unwrap(wrapped) {
+  // @ts-ignore
+  if (Array.isArray(wrapped) && typeof wrapped.__rawObject__ !== "object") {
+    return wrapped.map((i) => unwrap(i));
+  }
   if (
     typeof wrapped !== "object" ||
     wrapped === null ||

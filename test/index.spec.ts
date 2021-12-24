@@ -786,7 +786,7 @@ describe("computed behavior", () => {
       },
       computed: {
         d(data) {
-          return 10
+          return 10;
         },
         c(data) {
           return data.b * 2;
@@ -823,6 +823,52 @@ describe("computed behavior", () => {
     expect(_.match(component.dom!, "<wx-view>40</wx-view>")).toBe(true);
     expect(cTriggerCount).toBe(1);
     expect(dTriggerCount).toBe(0);
+  });
 
-  })
+  test("computed derivations", () => {
+    let aTriggerCount = 0;
+    let bTriggerCount = 0;
+    const componentId = _.load({
+      template: "<view></view>",
+      behaviors: [computedBehavior],
+      data: {
+        root: [
+          {
+            values: [1, 2, 3],
+          },
+        ],
+      },
+      computed: {
+        computedWithRoot(data) {
+          aTriggerCount++;
+          const res = data.root.map((v) => v);
+          return res;
+        },
+        computedWithDerivations(data) {
+          bTriggerCount++;
+          const res = data.computedWithRoot[0].values;
+          return res;
+        },
+      },
+    });
+
+    const component = _.render(componentId);
+    component.triggerLifeTime("attached");
+    expect(aTriggerCount).toBe(1);
+    expect(bTriggerCount).toBe(1);
+
+    component.data.root[0].values.push(1);
+    component.setData({
+      "root[0].values": component.data.root[0].values,
+    });
+    expect(aTriggerCount).toBe(1);
+    expect(bTriggerCount).toBe(2);
+
+    component.data.root.push(2);
+    component.setData({
+      root: component.data.root,
+    });
+    expect(aTriggerCount).toBe(2);
+    expect(bTriggerCount).toBe(3);
+  });
 });

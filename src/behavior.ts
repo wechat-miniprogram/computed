@@ -85,18 +85,17 @@ export const behavior = Behavior({
               const val = updateMethod(
                 dataTracer.create(this.data, relatedPathValuesOnDef)
               );
-
               const pathValues = relatedPathValuesOnDef.map(({ path }) => ({
                 path,
                 value: dataPath.getDataOnPath(this.data, path),
               }));
-
               // here we can do small setDatas
               // because observer handlers will force grouping small setDatas together
               this.setData({
                 [targetField]: dataTracer.unwrap(val),
               });
-              computedWatchInfo._triggerFromComputedAttached[targetField] = true;
+              computedWatchInfo._triggerFromComputedAttached[targetField] =
+                true;
               computedWatchInfo.computedRelatedPathValues[targetField] =
                 pathValues;
 
@@ -123,8 +122,12 @@ export const behavior = Behavior({
                 this.setData({
                   [targetField]: dataTracer.unwrap(val),
                 });
+                const pathValues = relatedPathValues.map(({ path }) => ({
+                  path,
+                  value: dataPath.getDataOnPath(this.data, path),
+                }));
                 computedWatchInfo.computedRelatedPathValues[targetField] =
-                  relatedPathValues;
+                  pathValues;
                 return true;
               };
               computedWatchInfo.computedUpdaters.push(
@@ -155,7 +158,6 @@ export const behavior = Behavior({
     }
 
     if (watchDef) {
-
       Object.keys(watchDef).forEach((watchPath) => {
         const paths = dataPath.parseMultiDataPaths(watchPath);
         observersItems.push({
@@ -166,14 +168,25 @@ export const behavior = Behavior({
               this._computedWatchInfo[computedWatchDefId];
             if (!computedWatchInfo) return;
             // (issue #58) ignore watch func when trigger by computed attached
-            if (Object.keys(computedWatchInfo._triggerFromComputedAttached).length) {
-              const pathsMap: Record<string, boolean> = {}
-              paths.forEach((path) => pathsMap[path.path[0]] = true);
-              for (let computedVal in computedWatchInfo._triggerFromComputedAttached) {
-                if (computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(computedVal)) {
-                  if (pathsMap[computedVal] && computedWatchInfo._triggerFromComputedAttached[computedVal]) {
-                    computedWatchInfo._triggerFromComputedAttached[computedVal] = false;
-                    return
+            if (
+              Object.keys(computedWatchInfo._triggerFromComputedAttached).length
+            ) {
+              const pathsMap: Record<string, boolean> = {};
+              paths.forEach((path) => (pathsMap[path.path[0]] = true));
+              for (const computedVal in computedWatchInfo._triggerFromComputedAttached) {
+                if (
+                  computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(
+                    computedVal
+                  )
+                ) {
+                  if (
+                    pathsMap[computedVal] &&
+                    computedWatchInfo._triggerFromComputedAttached[computedVal]
+                  ) {
+                    computedWatchInfo._triggerFromComputedAttached[
+                      computedVal
+                    ] = false;
+                    return;
                   }
                 }
               }
