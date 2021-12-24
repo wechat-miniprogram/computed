@@ -22,9 +22,9 @@
 /**
  * @type {Object}
  */
-var process;
+var process
 
 /**
  * @type {Object}
  */
-var global;
+var global

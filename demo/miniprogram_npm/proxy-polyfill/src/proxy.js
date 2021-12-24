@@ -15,47 +15,54 @@
  */
 
 module.exports = function proxyPolyfill() {
-  let lastRevokeFn = null;
-  let ProxyPolyfill;
+  let lastRevokeFn = null
+  let ProxyPolyfill
 
   /**
    * @param {*} o
    * @return {boolean} whether this is probably a (non-null) Object
    */
   function isObject(o) {
-    return o ? (typeof o === 'object' || typeof o === 'function') : false;
+    return o ? typeof o === 'object' || typeof o === 'function' : false
   }
 
   function validateProto(proto) {
     if (proto !== null && !isObject(proto)) {
-      throw new TypeError('Object prototype may only be an Object or null: ' + proto);
+      throw new TypeError(
+        'Object prototype may only be an Object or null: ' + proto,
+      )
     }
   }
 
-  const $Object = Object;
+  const $Object = Object
 
   // Closure assumes that `{__proto__: null} instanceof Object` is always true, hence why we check against a different name.
-  const canCreateNullProtoObjects = Boolean($Object.create) || !({ __proto__: null } instanceof $Object);
+  const canCreateNullProtoObjects =
+    Boolean($Object.create) || !({ __proto__: null } instanceof $Object)
   const objectCreate =
     $Object.create ||
     (canCreateNullProtoObjects
       ? function create(proto) {
-          validateProto(proto);
-          return { __proto__: proto };
+          validateProto(proto)
+          return { __proto__: proto }
         }
       : function create(proto) {
-          validateProto(proto);
+          validateProto(proto)
           if (proto === null) {
-            throw new SyntaxError('Native Object.create is required to create objects with null prototype');
+            throw new SyntaxError(
+              'Native Object.create is required to create objects with null prototype',
+            )
           }
 
           // nb. cast to convince Closure compiler that this is a constructor
-          var T = /** @type {!Function} */ (function T() {});
-          T.prototype = proto;
-          return new T();
-        });
+          var T = /** @type {!Function} */ (function T() {})
+          T.prototype = proto
+          return new T()
+        })
 
-  const noop = function() { return null; };
+  const noop = function () {
+    return null
+  }
 
   const getProto =
     $Object.getPrototypeOf ||
@@ -63,137 +70,147 @@ module.exports = function proxyPolyfill() {
       ? function getPrototypeOf(O) {
           // If O.[[Prototype]] === null, then the __proto__ accessor won't exist,
           // as it's inherited from `Object.prototype`
-          const proto = O.__proto__;
-          return isObject(proto) ? proto : null;
+          const proto = O.__proto__
+          return isObject(proto) ? proto : null
         }
-      : noop);
+      : noop)
 
   /**
    * @constructor
    * @param {!Object} target
    * @param {{apply, construct, get, set}} handler
    */
-  ProxyPolyfill = function(target, handler) {
-    const newTarget = this && this instanceof ProxyPolyfill ? this.constructor : undefined;
+  ProxyPolyfill = function (target, handler) {
+    const newTarget =
+      this && this instanceof ProxyPolyfill ? this.constructor : undefined
     if (newTarget === undefined) {
-      throw new TypeError("Constructor Proxy requires 'new'");
+      throw new TypeError("Constructor Proxy requires 'new'")
     }
 
     if (!isObject(target) || !isObject(handler)) {
-      throw new TypeError('Cannot create proxy with a non-object as target or handler');
+      throw new TypeError(
+        'Cannot create proxy with a non-object as target or handler',
+      )
     }
 
     // Construct revoke function, and set lastRevokeFn so that Proxy.revocable can steal it.
     // The caller might get the wrong revoke function if a user replaces or wraps scope.Proxy
     // to call itself, but that seems unlikely especially when using the polyfill.
-    let throwRevoked = function() {};
-    lastRevokeFn = function() {
+    let throwRevoked = function () {}
+    lastRevokeFn = function () {
       /** @suppress {checkTypes} */
-      target = null;  // clear ref
-      throwRevoked = function(trap) {
-        throw new TypeError(`Cannot perform '${trap}' on a proxy that has been revoked`);
-      };
-    };
-    setTimeout(function() {
-      lastRevokeFn = null;
-    }, 0);
+      target = null // clear ref
+      throwRevoked = function (trap) {
+        throw new TypeError(
+          `Cannot perform '${trap}' on a proxy that has been revoked`,
+        )
+      }
+    }
+    setTimeout(function () {
+      lastRevokeFn = null
+    }, 0)
 
     // Fail on unsupported traps: Chrome doesn't do this, but ensure that users of the polyfill
     // are a bit more careful. Copy the internal parts of handler to prevent user changes.
-    const unsafeHandler = handler;
-    handler = { 'get': null, 'set': null, 'apply': null, 'construct': null };
+    const unsafeHandler = handler
+    handler = { get: null, set: null, apply: null, construct: null }
     for (let k in unsafeHandler) {
       if (!(k in handler)) {
-        throw new TypeError(`Proxy polyfill does not support trap '${k}'`);
+        throw new TypeError(`Proxy polyfill does not support trap '${k}'`)
       }
-      handler[k] = unsafeHandler[k];
+      handler[k] = unsafeHandler[k]
     }
     if (typeof unsafeHandler === 'function') {
       // Allow handler to be a function (which has an 'apply' method). This matches what is
       // probably a bug in native versions. It treats the apply call as a trap to be configured.
-      handler.apply = unsafeHandler.apply.bind(unsafeHandler);
+      handler.apply = unsafeHandler.apply.bind(unsafeHandler)
     }
 
     // Define proxy as an object that extends target.[[Prototype]],
     // or a Function (if either it's callable, or apply is set).
-    const proto = getProto(target);  // can return null in old browsers
-    let proxy;
-    let isMethod = false;
-    let isArray = false;
+    const proto = getProto(target) // can return null in old browsers
+    let proxy
+    let isMethod = false
+    let isArray = false
     if (typeof target === 'function') {
       proxy = function ProxyPolyfill() {
-        const usingNew = (this && this.constructor === proxy);
-        const args = Array.prototype.slice.call(arguments);
-        throwRevoked(usingNew ? 'construct' : 'apply');
+        const usingNew = this && this.constructor === proxy
+        const args = Array.prototype.slice.call(arguments)
+        throwRevoked(usingNew ? 'construct' : 'apply')
 
         // TODO(samthor): Closure compiler doesn't know about 'construct', attempts to rename it.
         if (usingNew && handler['construct']) {
-          return handler['construct'].call(this, target, args);
+          return handler['construct'].call(this, target, args)
         } else if (!usingNew && handler.apply) {
-          return handler['apply'](target, this, args);
+          return handler['apply'](target, this, args)
         }
 
         // since the target was a function, fallback to calling it directly.
         if (usingNew) {
           // inspired by answers to https://stackoverflow.com/q/1606797
-          args.unshift(target);  // pass class as first arg to constructor, although irrelevant
+          args.unshift(target) // pass class as first arg to constructor, although irrelevant
           // nb. cast to convince Closure compiler that this is a constructor
-          const f = /** @type {!Function} */ (target.bind.apply(target, args));
-          return new f();
+          const f = /** @type {!Function} */ (target.bind.apply(target, args))
+          return new f()
         }
-        return target.apply(this, args);
-      };
-      isMethod = true;
+        return target.apply(this, args)
+      }
+      isMethod = true
     } else if (target instanceof Array) {
-      proxy = [];
-      isArray = true;
+      proxy = []
+      isArray = true
     } else {
-      proxy = (canCreateNullProtoObjects || proto !== null) ? objectCreate(proto) : {};
+      proxy =
+        canCreateNullProtoObjects || proto !== null ? objectCreate(proto) : {}
     }
 
     // Create default getters/setters. Create different code paths as handler.get/handler.set can't
     // change after creation.
-    const getter = handler.get ? function(prop) {
-      throwRevoked('get');
-      return handler.get(this, prop, proxy);
-    } : function(prop) {
-      throwRevoked('get');
-      return this[prop];
-    };
-    const setter = handler.set ? function(prop, value) {
-      throwRevoked('set');
-      const status = handler.set(this, prop, value, proxy);
-      // TODO(samthor): If the calling code is in strict mode, throw TypeError.
-      // if (!status) {
-        // It's (sometimes) possible to work this out, if this code isn't strict- try to load the
-        // callee, and if it's available, that code is non-strict. However, this isn't exhaustive.
-      // }
-    } : function(prop, value) {
-      throwRevoked('set');
-      this[prop] = value;
-    };
+    const getter = handler.get
+      ? function (prop) {
+          throwRevoked('get')
+          return handler.get(this, prop, proxy)
+        }
+      : function (prop) {
+          throwRevoked('get')
+          return this[prop]
+        }
+    const setter = handler.set
+      ? function (prop, value) {
+          throwRevoked('set')
+          const status = handler.set(this, prop, value, proxy)
+          // TODO(samthor): If the calling code is in strict mode, throw TypeError.
+          // if (!status) {
+          // It's (sometimes) possible to work this out, if this code isn't strict- try to load the
+          // callee, and if it's available, that code is non-strict. However, this isn't exhaustive.
+          // }
+        }
+      : function (prop, value) {
+          throwRevoked('set')
+          this[prop] = value
+        }
 
     // Clone direct properties (i.e., not part of a prototype).
-    const propertyNames = $Object.getOwnPropertyNames(target);
-    const propertyMap = {};
-    propertyNames.forEach(function(prop) {
+    const propertyNames = $Object.getOwnPropertyNames(target)
+    const propertyMap = {}
+    propertyNames.forEach(function (prop) {
       if ((isMethod || isArray) && prop in proxy) {
-        return;  // ignore properties already here, e.g. 'bind', 'prototype' etc
+        return // ignore properties already here, e.g. 'bind', 'prototype' etc
       }
-      const real = $Object.getOwnPropertyDescriptor(target, prop);
+      const real = $Object.getOwnPropertyDescriptor(target, prop)
       const desc = {
         enumerable: Boolean(real.enumerable),
         get: getter.bind(target, prop),
         set: setter.bind(target, prop),
-      };
-      $Object.defineProperty(proxy, prop, desc);
-      propertyMap[prop] = true;
-    });
+      }
+      $Object.defineProperty(proxy, prop, desc)
+      propertyMap[prop] = true
+    })
 
     // Set the prototype, or clone all prototype methods (always required if a getter is provided).
     // TODO(samthor): We don't allow prototype methods to be set. It's (even more) awkward.
     // An alternative here would be to _just_ clone methods to keep behavior consistent.
-    let prototypeOk = true;
+    let prototypeOk = true
     if (isMethod || isArray) {
       // Arrays and methods are special: above, we instantiate boring versions of these then swap
       // our their prototype later. So we only need to use setPrototypeOf in these cases. Some old
@@ -202,35 +219,35 @@ module.exports = function proxyPolyfill() {
         $Object.setPrototypeOf ||
         ([].__proto__ === Array.prototype
           ? function setPrototypeOf(O, proto) {
-              validateProto(proto);
-              O.__proto__ = proto;
-              return O;
+              validateProto(proto)
+              O.__proto__ = proto
+              return O
             }
-          : noop);
+          : noop)
       if (!(proto && setProto(proxy, proto))) {
-        prototypeOk = false;
+        prototypeOk = false
       }
     }
     if (handler.get || !prototypeOk) {
       for (let k in target) {
         if (propertyMap[k]) {
-          continue;
+          continue
         }
-        $Object.defineProperty(proxy, k, { get: getter.bind(target, k) });
+        $Object.defineProperty(proxy, k, { get: getter.bind(target, k) })
       }
     }
 
     // The Proxy polyfill cannot handle adding new properties. Seal the target and proxy.
-    $Object.seal(target);
-    $Object.seal(proxy);
+    $Object.seal(target)
+    $Object.seal(proxy)
 
-    return proxy;  // nb. if isMethod is true, proxy != this
-  };
+    return proxy // nb. if isMethod is true, proxy != this
+  }
 
-  ProxyPolyfill.revocable = function(target, handler) {
-    const p = new ProxyPolyfill(target, handler);
-    return { 'proxy': p, 'revoke': lastRevokeFn };
-  };
+  ProxyPolyfill.revocable = function (target, handler) {
+    const p = new ProxyPolyfill(target, handler)
+    return { proxy: p, revoke: lastRevokeFn }
+  }
 
-  return ProxyPolyfill;
+  return ProxyPolyfill
 }

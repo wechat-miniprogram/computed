@@ -14,19 +14,17 @@
  * the License.
  */
 
-'use strict';
-
-(function(scope) {
+'use strict'
+;(function (scope) {
   if (scope['Proxy']) {
-    return;
+    return
   }
-  scope.Proxy = require('./proxy.js')();
-  scope.Proxy['revocable'] = scope.Proxy.revocable;
+  scope.Proxy = require('./proxy.js')()
+  scope.Proxy['revocable'] = scope.Proxy.revocable
 })(
   ('undefined' !== typeof process &&
     '[object process]' === {}.toString.call(process)) ||
-  ('undefined' !== typeof navigator && navigator.product === 'ReactNative')
+    ('undefined' !== typeof navigator && navigator.product === 'ReactNative')
     ? global
-    : self
-);
-
+    : self,
+)

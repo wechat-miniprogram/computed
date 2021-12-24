@@ -1,16 +1,16 @@
-import { behavior } from "./behavior";
+import { behavior } from './behavior'
 
-export { behavior } from "./behavior";
+export { behavior } from './behavior'
 
 type ComputedInstance<
   D extends WechatMiniprogram.Component.DataOption,
   P extends WechatMiniprogram.Component.PropertyOption,
   M extends WechatMiniprogram.Component.MethodOption,
   C extends Record<string, (data: D & { [K in keyof P]: any }) => any>,
-  TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>
+  TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>,
 > = WechatMiniprogram.Component.Instance<D, P, M, TCustomProperty> & {
   data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any };
-};
+}
 
 type ComputedOptions<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -21,7 +21,7 @@ type ComputedOptions<
     string,
     (data: TData & { [K in keyof TProperty]: any }) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 > = (Partial<WechatMiniprogram.Component.Data<TData>> &
   Partial<WechatMiniprogram.Component.Property<TProperty>> &
   Partial<WechatMiniprogram.Component.Method<TMethod>> &
@@ -39,7 +39,7 @@ type ComputedOptions<
       TComputed,
       TCustomInstanceProperty
     >
-  >;
+  >
 
 export function ComponentWithComputed<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -50,7 +50,7 @@ export function ComponentWithComputed<
     string,
     (data: TData & { [K in keyof TProperty]: any }) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
   options: ComputedOptions<
     TData,
@@ -59,13 +59,13 @@ export function ComponentWithComputed<
     TWatch,
     TComputed,
     TCustomInstanceProperty
-  >
+  >,
 ): string {
   if (!Array.isArray(options.behaviors)) {
-    options.behaviors = [];
+    options.behaviors = []
   }
-  options.behaviors.unshift(behavior);
-  return Component(options);
+  options.behaviors.unshift(behavior)
+  return Component(options)
 }
 
 export function BehaviorWithComputed<
@@ -77,7 +77,7 @@ export function BehaviorWithComputed<
     string,
     (data: TData & { [K in keyof TProperty]: any }) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
   options: ComputedOptions<
     TData,
@@ -86,13 +86,13 @@ export function BehaviorWithComputed<
     TWatch,
     TComputed,
     TCustomInstanceProperty
-  >
+  >,
 ): string {
   if (!Array.isArray(options.behaviors)) {
-    options.behaviors = [];
+    options.behaviors = []
   }
-  options.behaviors.unshift(behavior);
-  return Behavior(options);
+  options.behaviors.unshift(behavior)
+  return Behavior(options)
 }
 
 // data tracer mode
@@ -102,12 +102,12 @@ export enum DataTracerMode {
   DefineProperty,
 }
 
-let currentDataTracerMode = DataTracerMode.Auto;
+let currentDataTracerMode = DataTracerMode.Auto
 
 export const getCurrentDataTracerMode = () => {
-  return currentDataTracerMode;
-};
+  return currentDataTracerMode
+}
 
 export const setCurrentDataTracerMode = (mode: DataTracerMode) => {
-  currentDataTracerMode = mode;
-};
+  currentDataTracerMode = mode
+}

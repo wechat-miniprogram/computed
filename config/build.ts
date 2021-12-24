@@ -8,13 +8,13 @@
 const swcOptions = {
   jsc: {
     parser: {
-      syntax: "typescript",
+      syntax: 'typescript',
       tsx: false,
       decorators: false,
       dynamicImport: false,
     },
     transform: null,
-    target: "es5",
+    target: 'es5',
     externalHelpers: false,
     keepClassNames: false,
     minify: {
@@ -26,29 +26,29 @@ const swcOptions = {
   },
   minify: false,
   module: {
-    type: "commonjs",
+    type: 'commonjs',
     strict: false,
     strictMode: true,
     lazy: false,
     noInterop: false,
   },
-};
+}
 
 // esbuild 配置
 const esbuildOptions = {
-  outfile: "index.js",
+  outfile: 'index.js',
   bundle: true,
-  format: "cjs",
+  format: 'cjs',
   minify: true,
-  external: ["rfdc", "fast-deep-equal"]
-};
+  external: ['rfdc', 'fast-deep-equal'],
+}
 
 export interface BuildConfig {
-  swcOptions: any;
-  esbuildOptions: any;
+  swcOptions: any
+  esbuildOptions: any
 }
 
 export const buildConfig: BuildConfig = {
   swcOptions,
   esbuildOptions,
-};
+}

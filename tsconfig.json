@@ -1,21 +1,19 @@
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "module": "commonjs",
-        "noImplicitAny": false,
-        "removeComments": true,
-        "target": "ESNEXT",
-        "lib": ["ESNEXT"],
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "declaration": true,
-        "declarationDir": "./types",
-        "emitDeclarationOnly": true,
-        "skipLibCheck": true,
-    },
-    "include": [
-        "./src/**/*.ts"
-    ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "target": "ESNEXT",
+    "lib": ["ESNEXT"],
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationDir": "./types",
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*.ts"]
 }

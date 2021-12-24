@@ -40,8 +40,8 @@ npm run dev // 构建 dev 版本
 
 ```js
 // component.js
-const computedBehavior = require("miniprogram-computed").behavior;
-const behaviorTest = require("./behavior-test"); // 引入自定义 behavior
+const computedBehavior = require('miniprogram-computed').behavior
+const behaviorTest = require('./behavior-test') // 引入自定义 behavior
 
 Component({
   behaviors: [behaviorTest, computedBehavior],
@@ -53,7 +53,7 @@ Component({
     sum(data) {
       // 注意： computed 函数中不能访问 this ，只有 data 对象可供访问
       // 这个函数的返回值会被设置到 this.data.sum 字段中
-      return data.a + data.b + data.c; // data.c 为自定义 behavior 数据段
+      return data.a + data.b + data.c // data.c 为自定义 behavior 数据段
     },
   },
   methods: {
@@ -61,10 +61,10 @@ Component({
       this.setData({
         a: this.data.b,
         b: this.data.a + this.data.b,
-      });
+      })
     },
   },
-});
+})
 ```
 
 ```js
@@ -73,7 +73,7 @@ module.exports = Behavior({
   data: {
     c: 2,
   },
-});
+})
 ```
 
 ```xml
@@ -86,7 +86,7 @@ module.exports = Behavior({
 ### watch 基本用法
 
 ```js
-const computedBehavior = require("miniprogram-computed").behavior;
+const computedBehavior = require('miniprogram-computed').behavior
 
 Component({
   behaviors: [computedBehavior],
@@ -96,10 +96,10 @@ Component({
     sum: 2,
   },
   watch: {
-    "a, b": function (a, b) {
+    'a, b': function (a, b) {
       this.setData({
         sum: a + b,
-      });
+      })
     },
   },
   methods: {
@@ -107,10 +107,10 @@ Component({
       this.setData({
         a: this.data.b,
         b: this.data.a + this.data.b,
-      });
+      })
     },
   },
-});
+})
 ```
 
 ```xml
@@ -125,7 +125,7 @@ Component({
 由于通过 behavior 的方式引入不能获得类型支持, 因此为了获得类型的支持, 可以使用一个辅助组件构造器：
 
 ```ts
-import { ComponentWithComputed } from "miniprogram-computed";
+import { ComponentWithComputed } from 'miniprogram-computed'
 
 ComponentWithComputed({
   data: {
@@ -134,20 +134,20 @@ ComponentWithComputed({
     sum: 2,
   },
   watch: {
-    "a, b": function (a, b) {
+    'a, b': function (a, b) {
       this.setData({
         sum: a + b,
-      });
+      })
     },
   },
   computed: {
     sum(data) {
       // 注意： computed 函数中不能访问 this ，只有 data 对象可供访问
       // 这个函数的返回值会被设置到 this.data.sum 字段中
-      return data.a + data.b + data.sum; // data.c 为自定义 behavior 数据段
+      return data.a + data.b + data.sum // data.c 为自定义 behavior 数据段
     },
   },
-});
+})
 ```
 
 当使用该构造器的时候, 编译器可以给 `computed` 和 `watch` 提供自动提示和类型支持。
@@ -158,7 +158,7 @@ ComponentWithComputed({
 
 **关于 TS 兼容问题**
 
-若在小程序中用 `TypeScript` 进行开发并使用到了 `Component` 构造器。这时定义 `computed` 或 `watch` 字段会出现类型报错。  
+若在小程序中用 `TypeScript` 进行开发并使用到了 `Component` 构造器。这时定义 `computed` 或 `watch` 字段会出现类型报错。
 
 针对此问题，推荐使用 `ComponentWithComputed` 构造器代替 `Component` 构造器。
 
@@ -215,7 +215,7 @@ ComponentWithComputed({
 在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers ）。
 
 ```js
-const computedBehavior = require("miniprogram-computed").behavior;
+const computedBehavior = require('miniprogram-computed').behavior
 
 Component({
   behaviors: [computedBehavior],
@@ -226,20 +226,20 @@ Component({
     },
   },
   watch: {
-    "obj.**": function (obj) {
+    'obj.**': function (obj) {
       this.setData({
         sum: obj.a + obj.b,
-      });
+      })
     },
   },
   methods: {
     onTap() {
       this.setData({
-        "obj.a": 10,
-      });
+        'obj.a': 10,
+      })
     },
   },
-});
+})
 ```
 
 除此以外：
@@ -248,4 +248,5 @@ Component({
 - 对于使用了 `**` 通配符的字段，则会进行深比较，来尝试精确检测对象是否真的发生了变化，这要求对象字段不能包含循环（类似于 `JSON.stringify` ）。
 
 ### 关于低版本兼容
+
 对于 IOS `9.3` 以下的版本，由于无法原生支持 `Proxy`，这里会使用 `proxy-polyfill` 去代替。
