@@ -14,31 +14,26 @@ module.exports = {
   },
   plugins: [
     '@typescript-eslint',
+    'prettier'
   ],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint'
   ],
   globals: {
     wx: true,
     App: true,
     Page: true,
-    Component: true,
-    Behavior: true,
+    Component: true
   },
   rules: {
-    'no-console': 0,
+    'prettier/prettier': 'error',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    "indent": ["error", 2, { "SwitchCase": 1 }],
-    "comma-spacing": "error",
-    "semi": ["error", "never"],
-    "quotes": ["error", "single"],
-    "object-curly-spacing": ["error", "always"],
-    "@typescript-eslint/ban-ts-comment": "off",
+    '@typescript-eslint/no-non-null-assertion': 'off'
   },
 }
-
