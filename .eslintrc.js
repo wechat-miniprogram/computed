@@ -34,5 +34,6 @@ module.exports = {
     quotes: ['error', 'single'],
     'object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/ban-ts-comment': 'off',
+    "@typescript-eslint/interface-name-prefix": 'off'
   },
 }

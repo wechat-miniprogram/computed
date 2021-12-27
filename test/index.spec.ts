@@ -809,9 +809,11 @@ describe('computed behavior', () => {
     expect(dTriggerCount).toBe(0)
   })
 
-  test('computed derivations', () => {
+  test('computed Array', () => {
     let aTriggerCount = 0
     let bTriggerCount = 0
+    let cTriggerCount = 0
+    let dTriggerCount = 0
     const componentId = _.load({
       template: '<view></view>',
       behaviors: [computedBehavior],
@@ -825,12 +827,22 @@ describe('computed behavior', () => {
       computed: {
         computedWithRoot(data) {
           aTriggerCount++
+          const res = data.root
+          return res
+        },
+        computedWithRootClone(data) {
+          bTriggerCount++
           const res = data.root.map((v) => v)
           return res
         },
-        computedWithDerivations(data) {
-          bTriggerCount++
+        computedWithCWR(data) {
+          cTriggerCount++
           const res = data.computedWithRoot[0].values
+          return res
+        },
+        computedWithCWRC(data) {
+          dTriggerCount++
+          const res = data.computedWithRootClone[0].values
           return res
         },
       },
@@ -840,19 +852,96 @@ describe('computed behavior', () => {
     component.triggerLifeTime('attached')
     expect(aTriggerCount).toBe(1)
     expect(bTriggerCount).toBe(1)
+    expect(cTriggerCount).toBe(1)
+    expect(dTriggerCount).toBe(1)
 
     component.data.root[0].values.push(1)
     component.setData({
       'root[0].values': component.data.root[0].values,
     })
     expect(aTriggerCount).toBe(1)
-    expect(bTriggerCount).toBe(2)
+    expect(bTriggerCount).toBe(1)
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(2)
 
     component.data.root.push(2)
     component.setData({
       root: component.data.root,
     })
-    expect(aTriggerCount).toBe(2)
-    expect(bTriggerCount).toBe(3)
+    expect(aTriggerCount).toBe(1)
+    expect(bTriggerCount).toBe(2)
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(3)
+  })
+
+  test('computed Object', () => {
+    let aTriggerCount = 0
+    let bTriggerCount = 0
+    let cTriggerCount = 0
+    let dTriggerCount = 0
+    const componentId = _.load({
+      template: '<view></view>',
+      behaviors: [computedBehavior],
+      data: {
+        root: { values: { arr: [1, 2, 3] } }
+      },
+      computed: {
+        computedWithRoot(data) {
+          aTriggerCount++
+          const res = data.root
+          return res
+        },
+        computedWithRootClone(data) {
+          bTriggerCount++
+          const res = { ...data.root }
+          return res
+        },
+        computedWithCWR(data) {
+          cTriggerCount++
+          const res = data.computedWithRoot.values.arr
+          return res
+        },
+        computedWithCWRC(data) {
+          dTriggerCount++
+          const res = data.computedWithRootClone.values.arr
+          return res
+        }
+      },
+    })
+
+    const component = _.render(componentId)
+    component.triggerLifeTime('attached')
+    expect(aTriggerCount).toBe(1)
+    expect(bTriggerCount).toBe(1)
+    expect(cTriggerCount).toBe(1)
+    expect(dTriggerCount).toBe(1)
+
+    component.data.root.values.arr.push(1)
+    component.setData({
+      'root.values.arr': component.data.root.values.arr
+    })
+    expect(aTriggerCount).toBe(1)
+    expect(bTriggerCount).toBe(1)
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(2)
+
+    component.data.root.values['new_obj'] = { a: 1 }
+    component.setData({
+      'root.values': component.data.root.values
+    })
+
+    expect(aTriggerCount).toBe(1)
+    expect(bTriggerCount).toBe(1)
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(2)
+
+    component.data.root['new_obj'] = { a: 1 }
+    component.setData({
+      'root': component.data.root
+    })
+    expect(aTriggerCount).toBe(1)
+    expect(bTriggerCount).toBe(2)
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(3)
   })
 })
