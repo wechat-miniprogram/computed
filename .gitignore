@@ -12,3 +12,4 @@ yarn-error.log*
 node_modules
 coverage
 swc_build
+pnpm-lock.yaml
