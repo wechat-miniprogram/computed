@@ -1,6 +1,11 @@
 const WHITE_SPACE_CHAR_REGEXP = /^\s/
 
-const throwParsingError = function (path, index) {
+interface IParserState { 
+  index: number;
+  length: number;
+}
+
+const throwParsingError = (path: string, index: number) => {
   throw new Error(
     'Parsing data path "' +
       path +
@@ -12,7 +17,7 @@ const throwParsingError = function (path, index) {
   )
 }
 
-const parseArrIndex = function (path, state) {
+const parseArrIndex = (path: string, state: IParserState) => {
   const startIndex = state.index
   while (state.index < state.length) {
     const ch = path[state.index]
@@ -28,7 +33,7 @@ const parseArrIndex = function (path, state) {
   return parseInt(path.slice(startIndex, state.index), 10)
 }
 
-const parseIdent = function (path, state) {
+const parseIdent = (path: string, state: IParserState) => {
   const startIndex = state.index
   const ch = path[startIndex]
   if (/^[_a-zA-Z$]/.test(ch)) {
@@ -47,7 +52,7 @@ const parseIdent = function (path, state) {
   return path.slice(startIndex, state.index)
 }
 
-const parseSinglePath = function (path, state) {
+const parseSinglePath = (path: string, state: IParserState) => {
   const paths = [parseIdent(path, state)]
   const options = {
     deepCmp: false,
@@ -56,7 +61,7 @@ const parseSinglePath = function (path, state) {
     const ch = path[state.index]
     if (ch === '[') {
       state.index++
-      paths.push(parseArrIndex(path, state))
+      paths.push(`${parseArrIndex(path, state)}`)
       const nextCh = path[state.index]
       if (nextCh !== ']') throwParsingError(path, state.index)
       state.index++
@@ -81,7 +86,7 @@ const parseSinglePath = function (path, state) {
   return { path: paths, options }
 }
 
-const parseMultiPaths = function (path, state) {
+const parseMultiPaths = (path: string, state: IParserState) => {
   while (WHITE_SPACE_CHAR_REGEXP.test(path[state.index])) {
     state.index++
   }
@@ -104,11 +109,11 @@ const parseMultiPaths = function (path, state) {
   return ret
 }
 
-const parseEOF = function (path, state) {
+const parseEOF = (path: string, state: IParserState) => {
   if (state.index < state.length) throwParsingError(path, state.index)
 }
 
-export function parseMultiDataPaths(path: string) {
+export const parseMultiDataPaths = (path: string) => {
   const state = {
     length: path.length,
     index: 0,
@@ -118,7 +123,7 @@ export function parseMultiDataPaths(path: string) {
   return ret
 }
 
-export const getDataOnPath = function (data, path) {
+export const getDataOnPath = (data: unknown, path: Array<string>) => {
   let ret = data
   path.forEach((s) => {
     if (typeof ret !== 'object' || ret === null) ret = undefined

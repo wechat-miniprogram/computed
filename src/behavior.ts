@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import rfdc from 'rfdc'
 import deepEqual from 'fast-deep-equal'
 import * as dataPath from './data-path'
 import * as dataTracer from './data-tracer'
+import type { IRelatedPathValue } from './data-tracer'
 
 const deepClone = rfdc({ proto: true })
+
 
 interface BehaviorExtend {
   // original
@@ -19,8 +20,8 @@ interface ObserversItem {
 }
 
 interface ComputedWatchInfo {
-  computedUpdaters: Array<any>;
-  computedRelatedPathValues: Record<string, any>;
+  computedUpdaters: Array<(...args: unknown[]) => boolean>;
+  computedRelatedPathValues: Record<string, Array<IRelatedPathValue>>;
   watchCurVal: Record<string, any>;
   _triggerFromComputedAttached: Record<string, boolean>;
 }

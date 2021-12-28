@@ -34,6 +34,7 @@
     "@swc/core": "^1.2.80",
     "@types/jest": "^27.0.1",
     "@types/rfdc": "^1.1.0",
+    "@types/wechat-miniprogram": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
     "codecov": "^3.7.0",
@@ -57,11 +58,10 @@
     "miniprogram-exparser": "^2.11.2",
     "miniprogram-simulate": "^1.2.9",
     "prettier": "^2.0.1",
+    "proxy-polyfill": "^0.3.2",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
-    "typescript": "^4.0.3",
-    "proxy-polyfill": "^0.3.2",
-    "@types/wechat-miniprogram": "^3.0.0"
+    "typescript": "^4.5.4"
   },
   "dependencies": {
     "fast-deep-equal": "^2.0.1",

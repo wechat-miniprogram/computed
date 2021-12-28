@@ -1,10 +1,19 @@
 import ProxyPolyfillBuilder from 'proxy-polyfill/src/proxy'
 const ProxyPolyfill = ProxyPolyfillBuilder()
 
-const wrapData = (data, relatedPathValues, basePath) => {
+interface IWrappedData { 
+  __rawObject__: unknown;
+}
+
+export interface IRelatedPathValue {
+  path: Array<string>;
+  value: unknown;
+}
+
+const wrapData = (data: unknown, relatedPathValues: Array<IRelatedPathValue>, basePath: Array<string>) => {
   if (typeof data !== 'object' || data === null) return data
   const handler = {
-    get(obj, key) {
+    get(obj: unknown, key: string) {
       if (key === '__rawObject__') return obj
       let keyWrapper = null
       const keyPath = basePath.concat(key)
@@ -26,11 +35,11 @@ const wrapData = (data, relatedPathValues, basePath) => {
   return propDef
 }
 
-export function create(data, relatedPathValues) {
+export function create(data: unknown, relatedPathValues: Array<IRelatedPathValue>) {
   return wrapData(data, relatedPathValues, [])
 }
 
-export function unwrap(wrapped) {
+export function unwrap(wrapped: IWrappedData) {
   // #70
   if (typeof wrapped.__rawObject__ !== 'object' && typeof wrapped === 'object' && wrapped !== null) {
     if (Array.isArray(wrapped)) {

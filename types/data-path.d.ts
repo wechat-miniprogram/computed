@@ -1,7 +1,7 @@
-export declare function parseMultiDataPaths(path: string): {
-    path: any[];
+export declare const parseMultiDataPaths: (path: string) => {
+    path: string[];
     options: {
         deepCmp: boolean;
     };
 }[];
-export declare const getDataOnPath: (data: any, path: any) => any;
+export declare const getDataOnPath: (data: unknown, path: Array<string>) => unknown;
