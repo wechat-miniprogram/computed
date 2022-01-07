@@ -6,10 +6,14 @@ import type { IRelatedPathValue } from './data-tracer'
 
 const deepClone = rfdc({ proto: true })
 
+interface BehaviorData {
+  '_computedWatchInit': ComputedWatchInitStatus;
+  [k: string]: any;
+}
 
 interface BehaviorExtend {
   // original
-  data: Record<string, any>;
+  data: BehaviorData;
   setData(d: Record<string, any>): void;
   _computedWatchInfo: Record<string, ComputedWatchInfo>;
 }
@@ -26,18 +30,23 @@ interface ComputedWatchInfo {
   _triggerFromComputedAttached: Record<string, boolean>;
 }
 
+enum ComputedWatchInitStatus {
+  CREATED,
+  ATTACHED
+}
+
 let computedWatchDefIdInc = 0
 
 export const behavior = Behavior({
   lifetimes: {
     attached(this: BehaviorExtend) {
       this.setData({
-        _computedWatchInit: 'attached',
+        _computedWatchInit: ComputedWatchInitStatus.ATTACHED,
       })
     },
     created(this: BehaviorExtend) {
       this.setData({
-        _computedWatchInit: 'created',
+        _computedWatchInit: ComputedWatchInitStatus.CREATED,
       })
     },
   },
@@ -51,7 +60,7 @@ export const behavior = Behavior({
       fields: '_computedWatchInit',
       observer(this: BehaviorExtend) {
         const status = this.data._computedWatchInit
-        if (status === 'created') {
+        if (status === ComputedWatchInitStatus.CREATED) {
           // init data fields
           const computedWatchInfo = {
             computedUpdaters: [],
@@ -74,7 +83,7 @@ export const behavior = Behavior({
               computedWatchInfo.watchCurVal[watchPath] = curVal
             })
           }
-        } else if (status === 'attached') {
+        } else if (status === ComputedWatchInitStatus.ATTACHED) {
           // handling computed
           // 1. push to initFuncs
           // 2. push to computedUpdaters

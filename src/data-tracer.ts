@@ -26,13 +26,11 @@ const wrapData = (data: unknown, relatedPathValues: Array<IRelatedPathValue>, ba
       return keyWrapper
     },
   }
-  let propDef
   try {
-    propDef = new Proxy(data, handler)
+    return new Proxy(data, handler)
   } catch (e) {
-    propDef = new ProxyPolyfill(data, handler)
+    return new ProxyPolyfill(data, handler)
   }
-  return propDef
 }
 
 export function create(data: unknown, relatedPathValues: Array<IRelatedPathValue>) {
@@ -41,7 +39,7 @@ export function create(data: unknown, relatedPathValues: Array<IRelatedPathValue
 
 export function unwrap(wrapped: IWrappedData) {
   // #70
-  if (typeof wrapped.__rawObject__ !== 'object' && typeof wrapped === 'object' && wrapped !== null) {
+  if (wrapped !== null && typeof wrapped === 'object' && typeof wrapped.__rawObject__ !== 'object' ) {
     if (Array.isArray(wrapped)) {
       return wrapped.map((i) => unwrap(i))
     }
