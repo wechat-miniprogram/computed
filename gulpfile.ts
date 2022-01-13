@@ -59,6 +59,13 @@ gulp.task('esbuild-bundle', () => {
     .pipe(gulp.dest(bundlePath))
 })
 
+gulp.task('esbuild-bundle-dev', () => {
+  return gulp
+    .src(path.resolve(swcBuildPath, `${entry}.js`))
+    .pipe(esbuild({ ...esbuildOptions, minify: false, outfile: 'index.dev.js' }))
+    .pipe(gulp.dest(bundlePath))
+})
+
 gulp.task('copy-2-demo', () => {
   return gulp
     .src(path.resolve(swcBuildPath, '*.js'))
@@ -80,6 +87,7 @@ gulp.task(
     'clean-dev-bundle',
     'clean-demo-dev-bundle',
     'swc-ts-2-js',
+    'esbuild-bundle-dev',
     'copy-2-demo',
   ),
 )
