@@ -37,6 +37,16 @@ enum ComputedWatchInitStatus {
 
 let computedWatchDefIdInc = 0
 
+function equal(a: unknown, b: unknown) {
+  if (a === b) {
+    return true
+  } else {
+    // When a = b = NaN
+    // NaN === NaN is false
+    return a !== a && b !== b
+  }
+}
+
 export const behavior = Behavior({
   lifetimes: {
     attached(this: BehaviorExtend) {
@@ -117,7 +127,7 @@ export const behavior = Behavior({
                 for (let i = 0; i < oldPathValues.length; i++) {
                   const { path, value: oldVal } = oldPathValues[i]
                   const curVal = dataPath.getDataOnPath(this.data, path)
-                  if (oldVal !== curVal) {
+                  if (!equal(oldVal, curVal)) {
                     needUpdate = true
                     break
                   }
@@ -220,7 +230,7 @@ export const behavior = Behavior({
               if (
                 deepCmp
                   ? !deepEqual(oldVal[i], curVal[i])
-                  : oldVal[i] !== curVal[i]
+                  : !equal(oldVal[i], curVal[i])
               ) {
                 changed = true
                 break
