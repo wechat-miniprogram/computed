@@ -19,7 +19,7 @@ type ComputedOptions<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & { [K in keyof TProperty]: any }) => any
+    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 > = (Partial<WechatMiniprogram.Component.Data<TData>> &
@@ -48,7 +48,7 @@ export function ComponentWithComputed<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & { [K in keyof TProperty]: any }) => any
+    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
@@ -75,7 +75,7 @@ export function BehaviorWithComputed<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & { [K in keyof TProperty]: any }) => any
+    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
