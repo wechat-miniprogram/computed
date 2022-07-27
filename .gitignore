@@ -1,7 +1,6 @@
 .idea
 .vscode
 .DS_Store
-package-lock.json
 
 logs
 *.log
