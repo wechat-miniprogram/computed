@@ -64,7 +64,7 @@ export function ComponentWithComputed<
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = []
   }
-  options.behaviors.unshift(behavior)
+  options.behaviors.push(behavior)
   return Component(options)
 }
 
