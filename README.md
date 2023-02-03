@@ -156,6 +156,21 @@ ComponentWithComputed({
 
 （类似地，也有 `BehaviorWithComputed` 构造器对应于 `Bahavior` 。）
 
+**注意：当使用 `ComponentWithComputed` 或者 `BehaviorWithComputed` 的时候，要留意 `computedBehavior` 的加入时机**
+
+`computedBehavior` 会通过 `unshift` 方法加入到 `behaviors` 的开始位置，如果需要在加入 `computedBehavior` 之前加入其他的 behavior，需要通过 `behaviorsBeforeComputed` 属性加入，如：
+
+```ts
+import { ComponentWithComputed } from 'miniprogram-computed'
+
+ComponentWithComputed({
+  behaviors: ['b'],
+  behaviorsBeforeComputed: ['a'],
+})
+```
+
+最终会将behaviors处理成：`['a', 'computedBehavior', 'c']`
+
 **关于 TS 兼容问题**
 
 若在小程序中用 `TypeScript` 进行开发并使用到了 `Component` 构造器。这时定义 `computed` 或 `watch` 字段会出现类型报错。

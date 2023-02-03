@@ -31,6 +31,9 @@ type ComputedOptions<
     computed?: TComputed;
     template?: string;
   }) &
+  Partial<{
+    behaviorsBeforeComputed?: string[];
+  }> &
   ThisType<
     ComputedInstance<
       TData,
@@ -65,6 +68,9 @@ export function ComponentWithComputed<
     options.behaviors = []
   }
   options.behaviors.unshift(behavior)
+  if (Array.isArray(options.behaviorsBeforeComputed)) {
+    options.behaviors = options.behaviorsBeforeComputed.concat(options.behaviors)
+  }
   return Component(options)
 }
 
@@ -92,6 +98,9 @@ export function BehaviorWithComputed<
     options.behaviors = []
   }
   options.behaviors.unshift(behavior)
+  if (Array.isArray(options.behaviorsBeforeComputed)) {
+    options.behaviors = options.behaviorsBeforeComputed.concat(options.behaviors)
+  }
   return Behavior(options)
 }
 
