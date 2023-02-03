@@ -15,7 +15,9 @@ declare type ComputedOptions<TData extends WechatMiniprogram.Component.DataOptio
     watch?: TWatch;
     computed?: TComputed;
     template?: string;
-}) & ThisType<ComputedInstance<TData, TProperty, TMethod, TComputed, TCustomInstanceProperty>>;
+}) & Partial<{
+    behaviorsBeforeComputed?: string[];
+}> & ThisType<ComputedInstance<TData, TProperty, TMethod, TComputed, TCustomInstanceProperty>>;
 export declare function ComponentWithComputed<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TMethod extends WechatMiniprogram.Component.MethodOption, TWatch extends Record<string, (...args: any[]) => void>, TComputed extends Record<string, (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any>, TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}>(options: ComputedOptions<TData, TProperty, TMethod, TWatch, TComputed, TCustomInstanceProperty>): string;
 export declare function BehaviorWithComputed<TData extends WechatMiniprogram.Behavior.DataOption, TProperty extends WechatMiniprogram.Behavior.PropertyOption, TMethod extends WechatMiniprogram.Behavior.MethodOption, TWatch extends Record<string, (...args: any[]) => void>, TComputed extends Record<string, (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any>, TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}>(options: ComputedOptions<TData, TProperty, TMethod, TWatch, TComputed, TCustomInstanceProperty>): string;
 export declare enum DataTracerMode {
