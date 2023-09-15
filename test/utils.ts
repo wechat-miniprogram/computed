@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import path from 'path'
 import simulate from 'miniprogram-simulate'
 import exparser from 'miniprogram-exparser'

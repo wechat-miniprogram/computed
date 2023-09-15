@@ -13,7 +13,7 @@
     "declaration": true,
     "declarationDir": "./types",
     "emitDeclarationOnly": true,
-    "skipLibCheck": true
+    "types": ["jest", "rfdc"]
   },
   "include": ["./src/**/*.ts"]
 }

@@ -1,3 +1,5 @@
+import 'miniprogram-api-typings'
+
 import { behavior } from './behavior'
 
 export { behavior } from './behavior'
