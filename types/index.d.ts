@@ -1,6 +1,4 @@
-/// <reference types="wechat-miniprogram" />
-/// <reference types="wechat-miniprogram" />
-/// <reference types="wechat-miniprogram" />
+import 'miniprogram-api-typings';
 export { behavior } from './behavior';
 declare type ComputedInstance<D extends WechatMiniprogram.Component.DataOption, P extends WechatMiniprogram.Component.PropertyOption, M extends WechatMiniprogram.Component.MethodOption, C extends Record<string, (data: D & {
     [K in keyof P]: any;
