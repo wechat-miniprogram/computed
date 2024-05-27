@@ -7,32 +7,32 @@ import type { IRelatedPathValue } from './data-tracer'
 const deepClone = rfdc({ proto: true })
 
 interface BehaviorData {
-  '_computedWatchInit': ComputedWatchInitStatus;
-  [k: string]: any;
+  _computedWatchInit: ComputedWatchInitStatus
+  [k: string]: any
 }
 
 interface BehaviorExtend {
   // original
-  data: BehaviorData;
-  setData(d: Record<string, any>): void;
-  _computedWatchInfo: Record<string, ComputedWatchInfo>;
+  data: BehaviorData
+  setData(d: Record<string, any>): void
+  _computedWatchInfo: Record<string, ComputedWatchInfo>
 }
 
 interface ObserversItem {
-  fields: string;
-  observer(): void;
+  fields: string
+  observer(): void
 }
 
 interface ComputedWatchInfo {
-  computedUpdaters: Array<(...args: unknown[]) => boolean>;
-  computedRelatedPathValues: Record<string, Array<IRelatedPathValue>>;
-  watchCurVal: Record<string, any>;
-  _triggerFromComputedAttached: Record<string, boolean>;
+  computedUpdaters: Array<(...args: unknown[]) => boolean>
+  computedRelatedPathValues: Record<string, Array<IRelatedPathValue>>
+  watchCurVal: Record<string, any>
+  _triggerFromComputedAttached: Record<string, boolean>
 }
 
 enum ComputedWatchInitStatus {
   CREATED,
-  ATTACHED
+  ATTACHED,
 }
 
 let computedWatchDefIdInc = 0
@@ -102,9 +102,7 @@ export const behavior = Behavior({
             Object.keys(computedDef).forEach((targetField) => {
               const updateMethod = computedDef[targetField]
               const relatedPathValuesOnDef = []
-              const val = updateMethod(
-                dataTracer.create(this.data, relatedPathValuesOnDef),
-              )
+              const val = updateMethod(dataTracer.create(this.data, relatedPathValuesOnDef))
               const pathValues = relatedPathValuesOnDef.map(({ path }) => ({
                 path,
                 value: dataPath.getDataOnPath(this.data, path),
@@ -115,13 +113,11 @@ export const behavior = Behavior({
                 [targetField]: dataTracer.unwrap(val),
               })
               computedWatchInfo._triggerFromComputedAttached[targetField] = true
-              computedWatchInfo.computedRelatedPathValues[targetField] =
-                pathValues
+              computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
 
               // will be invoked when setData is called
               const updateValueAndRelatedPaths = () => {
-                const oldPathValues =
-                  computedWatchInfo.computedRelatedPathValues[targetField]
+                const oldPathValues = computedWatchInfo.computedRelatedPathValues[targetField]
                 let needUpdate = false
                 // check whether its dependency updated
                 for (let i = 0; i < oldPathValues.length; i++) {
@@ -135,9 +131,7 @@ export const behavior = Behavior({
                 if (!needUpdate) return false
 
                 const relatedPathValues = []
-                const val = updateMethod(
-                  dataTracer.create(this.data, relatedPathValues),
-                )
+                const val = updateMethod(dataTracer.create(this.data, relatedPathValues))
                 this.setData({
                   [targetField]: dataTracer.unwrap(val),
                 })
@@ -145,13 +139,10 @@ export const behavior = Behavior({
                   path,
                   value: dataPath.getDataOnPath(this.data, path),
                 }))
-                computedWatchInfo.computedRelatedPathValues[targetField] =
-                  pathValues
+                computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
                 return true
               }
-              computedWatchInfo.computedUpdaters.push(
-                updateValueAndRelatedPaths,
-              )
+              computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths)
             })
           }
         }
@@ -168,9 +159,7 @@ export const behavior = Behavior({
 
           let changed: boolean
           do {
-            changed = computedWatchInfo.computedUpdaters.some((func) =>
-              func.call(this),
-            )
+            changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this))
           } while (changed)
         },
       })
@@ -183,28 +172,19 @@ export const behavior = Behavior({
           fields: watchPath,
           observer(this: BehaviorExtend) {
             if (!this._computedWatchInfo) return
-            const computedWatchInfo =
-              this._computedWatchInfo[computedWatchDefId]
+            const computedWatchInfo = this._computedWatchInfo[computedWatchDefId]
             if (!computedWatchInfo) return
             // (issue #58) ignore watch func when trigger by computed attached
-            if (
-              Object.keys(computedWatchInfo._triggerFromComputedAttached).length
-            ) {
+            if (Object.keys(computedWatchInfo._triggerFromComputedAttached).length) {
               const pathsMap: Record<string, boolean> = {}
               paths.forEach((path) => (pathsMap[path.path[0]] = true))
               for (const computedVal in computedWatchInfo._triggerFromComputedAttached) {
-                if (
-                  computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(
-                    computedVal,
-                  )
-                ) {
+                if (computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(computedVal)) {
                   if (
                     pathsMap[computedVal] &&
                     computedWatchInfo._triggerFromComputedAttached[computedVal]
                   ) {
-                    computedWatchInfo._triggerFromComputedAttached[
-                      computedVal
-                    ] = false
+                    computedWatchInfo._triggerFromComputedAttached[computedVal] = false
                     return
                   }
                 }
@@ -227,11 +207,7 @@ export const behavior = Behavior({
             for (let i = 0; i < curVal.length; i++) {
               const options = paths[i].options
               const deepCmp = options.deepCmp
-              if (
-                deepCmp
-                  ? !deepEqual(oldVal[i], curVal[i])
-                  : !equal(oldVal[i], curVal[i])
-              ) {
+              if (deepCmp ? !deepEqual(oldVal[i], curVal[i]) : !equal(oldVal[i], curVal[i])) {
                 changed = true
                 break
               }

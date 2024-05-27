@@ -1,6 +1,8 @@
-import 'miniprogram-api-typings';
+/// <reference types="wechat-miniprogram" />
+/// <reference types="wechat-miniprogram" />
+/// <reference types="wechat-miniprogram" />
 export { behavior } from './behavior';
-declare type ComputedInstance<D extends WechatMiniprogram.Component.DataOption, P extends WechatMiniprogram.Component.PropertyOption, M extends WechatMiniprogram.Component.MethodOption, C extends Record<string, (data: D & {
+type ComputedInstance<D extends WechatMiniprogram.Component.DataOption, P extends WechatMiniprogram.Component.PropertyOption, M extends WechatMiniprogram.Component.MethodOption, C extends Record<string, (data: D & {
     [K in keyof P]: any;
 }) => any>, TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>> = WechatMiniprogram.Component.Instance<D, P, M, TCustomProperty> & {
     data: {
@@ -9,7 +11,7 @@ declare type ComputedInstance<D extends WechatMiniprogram.Component.DataOption, 
         [K in keyof P]: any;
     };
 };
-declare type ComputedOptions<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TMethod extends WechatMiniprogram.Component.MethodOption, TWatch extends Record<string, (...args: any[]) => void>, TComputed extends Record<string, (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any>, TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}> = (Partial<WechatMiniprogram.Component.Data<TData>> & Partial<WechatMiniprogram.Component.Property<TProperty>> & Partial<WechatMiniprogram.Component.Method<TMethod>> & Partial<WechatMiniprogram.Component.OtherOption> & Partial<WechatMiniprogram.Component.Lifetimes> & {
+type ComputedOptions<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TMethod extends WechatMiniprogram.Component.MethodOption, TWatch extends Record<string, (...args: any[]) => void>, TComputed extends Record<string, (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any>, TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {}> = (Partial<WechatMiniprogram.Component.Data<TData>> & Partial<WechatMiniprogram.Component.Property<TProperty>> & Partial<WechatMiniprogram.Component.Method<TMethod>> & Partial<WechatMiniprogram.Component.OtherOption> & Partial<WechatMiniprogram.Component.Lifetimes> & {
     watch?: TWatch;
     computed?: TComputed;
     template?: string;

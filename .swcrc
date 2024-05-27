@@ -1,29 +1,29 @@
 {
-    "jsc": {
-        "parser": {
-            "syntax": "typescript",
-            "tsx": false,
-            "decorators": false,
-            "dynamicImport": false
-        },
-        "transform": null,
-        "target": "es5",
-        "loose": true,
-        "externalHelpers": false,
-        "keepClassNames": false,
-        "minify": {
-            "compress": {
-                "unused": true
-            },
-            "mangle": true
-        }
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": false,
+      "dynamicImport": false
     },
-    "minify": true,
-    "module": {
-        "type": "commonjs",
-        "strict": false,
-        "strictMode": true,
-        "lazy": false,
-        "noInterop": false
+    "transform": null,
+    "target": "es5",
+    "loose": true,
+    "externalHelpers": false,
+    "keepClassNames": false,
+    "minify": {
+      "compress": {
+        "unused": true
+      },
+      "mangle": true
     }
+  },
+  "minify": true,
+  "module": {
+    "type": "commonjs",
+    "strict": false,
+    "strictMode": true,
+    "lazy": false,
+    "noInterop": false
+  }
 }

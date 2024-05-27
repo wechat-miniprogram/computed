@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "computed-example": "../components/computed-example",
-    "watch-example": "../components/watch-example"
-  }
-}

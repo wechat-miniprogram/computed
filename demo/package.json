@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "fast-deep-equal": "^2.0.1",
-    "mobx-miniprogram": "^4.13.2",
-    "mobx-miniprogram-bindings": "^2.0.0",
-    "rfdc": "^1.1.4",
-    "proxy-polyfill": "^0.3.2"
-  }
-}

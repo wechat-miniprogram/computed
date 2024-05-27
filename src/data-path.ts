@@ -1,19 +1,13 @@
 const WHITE_SPACE_CHAR_REGEXP = /^\s/
 
-interface IParserState { 
-  index: number;
-  length: number;
+interface IParserState {
+  index: number
+  length: number
 }
 
 const throwParsingError = (path: string, index: number) => {
   throw new Error(
-    'Parsing data path "' +
-      path +
-      '" failed at char "' +
-      path[index] +
-      '" (index ' +
-      index +
-      ')',
+    'Parsing data path "' + path + '" failed at char "' + path[index] + '" (index ' + index + ')',
   )
 }
 

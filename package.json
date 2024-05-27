@@ -1,6 +1,6 @@
 {
   "name": "miniprogram-computed",
-  "version": "4.4.0",
+  "version": "5.0.0-alpha.1",
   "description": "Computed & watch - wechat miniprogram custom component extend behavior",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
@@ -46,6 +46,9 @@
     "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^3.8.0",
+    "glass-easel": "0.5.4",
+    "glass-easel-miniprogram-adapter": "0.5.4",
+    "glass-easel-template-compiler": "0.5.4",
     "gulp": "^4.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-esbuild": "^0.8.6",
@@ -54,9 +57,6 @@
     "gulp-watch": "^5.0.1",
     "husky": "^7.0.2",
     "jest": "^27.0.6",
-    "miniprogram-api-typings": "^3.12.0",
-    "miniprogram-exparser": "^2.11.2",
-    "miniprogram-simulate": "^1.2.9",
     "prettier": "^2.0.1",
     "proxy-polyfill": "^0.3.2",
     "ts-jest": "^27.0.5",
@@ -65,7 +65,8 @@
   },
   "dependencies": {
     "fast-deep-equal": "^2.0.1",
-    "rfdc": "^1.1.4"
+    "rfdc": "^1.1.4",
+    "@types/wechat-miniprogram": "^3.4.7"
   },
   "husky": {
     "hooks": {
