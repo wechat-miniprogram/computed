@@ -23,7 +23,6 @@ const setup = () => {
   const backend = env.associateBackend()
   codeSpace.componentEnv('', (env) => {
     ;(globalThis as any).Behavior = env.Behavior
-    console.info(globalThis)
   })
   globalThis.__defineComponent = (
     path: string,
