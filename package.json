@@ -56,6 +56,7 @@
     "gulp-watch": "^5.0.1",
     "husky": "^9.0.11",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "prettier": "^3.2.5",
     "proxy-polyfill": "^0.3.2",
     "ts-jest": "^29.1.4",

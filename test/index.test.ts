@@ -1,7 +1,7 @@
 import * as adapter from 'glass-easel-miniprogram-adapter'
 import { BehaviorWithComputed } from '../src'
 import { behavior as computedBehavior } from '../src'
-import { renderComponent } from './env'
+import { defineComponent, renderComponent } from './env'
 
 const innerHTML = (component: adapter.component.GeneralComponent) => {
   return (component._$.$$ as unknown as HTMLElement).innerHTML
@@ -49,30 +49,30 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(funcTriggeringCount).toBe(0)
 
     component.setData({ a: 10 })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ b: 20 })
-    expect(innerHTML(component)).toBe('<wx-view>10+20=30</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+20=30</view>')
     expect(funcTriggeringCount).toBe(2)
 
     component.setData({ a: 100, b: 200 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(funcTriggeringCount).toBe(3)
 
     component.setData({ c: -1 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=-1</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=-1</view>')
     expect(funcTriggeringCount).toBe(3)
   })
 
   test('watch property changes', () => {
     let funcTriggeringCount = 0
-    const innerComponent = renderComponent(
-      undefined,
+    const innerComponent = defineComponent(
+      'inner',
       '<view>{{a}}+{{b}}={{c}}</view>',
       (Component) => {
         Component({
@@ -111,11 +111,11 @@ describe('computed behavior', () => {
       },
     ) as any
 
-    expect(innerHTML(component)).toBe('<inner><wx-view>1+2=3</wx-view></inner>')
+    expect(innerHTML(component)).toBe('<inner><view>1+2=3</view></inner>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ a: 100, b: 200 })
-    expect(innerHTML(component)).toBe('<inner><wx-view>100+200=300</wx-view></inner>')
+    expect(innerHTML(component)).toBe('<inner><view>100+200=300</view></inner>')
     expect(funcTriggeringCount).toBe(2)
   })
 
@@ -148,37 +148,37 @@ describe('computed behavior', () => {
       },
     ) as any
 
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(func1TriggeringCount).toBe(0)
     expect(func2TriggeringCount).toBe(0)
 
     component.setData({ a: { d: 10 } })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(1)
 
     component.setData({ b: [20] })
-    expect(innerHTML(component)).toBe('<wx-view>10+20=30</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+20=30</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(2)
 
     component.setData({ 'a.d': 100 })
-    expect(innerHTML(component)).toBe('<wx-view>100+20=120</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+20=120</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(3)
 
     component.setData({ 'b[0]': 200 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(4)
 
     component.setData({ 'a.e': -1 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(4)
 
     component.setData({ 'b[2]': -1 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(4)
   })
@@ -218,25 +218,25 @@ describe('computed behavior', () => {
       },
     ) as any
 
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(func1TriggeringCount).toBe(0)
     expect(func2TriggeringCount).toBe(0)
     expect(func3TriggeringCount).toBe(0)
 
     component.setData({ obj: { a: 10, b: 2 } })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(0)
     expect(func3TriggeringCount).toBe(1)
 
     component.setData({ 'obj.b': 2 })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(0)
     expect(func3TriggeringCount).toBe(1)
 
     component.setData({ 'obj.a': 100 })
-    expect(innerHTML(component)).toBe('<wx-view>100+2=102</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+2=102</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(0)
     expect(func3TriggeringCount).toBe(2)
@@ -275,31 +275,30 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    component.triggerLifeTime('attached')
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3, 1*2=2</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3, 1*2=2</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(1)
 
     component.setData({ a: 10 })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12, 10*2=20</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12, 10*2=20</view>')
     expect(func1TriggeringCount).toBe(2)
     expect(func2TriggeringCount).toBe(2)
 
     component.setData({ b: 20 })
-    expect(innerHTML(component)).toBe('<wx-view>10+20=30, 10*2=20</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+20=30, 10*2=20</view>')
     expect(func1TriggeringCount).toBe(3)
     expect(func2TriggeringCount).toBe(2)
 
     component.setData({ a: 100, b: 200 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300, 100*2=200</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300, 100*2=200</view>')
     expect(func1TriggeringCount).toBe(4)
     expect(func2TriggeringCount).toBe(3)
   })
 
   test('computed property changes', () => {
     let funcTriggeringCount = 0
-    const innerComponent = renderComponent(
-      undefined,
+    const innerComponent = defineComponent(
+      'inner',
       '<view>{{a}}+{{b}}={{c}}</view>',
       (Component) => {
         Component({
@@ -336,11 +335,11 @@ describe('computed behavior', () => {
       },
     ) as any
 
-    expect(innerHTML(component)).toBe('<inner><wx-view>1+2=3</wx-view></inner>')
+    expect(innerHTML(component)).toBe('<inner><view>1+2=3</view></inner>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ a: 100, b: 200 })
-    expect(innerHTML(component)).toBe('<inner><wx-view>100+200=300</wx-view></inner>')
+    expect(innerHTML(component)).toBe('<inner><view>100+200=300</view></inner>')
     expect(funcTriggeringCount).toBe(2)
   })
 
@@ -370,22 +369,22 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3, 1+3=4</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3, 1+3=4</view>')
     expect(func1TriggeringCount).toBe(1)
     expect(func2TriggeringCount).toBe(1)
 
     component.setData({ a: 10 })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12, 10+12=22</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12, 10+12=22</view>')
     expect(func1TriggeringCount).toBe(2)
     expect(func2TriggeringCount).toBe(2)
 
     component.setData({ b: 20 })
-    expect(innerHTML(component)).toBe('<wx-view>10+20=30, 10+30=40</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+20=30, 10+30=40</view>')
     expect(func1TriggeringCount).toBe(3)
     expect(func2TriggeringCount).toBe(3)
 
     component.setData({ a: 100, b: 200 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300, 100+300=400</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300, 100+300=400</view>')
     expect(func1TriggeringCount).toBe(4)
     expect(func2TriggeringCount).toBe(4)
   })
@@ -412,27 +411,27 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>0, 1, 2, 2</wx-view>')
+    expect(innerHTML(component)).toBe('<view>0, 1, 2, 2</view>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ b: 10 })
-    expect(innerHTML(component)).toBe('<wx-view>0, 10, 2, 2</wx-view>')
+    expect(innerHTML(component)).toBe('<view>0, 10, 2, 2</view>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ c: 20 })
-    expect(innerHTML(component)).toBe('<wx-view>0, 10, 20, 20</wx-view>')
+    expect(innerHTML(component)).toBe('<view>0, 10, 20, 20</view>')
     expect(funcTriggeringCount).toBe(2)
 
     component.setData({ a: -1 })
-    expect(innerHTML(component)).toBe('<wx-view>-1, 10, 20, 10</wx-view>')
+    expect(innerHTML(component)).toBe('<view>-1, 10, 20, 10</view>')
     expect(funcTriggeringCount).toBe(3)
 
     component.setData({ b: 100 })
-    expect(innerHTML(component)).toBe('<wx-view>-1, 100, 20, 100</wx-view>')
+    expect(innerHTML(component)).toBe('<view>-1, 100, 20, 100</view>')
     expect(funcTriggeringCount).toBe(4)
 
     component.setData({ c: 200 })
-    expect(innerHTML(component)).toBe('<wx-view>-1, 100, 200, 100</wx-view>')
+    expect(innerHTML(component)).toBe('<view>-1, 100, 200, 100</view>')
     expect(funcTriggeringCount).toBe(4)
   })
 
@@ -459,31 +458,31 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(funcTriggeringCount).toBe(1)
 
     component.setData({ a: { d: 10 } })
-    expect(innerHTML(component)).toBe('<wx-view>10+2=12</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
     expect(funcTriggeringCount).toBe(2)
 
     component.setData({ b: [20] })
-    expect(innerHTML(component)).toBe('<wx-view>10+20=30</wx-view>')
+    expect(innerHTML(component)).toBe('<view>10+20=30</view>')
     expect(funcTriggeringCount).toBe(3)
 
     component.setData({ 'a.d': 100 })
-    expect(innerHTML(component)).toBe('<wx-view>100+20=120</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+20=120</view>')
     expect(funcTriggeringCount).toBe(4)
 
     component.setData({ 'b[0]': 200 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(funcTriggeringCount).toBe(5)
 
     component.setData({ 'a.e': -1 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(funcTriggeringCount).toBe(5)
 
     component.setData({ 'b[2]': -1 })
-    expect(innerHTML(component)).toBe('<wx-view>100+200=300</wx-view>')
+    expect(innerHTML(component)).toBe('<view>100+200=300</view>')
     expect(funcTriggeringCount).toBe(5)
   })
 
@@ -530,7 +529,7 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view></wx-view>')
+    expect(innerHTML(component)).toBe('<view></view>')
   })
 
   test('computed object tracer', () => {
@@ -558,7 +557,7 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>3</wx-view><wx-view>30</wx-view>')
+    expect(innerHTML(component)).toBe('<view>3</view><view>30</view>')
   })
 
   test('computed behaviors data', () => {
@@ -575,7 +574,7 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+2=3</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
   })
 
   test('computed behaviors data deep comparison', () => {
@@ -596,7 +595,7 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+3+1=5</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+3+1=5</view>')
   })
 
   test('computed behavior lifetimes', () => {
@@ -617,7 +616,7 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>1+10=11</wx-view>')
+    expect(innerHTML(component)).toBe('<view>1+10=11</view>')
   })
 
   test('computed with wildcard observers', () => {
@@ -640,7 +639,7 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view>2</wx-view>')
+    expect(innerHTML(component)).toBe('<view>2</view>')
   })
 
   test('multiple usage in a single component', () => {
@@ -721,7 +720,7 @@ describe('computed behavior', () => {
         } as any)
       },
     ) as any
-    expect(innerHTML(component)).toBe('<wx-view>6 66 666</wx-view>')
+    expect(innerHTML(component)).toBe('<view>6 66 666</view>')
     expect(a1TriggerCount).toBe(1)
     expect(a2TriggerCount).toBe(2)
     expect(b1TriggerCount).toBe(1)
@@ -768,7 +767,7 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view>40</wx-view>')
+    expect(innerHTML(component)).toBe('<view>40</view>')
     expect(c1TriggerCount).toBe(2)
     expect(c2TriggerCount).toBe(2)
   })
@@ -815,7 +814,7 @@ describe('computed behavior', () => {
         },
       } as any)
     }) as any
-    expect(innerHTML(component)).toBe('<wx-view>40</wx-view>')
+    expect(innerHTML(component)).toBe('<view>40</view>')
     expect(cTriggerCount).toBe(1)
     expect(dTriggerCount).toBe(0)
   })
@@ -864,7 +863,7 @@ describe('computed behavior', () => {
     expect(cTriggerCount).toBe(1)
     expect(dTriggerCount).toBe(1)
 
-    component.data.root[0].values.push(1)
+    component.data.root[0].values = [1, 2, 3, 1]
     component.setData({
       'root[0].values': component.data.root[0].values,
     })
@@ -902,17 +901,17 @@ describe('computed behavior', () => {
           },
           computedWithRootClone(data) {
             bTriggerCount++
-            const res = { ...data.root }
+            const res = Object.assign({}, data.root)
             return res
           },
           computedWithCWR(data) {
             cTriggerCount++
-            const res = data.computedWithRoot.values.arr
+            const res = data.computedWithRoot.values?.arr
             return res
           },
           computedWithCWRC(data) {
             dTriggerCount++
-            const res = data.computedWithRootClone.values.arr
+            const res = data.computedWithRootClone.values?.arr
             return res
           },
         },
@@ -924,7 +923,7 @@ describe('computed behavior', () => {
     expect(cTriggerCount).toBe(1)
     expect(dTriggerCount).toBe(1)
 
-    component.data.root.values.arr.push(1)
+    component.data.root.values.arr = [1, 2, 3, 1]
     component.setData({
       'root.values.arr': component.data.root.values.arr,
     })
@@ -937,7 +936,6 @@ describe('computed behavior', () => {
     component.setData({
       'root.values': component.data.root.values,
     })
-
     expect(aTriggerCount).toBe(1)
     expect(bTriggerCount).toBe(1)
     expect(cTriggerCount).toBe(2)

@@ -2,7 +2,6 @@ import rfdc from 'rfdc'
 import deepEqual from 'fast-deep-equal'
 import * as dataPath from './data-path'
 import * as dataTracer from './data-tracer'
-import type { IRelatedPathValue } from './data-tracer'
 
 const deepClone = rfdc({ proto: true })
 
@@ -25,7 +24,7 @@ interface ObserversItem {
 
 interface ComputedWatchInfo {
   computedUpdaters: Array<(...args: unknown[]) => boolean>
-  computedRelatedPathValues: Record<string, Array<IRelatedPathValue>>
+  computedRelatedPathValues: Record<string, Array<dataTracer.RelatedPathValue>>
   watchCurVal: Record<string, any>
   _triggerFromComputedAttached: Record<string, boolean>
 }
@@ -76,7 +75,7 @@ export const behavior = Behavior({
             computedUpdaters: [],
             computedRelatedPathValues: {},
             watchCurVal: {},
-            _triggerFromComputedAttached: {},
+            _triggerFromComputedAttached: Object.create(null),
           }
           if (!this._computedWatchInfo) this._computedWatchInfo = {}
           this._computedWatchInfo[computedWatchDefId] = computedWatchInfo
@@ -101,19 +100,15 @@ export const behavior = Behavior({
           if (computedDef) {
             Object.keys(computedDef).forEach((targetField) => {
               const updateMethod = computedDef[targetField]
-              const relatedPathValuesOnDef = []
+              const relatedPathValuesOnDef = [] as Array<dataTracer.RelatedPathValue>
               const val = updateMethod(dataTracer.create(this.data, relatedPathValuesOnDef))
-              const pathValues = relatedPathValuesOnDef.map(({ path }) => ({
-                path,
-                value: dataPath.getDataOnPath(this.data, path),
-              }))
               // here we can do small setDatas
               // because observer handlers will force grouping small setDatas together
               this.setData({
                 [targetField]: dataTracer.unwrap(val),
               })
               computedWatchInfo._triggerFromComputedAttached[targetField] = true
-              computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
+              computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValuesOnDef
 
               // will be invoked when setData is called
               const updateValueAndRelatedPaths = () => {
@@ -121,25 +116,38 @@ export const behavior = Behavior({
                 let needUpdate = false
                 // check whether its dependency updated
                 for (let i = 0; i < oldPathValues.length; i++) {
-                  const { path, value: oldVal } = oldPathValues[i]
-                  const curVal = dataPath.getDataOnPath(this.data, path)
-                  if (!equal(oldVal, curVal)) {
-                    needUpdate = true
-                    break
+                  const item = oldPathValues[i]
+                  if (item.kind === 'keys') {
+                    const { path, keys: oldKeys } = item
+                    const curVal = dataPath.getDataOnPath(this.data, path)
+                    const keys = Object.keys(curVal).sort()
+                    if (keys.length !== oldKeys.length) {
+                      needUpdate = true
+                      break
+                    }
+                    for (let j = 0; j < keys.length; j += 1) {
+                      if (keys[j] !== oldKeys[j]) {
+                        needUpdate = true
+                        break
+                      }
+                    }
+                  } else {
+                    const { path, value: oldVal } = item
+                    const curVal = dataPath.getDataOnPath(this.data, path)
+                    if (!equal(oldVal, curVal)) {
+                      needUpdate = true
+                      break
+                    }
                   }
                 }
                 if (!needUpdate) return false
 
-                const relatedPathValues = []
+                const relatedPathValues = [] as Array<dataTracer.RelatedPathValue>
                 const val = updateMethod(dataTracer.create(this.data, relatedPathValues))
                 this.setData({
                   [targetField]: dataTracer.unwrap(val),
                 })
-                const pathValues = relatedPathValues.map(({ path }) => ({
-                  path,
-                  value: dataPath.getDataOnPath(this.data, path),
-                }))
-                computedWatchInfo.computedRelatedPathValues[targetField] = pathValues
+                computedWatchInfo.computedRelatedPathValues[targetField] = relatedPathValues
                 return true
               }
               computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths)
@@ -159,7 +167,12 @@ export const behavior = Behavior({
 
           let changed: boolean
           do {
-            changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this))
+            try {
+              changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this))
+            } catch (err) {
+              console.error(err.stack)
+              break
+            }
           } while (changed)
         },
       })
@@ -179,7 +192,7 @@ export const behavior = Behavior({
               const pathsMap: Record<string, boolean> = {}
               paths.forEach((path) => (pathsMap[path.path[0]] = true))
               for (const computedVal in computedWatchInfo._triggerFromComputedAttached) {
-                if (computedWatchInfo._triggerFromComputedAttached.hasOwnProperty(computedVal)) {
+                if (computedWatchInfo._triggerFromComputedAttached[computedVal]) {
                   if (
                     pathsMap[computedVal] &&
                     computedWatchInfo._triggerFromComputedAttached[computedVal]
