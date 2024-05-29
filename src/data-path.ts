@@ -1,5 +1,10 @@
 const WHITE_SPACE_CHAR_REGEXP = /^\s/
 
+export type DataPathWithOptions = {
+  path: string[]
+  options: { deepCmp: boolean }
+}
+
 type ParserState = {
   index: number
   length: number
@@ -46,7 +51,7 @@ const parseIdent = (path: string, state: ParserState) => {
   return path.slice(startIndex, state.index)
 }
 
-const parseSinglePath = (path: string, state: ParserState) => {
+const parseSinglePath = (path: string, state: ParserState): DataPathWithOptions => {
   const paths = [parseIdent(path, state)]
   const options = {
     deepCmp: false,
@@ -80,7 +85,7 @@ const parseSinglePath = (path: string, state: ParserState) => {
   return { path: paths, options }
 }
 
-const parseMultiPaths = (path: string, state: ParserState) => {
+const parseMultiPaths = (path: string, state: ParserState): DataPathWithOptions[] => {
   while (WHITE_SPACE_CHAR_REGEXP.test(path[state.index])) {
     state.index++
   }
@@ -107,7 +112,7 @@ const parseEOF = (path: string, state: ParserState) => {
   if (state.index < state.length) throwParsingError(path, state.index)
 }
 
-export const parseMultiDataPaths = (path: string) => {
+export const parseMultiDataPaths = (path: string): DataPathWithOptions[] => {
   const state = {
     length: path.length,
     index: 0,

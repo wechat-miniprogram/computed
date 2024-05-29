@@ -59,12 +59,12 @@ export function create(data: unknown, relatedPathValues: Array<RelatedPathValue>
   return wrapData(data, relatedPathValues, [])
 }
 
-export function unwrap(wrapped: WrappedData) {
+export function unwrap(wrapped: unknown) {
   // #70
   if (
     wrapped !== null &&
     typeof wrapped === 'object' &&
-    typeof wrapped.__rawObject__ !== 'object'
+    typeof (wrapped as WrappedData).__rawObject__ !== 'object'
   ) {
     if (Array.isArray(wrapped)) {
       return wrapped.map((i) => unwrap(i))
@@ -78,9 +78,9 @@ export function unwrap(wrapped: WrappedData) {
   if (
     typeof wrapped !== 'object' ||
     wrapped === null ||
-    typeof wrapped.__rawObject__ !== 'object'
+    typeof (wrapped as WrappedData).__rawObject__ !== 'object'
   ) {
     return wrapped
   }
-  return wrapped.__rawObject__
+  return (wrapped as WrappedData).__rawObject__
 }
