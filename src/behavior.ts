@@ -3,6 +3,7 @@ import deepEqual from 'fast-deep-equal'
 import * as dataPath from './data-path'
 import * as dataTracer from './data-tracer'
 import type { DataPathWithOptions } from './data-path'
+import type * as adapter from 'glass-easel-miniprogram-adapter'
 
 const deepClone = rfdc({ proto: true })
 
@@ -285,3 +286,124 @@ export const behavior = Behavior({
     }
   },
 })
+
+const tryInitInCtx = (ctx: adapter.builder.BuilderContext<any, any, any> & { _computedWatchInit?: boolean }) => {
+  if (ctx._computedWatchInit) return
+  ctx._computedWatchInit = true
+  const { lifetime, setData } = ctx
+  lifetime('attached', function () {
+    setData({
+      _computedWatchInit: ComputedWatchInitStatus.ATTACHED,
+    })
+  })
+  lifetime('created', function () {
+    setData({
+      _computedWatchInit: ComputedWatchInitStatus.CREATED,
+    })
+  })
+}
+
+export function computed<
+  TComputedDefinition1 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>) => any },
+  TPrevData extends adapter.glassEasel.typeUtils.DataList,
+  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+>(
+  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  computedDefinition1: TComputedDefinition1,
+): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+  TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> },
+  TProperty
+>
+export function computed<
+  TComputedDefinition1 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>) => any },
+  TComputedDefinition2 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> }, TProperty>) => any },
+  TPrevData extends adapter.glassEasel.typeUtils.DataList,
+  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+>(
+  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  computedDefinition1: TComputedDefinition1,
+  computedDefinition2: TComputedDefinition2,
+): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+  TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> },
+  TProperty
+>
+export function computed<
+  TComputedDefinition1 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>) => any },
+  TComputedDefinition2 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> }, TProperty>) => any },
+  TComputedDefinition3 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> }, TProperty>) => any },
+  TPrevData extends adapter.glassEasel.typeUtils.DataList,
+  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+>(
+  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  computedDefinition1: TComputedDefinition1,
+  computedDefinition2: TComputedDefinition2,
+  computedDefinition3: TComputedDefinition3,
+): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+  TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> },
+  TProperty
+>
+export function computed<
+  TComputedDefinition1 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>) => any },
+  TComputedDefinition2 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> }, TProperty>) => any },
+  TComputedDefinition3 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> }, TProperty>) => any },
+  TComputedDefinition4 extends { [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> }, TProperty>) => any },
+  TPrevData extends adapter.glassEasel.typeUtils.DataList,
+  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+>(
+  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  computedDefinition1: TComputedDefinition1,
+  computedDefinition2: TComputedDefinition2,
+  computedDefinition3: TComputedDefinition3,
+  computedDefinition4: TComputedDefinition4,
+): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+  TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & { [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]> } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> } & { [k in keyof TComputedDefinition4]: ReturnType<TComputedDefinition4[k]> },
+  TProperty
+>
+export function computed<
+  TPrevData extends adapter.glassEasel.typeUtils.DataList,
+  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+>(
+  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  computedDefinition1: any,
+  computedDefinition2?: any,
+  computedDefinition3?: any,
+  computedDefinition4?: any,
+): unknown {
+  tryInitInCtx(ctx)
+  const builder = new ComputedBuilder()
+  Object.keys(computedDefinition1).forEach((targetField) => {
+    const updateMethod = computedDefinition1[targetField]
+    builder.addComputed(targetField, updateMethod)
+  })
+  if (computedDefinition2) {
+    Object.keys(computedDefinition2).forEach((targetField) => {
+      const updateMethod = computedDefinition2[targetField]
+      builder.addComputed(targetField, updateMethod)
+    })
+  }
+  if (computedDefinition3) {
+    Object.keys(computedDefinition3).forEach((targetField) => {
+      const updateMethod = computedDefinition3[targetField]
+      builder.addComputed(targetField, updateMethod)
+    })
+  }
+  if (computedDefinition4) {
+    Object.keys(computedDefinition4).forEach((targetField) => {
+      const updateMethod = computedDefinition4[targetField]
+      builder.addComputed(targetField, updateMethod)
+    })
+  }
+  builder.observersItems.forEach(({ fields, observer }) => {
+    ctx.observer(fields as any, observer)
+  })
+  return ctx.data as any
+}
+
+export const watch = (ctx: adapter.builder.BuilderContext<any, any, any>, watchPath: string, listener: (...args: any[]) => void) => {
+  tryInitInCtx(ctx)
+  const builder = new ComputedBuilder()
+  builder.addWatch(watchPath, listener)
+  builder.observersItems.forEach(({ fields, observer }) => {
+    ctx.observer(fields as any, observer)
+  })
+}

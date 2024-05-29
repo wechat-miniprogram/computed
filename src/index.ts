@@ -1,6 +1,6 @@
 import { behavior } from './behavior'
 
-export { behavior } from './behavior'
+export { behavior, computed, watch } from './behavior'
 
 type ComputedInstance<
   D extends WechatMiniprogram.Component.DataOption,

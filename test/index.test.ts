@@ -1,11 +1,13 @@
 import * as adapter from 'glass-easel-miniprogram-adapter'
 import { BehaviorWithComputed } from '../src'
-import { behavior as computedBehavior } from '../src'
+import { behavior as computedBehavior, computed, watch } from '../src'
 import { defineComponent, renderComponent } from './env'
 
 const innerHTML = (component: adapter.component.GeneralComponent) => {
   return (component._$.$$ as unknown as HTMLElement).innerHTML
 }
+
+adapter.glassEasel.globalOptions.throwGlobalError = true
 
 const behaviorA = Behavior({
   data: {
@@ -67,6 +69,34 @@ describe('computed behavior', () => {
     component.setData({ c: -1 })
     expect(innerHTML(component)).toBe('<view>100+200=-1</view>')
     expect(funcTriggeringCount).toBe(3)
+  })
+
+  test('watch with chaining API', () => {
+    const component = renderComponent(
+      undefined,
+      '<view>{{a}}+{{b}}={{c}}</view>',
+      (Component) => {
+        Component()
+          .property('a', {
+            type: Number,
+            value: 1,
+          })
+          .data(() => ({
+            b: 2,
+            c: 0,
+          }))
+          .init((ctx) => {
+            watch(ctx, 'a, b', (a: number, b: number) => {
+              ctx.setData({ c: a + b })
+            })
+          })
+          .register()
+      },
+    ) as any
+    expect(innerHTML(component)).toBe('<view>1+2=0</view>')
+
+    component.setData({ a: 10 })
+    expect(innerHTML(component)).toBe('<view>10+2=12</view>')
   })
 
   test('watch property changes', () => {
@@ -293,6 +323,39 @@ describe('computed behavior', () => {
     expect(innerHTML(component)).toBe('<view>100+200=300, 100*2=200</view>')
     expect(func1TriggeringCount).toBe(4)
     expect(func2TriggeringCount).toBe(3)
+  })
+
+  test('computed with chaining API', () => {
+    const component = renderComponent(
+      undefined,
+      '<view>{{a}}+{{b}}={{c}}, {{d}}+1={{e}}</view>',
+      (Component) => {
+        Component()
+          .property('a', {
+            type: Number,
+            value: 1,
+          })
+          .data(() => ({
+            b: 2,
+          }))
+          .init((ctx) => {
+            const data = computed(ctx, {
+              c: (data) => data.a + data.b,
+              d: (data) => data.a * 2,
+            }, {
+              e: (data) => data.d + 1,
+            })
+            ctx.lifetime('attached', () => {
+              expect(data.e).toBe(3)
+            })
+          })
+          .register()
+      },
+    ) as any
+    expect(innerHTML(component)).toBe('<view>1+2=3, 2+1=3</view>')
+
+    component.setData({ a: 10 })
+    expect(innerHTML(component)).toBe('<view>10+2=12, 20+1=21</view>')
   })
 
   test('computed property changes', () => {
