@@ -168,6 +168,29 @@ ComponentWithComputed({
 
 强烈建议将 `miniprogram-computed` npm 包依赖升级至 `^4.0.5` 已获取完整的类型能力。
 
+### glass-easel Chaining API 支持
+
+使用 glass-easel Chaining API 时，可以用更友好的 `computed` `watch` 函数。
+
+```js
+import { computed, watch } from 'miniprogram-computed'
+
+Component()
+  .data(() => ({
+    a: 1,
+    b: 2,
+  }))
+  .init((ctx) => {
+    const data = computed(ctx, {
+      c: (data) => data.a + data.b,
+    })
+    watch(ctx, 'a, b', (a: number, b: number) => {
+      // ...
+    })
+  })
+  .register()
+```
+
 ## ^4.0.0 与 ^1.0.0、 ^2.0.0、 ^3.0.0 版本的差异
 
 ### ^4.0.0 版本

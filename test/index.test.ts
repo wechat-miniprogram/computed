@@ -72,27 +72,23 @@ describe('computed behavior', () => {
   })
 
   test('watch with chaining API', () => {
-    const component = renderComponent(
-      undefined,
-      '<view>{{a}}+{{b}}={{c}}</view>',
-      (Component) => {
-        Component()
-          .property('a', {
-            type: Number,
-            value: 1,
+    const component = renderComponent(undefined, '<view>{{a}}+{{b}}={{c}}</view>', (Component) => {
+      Component()
+        .property('a', {
+          type: Number,
+          value: 1,
+        })
+        .data(() => ({
+          b: 2,
+          c: 0,
+        }))
+        .init((ctx) => {
+          watch(ctx, 'a, b', (a: number, b: number) => {
+            ctx.setData({ c: a + b })
           })
-          .data(() => ({
-            b: 2,
-            c: 0,
-          }))
-          .init((ctx) => {
-            watch(ctx, 'a, b', (a: number, b: number) => {
-              ctx.setData({ c: a + b })
-            })
-          })
-          .register()
-      },
-    ) as any
+        })
+        .register()
+    }) as any
     expect(innerHTML(component)).toBe('<view>1+2=0</view>')
 
     component.setData({ a: 10 })
@@ -339,12 +335,16 @@ describe('computed behavior', () => {
             b: 2,
           }))
           .init((ctx) => {
-            const data = computed(ctx, {
-              c: (data) => data.a + data.b,
-              d: (data) => data.a * 2,
-            }, {
-              e: (data) => data.d + 1,
-            })
+            const data = computed(
+              ctx,
+              {
+                c: (data) => data.a + data.b,
+                d: (data) => data.a * 2,
+              },
+              {
+                e: (data) => data.d + 1,
+              },
+            )
             ctx.lifetime('attached', () => {
               expect(data.e).toBe(3)
             })
