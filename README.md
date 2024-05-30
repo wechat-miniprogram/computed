@@ -4,13 +4,13 @@
 
 > 此 behavior 依赖开发者工具的 npm 构建。具体详情可查阅[官方 npm 文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)。
 
-注意： 4.0.0 大版本变更了最基本的接口名，升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。旧版文档可以参考对应版本的 git tag 中的 README ，如 [v3.1.1](https://github.com/wechat-miniprogram/computed/tree/v3.1.1) tag 。
+注意： 4.0.0 大版本变更了最基本的接口名，从低版本升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。
 
 ## 使用方法
 
 ### 方式一 代码片段
 
-需要小程序基础库版本 >= 2.6.1 的环境。
+需要小程序基础库版本 >= 2.11.0 的环境。
 
 可以直接体验一下这个代码片段，它包含了基本用法示例：[https://developers.weixin.qq.com/s/4KYn6TmJ7osP](https://developers.weixin.qq.com/s/4KYn6TmJ7osP)
 
@@ -120,7 +120,33 @@ Component({
 <button bindtap="onTap">click</button>
 ```
 
-### TypeScript 支持
+### glass-easel Chaining API 支持
+
+使用 glass-easel Chaining API 时，可以用更友好的 `computed` `watch` 函数。
+
+```js
+import { computed, watch } from 'miniprogram-computed'
+
+Component()
+  .data(() => ({
+    a: 1,
+    b: 2,
+  }))
+  .init((ctx) => {
+    const data = computed(ctx, {
+      c: (data) => data.a + data.b,
+      d: (data) => data.a * 2,
+    }, {
+      e: (data) => data.c + data.d,
+    })
+    watch(ctx, 'a, b', (a: number, b: number) => {
+      // ...
+    })
+  })
+  .register()
+```
+
+### 非 chaining API 的 TypeScript 支持
 
 由于通过 behavior 的方式引入不能获得类型支持, 因此为了获得类型的支持, 可以使用一个辅助组件构造器：
 
@@ -162,65 +188,6 @@ ComponentWithComputed({
 
 针对此问题，推荐使用 `ComponentWithComputed` 构造器代替 `Component` 构造器。
 
-**关于类型声明**
-
-在 `4.0.5` 版本之前，并未提供相关的 `.d.ts` 类型声明。
-
-强烈建议将 `miniprogram-computed` npm 包依赖升级至 `^4.0.5` 已获取完整的类型能力。
-
-### glass-easel Chaining API 支持
-
-使用 glass-easel Chaining API 时，可以用更友好的 `computed` `watch` 函数。
-
-```js
-import { computed, watch } from 'miniprogram-computed'
-
-Component()
-  .data(() => ({
-    a: 1,
-    b: 2,
-  }))
-  .init((ctx) => {
-    const data = computed(ctx, {
-      c: (data) => data.a + data.b,
-    })
-    watch(ctx, 'a, b', (a: number, b: number) => {
-      // ...
-    })
-  })
-  .register()
-```
-
-## ^4.0.0 与 ^1.0.0、 ^2.0.0、 ^3.0.0 版本的差异
-
-### ^4.0.0 版本
-
-- 变更了最基本的接口。
-
-- 新增简单的 TypeScript 支持。
-
-### ^3.0.0 版本
-
-- 支持 mobx-miniprogram 扩展库引入的数据段。
-
-- 对自定义 behavior 数据段使用 computed 时，支持在初始化视图中进行数据渲染。
-
-- 基于 proxy 更新了 computed 数据追踪的实现方式，computed 依赖的数据路径追踪初始化操作，延后到组件的 created 阶段 。
-
-### ^2.0.0 版本
-
-基于小程序基础库 2.6.1 开始支持的 observers 定义段实现，具有较好的性能。
-
-以下是版本之间主要区别的比较。
-
-| 项目                                            | ^1.0.0          | ^2.0.0        | ^3.0.0 和 ^4.0.0 |
-| ----------------------------------------------- | --------------- | ------------- | ---------------- |
-| 支持的基础库最低版本                            | 2.2.3           | 2.6.1         | 2.6.1            |
-| 支持 `watch` 定义段                             | 否              | 是            | 是               |
-| 性能                                            | 相对较差        | 相对较好      | 相对较好         |
-| 支持 `mobx-miniprogram` 扩展库                  | 不支持          | 不支持        | 支持             |
-| 支持自定义 `behavior` 数据字段 / 初始化视图渲染 | 不支持 / 不支持 | 支持 / 不支持 | 支持 / 支持      |
-
 ## 常见问题说明
 
 ### 我应该使用 computed 还是 watch ？
@@ -235,7 +202,7 @@ Component()
 
 ### 关于 \*\* 通配符
 
-在 `watch` 字段上可以使用 `**` 通配符，是它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers ）。
+在 `watch` 字段上可以使用 `**` 通配符，它能够监听这个字段下的子字段的变化（类似于小程序基础库本身的 observers ）。
 
 ```js
 const computedBehavior = require('miniprogram-computed').behavior
@@ -269,7 +236,3 @@ Component({
 
 - 对于没有使用 `**` 通配符的字段，在 `watch` 检查值是否发生变化时，只会进行粗略的浅比较（使用 `===` ）；
 - 对于使用了 `**` 通配符的字段，则会进行深比较，来尝试精确检测对象是否真的发生了变化，这要求对象字段不能包含循环（类似于 `JSON.stringify` ）。
-
-### 关于低版本兼容
-
-对于 IOS `9.3` 以下的版本，由于无法原生支持 `Proxy`，这里会使用 `proxy-polyfill` 去代替。
