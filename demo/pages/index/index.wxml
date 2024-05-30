@@ -1,6 +1,0 @@
-<view class="wrapper">
-  <computed-example />
-</view>
-<view class="wrapper">
-  <watch-example />
-</view>

@@ -1,5 +1,0 @@
-<view>watch example</view>
-<view>A = {{a}}</view>
-<view>behaviorTestData = {{behaviorTestData}}</view>
-<view>SUM = {{sum}}</view>
-<button bindtap="onTap">update</button>

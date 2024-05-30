@@ -1,8 +1,6 @@
-import 'miniprogram-api-typings'
-
 import { behavior } from './behavior'
 
-export { behavior } from './behavior'
+export { behavior, computed, watch } from './behavior'
 
 type ComputedInstance<
   D extends WechatMiniprogram.Component.DataOption,
@@ -11,7 +9,7 @@ type ComputedInstance<
   C extends Record<string, (data: D & { [K in keyof P]: any }) => any>,
   TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>,
 > = WechatMiniprogram.Component.Instance<D, P, M, TCustomProperty> & {
-  data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any };
+  data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any }
 }
 
 type ComputedOptions<
@@ -29,19 +27,11 @@ type ComputedOptions<
   Partial<WechatMiniprogram.Component.Method<TMethod>> &
   Partial<WechatMiniprogram.Component.OtherOption> &
   Partial<WechatMiniprogram.Component.Lifetimes> & {
-    watch?: TWatch;
-    computed?: TComputed;
-    template?: string;
+    watch?: TWatch
+    computed?: TComputed
+    template?: string
   }) &
-  ThisType<
-    ComputedInstance<
-      TData,
-      TProperty,
-      TMethod,
-      TComputed,
-      TCustomInstanceProperty
-    >
-  >
+  ThisType<ComputedInstance<TData, TProperty, TMethod, TComputed, TCustomInstanceProperty>>
 
 export function ComponentWithComputed<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -54,14 +44,7 @@ export function ComponentWithComputed<
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
-  options: ComputedOptions<
-    TData,
-    TProperty,
-    TMethod,
-    TWatch,
-    TComputed,
-    TCustomInstanceProperty
-  >,
+  options: ComputedOptions<TData, TProperty, TMethod, TWatch, TComputed, TCustomInstanceProperty>,
 ): string {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = []
@@ -81,14 +64,7 @@ export function BehaviorWithComputed<
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
-  options: ComputedOptions<
-    TData,
-    TProperty,
-    TMethod,
-    TWatch,
-    TComputed,
-    TCustomInstanceProperty
-  >,
+  options: ComputedOptions<TData, TProperty, TMethod, TWatch, TComputed, TCustomInstanceProperty>,
 ): string {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = []

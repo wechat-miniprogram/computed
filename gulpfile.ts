@@ -46,10 +46,7 @@ gulp.task('gen-dts', () => {
 })
 
 gulp.task('swc-ts-2-js', () => {
-  return gulp
-    .src(path.resolve(srcPath, '*.ts'))
-    .pipe(swc(swcOptions))
-    .pipe(gulp.dest(swcBuildPath))
+  return gulp.src(path.resolve(srcPath, '*.ts')).pipe(swc(swcOptions)).pipe(gulp.dest(swcBuildPath))
 })
 
 gulp.task('esbuild-bundle', () => {
@@ -67,9 +64,7 @@ gulp.task('esbuild-bundle-dev', () => {
 })
 
 gulp.task('copy-2-demo', () => {
-  return gulp
-    .src(path.resolve(swcBuildPath, '*.js'))
-    .pipe(gulp.dest(bundleInDemoPath))
+  return gulp.src(path.resolve(swcBuildPath, '*.js')).pipe(gulp.dest(bundleInDemoPath))
 })
 
 gulp.task('watch', () => {
@@ -97,7 +92,4 @@ gulp.task('dev-watch', gulp.series('dev', 'watch'))
 // generate .d.ts
 gulp.task('dts', gulp.series('clean-dts', 'gen-dts'))
 // build for publish
-gulp.task(
-  'default',
-  gulp.series('clean-bundle', 'swc-ts-2-js', 'esbuild-bundle', 'dts'),
-)
+gulp.task('default', gulp.series('clean-bundle', 'swc-ts-2-js', 'esbuild-bundle', 'dts'))
