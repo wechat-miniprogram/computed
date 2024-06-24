@@ -5,7 +5,7 @@ export const renderComponent: (
   template: string,
   f: (
     Component: adapter.ComponentConstructor,
-    env: { Behavior: adapter.BehaviorConstructor },
+    env: { Behavior: adapter.BehaviorConstructor, Page: adapter.PageConstructor },
   ) => void,
 ) => adapter.glassEasel.GeneralComponent
 

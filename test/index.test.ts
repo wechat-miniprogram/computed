@@ -705,6 +705,62 @@ describe('computed behavior', () => {
     expect(innerHTML(component)).toBe('<view>2</view>')
   })
 
+  test('computed and watch inside behaviors', () => {
+    const behA = BehaviorWithComputed({
+      behaviors: [computedBehavior],
+      computed: {
+        b(data) {
+          return data.a * 2
+        },
+      },
+      watch: {
+        'a, b': function() {
+          this.setData({ c: this.data.a + this.data.b })
+        },
+      },
+      attached() {
+        this.onLoad()
+      },
+    })
+    const component = renderComponent(
+      undefined,
+      '<view>{{a}}+{{b}}={{c}}</view>',
+      (_Component, { Page }) => {
+        Page({
+          behaviors: [behA],
+          onLoad() {
+            this.setData({ a: 1 })
+          }
+        } as any)
+      },
+    ) as any
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
+  })
+
+  test('computed and watch inside page constructor', () => {
+    const component = renderComponent(
+      undefined,
+      '<view>{{a}}+{{b}}={{c}}</view>',
+      (_Component, { Page }) => {
+        Page({
+          behaviors: [computedBehavior],
+          computed: {
+            b(data) {
+              return data.a * 2
+            },
+            c(data) {
+              return data.a + data.b
+            },
+          },
+          data: {
+            a: 1,
+          },
+        } as any)
+      },
+    ) as any
+    expect(innerHTML(component)).toBe('<view>1+2=3</view>')
+  })
+
   test('multiple usage in a single component', () => {
     let a1TriggerCount = 0
     let a2TriggerCount = 0
