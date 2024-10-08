@@ -3,6 +3,8 @@ import { BehaviorWithComputed } from '../src'
 import { behavior as computedBehavior, computed, watch } from '../src'
 import { defineComponent, renderComponent } from './env'
 
+declare const Behavior: adapter.BehaviorConstructor
+
 const innerHTML = (component: adapter.component.GeneralComponent) => {
   return (component._$.$$ as unknown as HTMLElement).innerHTML
 }

@@ -45,9 +45,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-promise": "^6.2.0",
-    "glass-easel": "0.5.4",
-    "glass-easel-miniprogram-adapter": "0.5.4",
-    "glass-easel-template-compiler": "0.5.4",
+    "glass-easel": "~0.10.0",
+    "glass-easel-miniprogram-adapter": "~0.10.0",
+    "glass-easel-template-compiler": "~0.10.0",
     "gulp": "^5.0.0",
     "gulp-clean": "^0.4.0",
     "gulp-esbuild": "^0.12.0",
@@ -64,8 +64,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@types/wechat-miniprogram": "^3.4.7",
     "fast-deep-equal": "^3.1.3",
+    "miniprogram-api-typings": "^3.12.2",
     "rfdc": "^1.3.1"
   },
   "husky": {

@@ -55,4 +55,5 @@ const setup = () => {
   }
 }
 
+//@ts-ignore
 module.exports = setup

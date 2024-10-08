@@ -13,7 +13,8 @@
     "declaration": true,
     "declarationDir": "./types",
     "emitDeclarationOnly": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": [ "./node_modules/@types", "./node_modules/miniprogram-api-typings" ]
   },
   "include": ["./src/**/*.ts"]
 }
