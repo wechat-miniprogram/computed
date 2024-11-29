@@ -1,6 +1,6 @@
 {
   "name": "miniprogram-computed",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "Computed & watch - wechat miniprogram custom component extend behavior",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
@@ -65,8 +65,10 @@
   },
   "dependencies": {
     "fast-deep-equal": "^3.1.3",
-    "miniprogram-api-typings": "^3.12.2",
     "rfdc": "^1.3.1"
+  },
+  "peerDependencies": {
+    "miniprogram-api-typings": "^4.0.0"
   },
   "husky": {
     "hooks": {

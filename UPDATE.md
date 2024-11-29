@@ -42,3 +42,7 @@
 
 - 基于 glass-easel 重构
 - 支持 chaining API
+
+## 6.0.0
+
+- 更新到 miniprogram-api-typing v4
