@@ -1,5 +1,5 @@
 import type * as adapter from 'glass-easel-miniprogram-adapter';
-export declare const behavior: string;
+export declare const behavior: WechatMiniprogram.Behavior.BehaviorIdentifier<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, WechatMiniprogram.Component.MethodOption, WechatMiniprogram.Component.BehaviorOption>;
 export declare function computed<TComputedDefinition1 extends {
     [k: string]: (data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>) => any;
 }, TPrevData extends adapter.glassEasel.typeUtils.DataList, TProperty extends adapter.glassEasel.typeUtils.PropertyList>(ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>, computedDefinition1: TComputedDefinition1): adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData & {
