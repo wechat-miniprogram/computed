@@ -710,6 +710,7 @@ describe('computed behavior', () => {
   test('computed and watch inside behaviors', () => {
     const behA = BehaviorWithComputed({
       behaviors: [computedBehavior],
+      data: { a: 0 },
       computed: {
         b(data) {
           return data.a * 2
@@ -794,6 +795,7 @@ describe('computed behavior', () => {
     const behB = BehaviorWithComputed({
       behaviors: [behA],
       data: {
+        a2: 0,
         b1: 10,
       },
       computed: {
@@ -899,6 +901,7 @@ describe('computed behavior', () => {
     const behA = BehaviorWithComputed({
       data: {
         a: 1,
+        b: 0,
       },
       computed: {
         d() {

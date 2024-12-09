@@ -2,16 +2,32 @@ import { behavior } from './behavior'
 
 export { behavior, computed, watch } from './behavior'
 
+type FilterUnknownType<T> = WechatMiniprogram.Component.FilterUnknownType<T>
+
+type AllDataAndProperties<
+  TData extends WechatMiniprogram.Component.DataOption,
+  TProperty extends WechatMiniprogram.Component.PropertyOption,
+  TBehavior extends WechatMiniprogram.Component.BehaviorOption,
+> = FilterUnknownType<TData> &
+  WechatMiniprogram.Component.MixinData<TBehavior> &
+  WechatMiniprogram.Component.MixinProperties<TBehavior> &
+  WechatMiniprogram.Component.PropertyOptionToData<FilterUnknownType<TProperty>>
+
+
 type ComputedInstance<
-  D extends WechatMiniprogram.Component.DataOption,
-  P extends WechatMiniprogram.Component.PropertyOption,
-  M extends WechatMiniprogram.Component.MethodOption,
-  B extends WechatMiniprogram.Component.BehaviorOption,
-  C extends Record<string, (data: D & { [K in keyof P]: any }) => any>,
+  TData extends WechatMiniprogram.Component.DataOption,
+  TProperty extends WechatMiniprogram.Component.PropertyOption,
+  TMethod extends WechatMiniprogram.Component.MethodOption,
+  TBehavior extends WechatMiniprogram.Component.BehaviorOption,
+  TComputed extends Record<string, (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any>,
   TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>,
-> = WechatMiniprogram.Component.Instance<D, P, M, B, TCustomProperty> & {
-  data: { [K in keyof C]: ReturnType<C[K]> } & { [K in keyof P]: any }
-}
+> = WechatMiniprogram.Component.Instance<
+  TData & { [k in keyof TComputed]: ReturnType<TComputed[k]> },
+  TProperty,
+  TMethod,
+  TBehavior,
+  TCustomProperty
+>
 
 type ComputedOptions<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -21,7 +37,7 @@ type ComputedOptions<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
+    (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 > = (Partial<WechatMiniprogram.Component.Data<TData>> &
@@ -44,7 +60,7 @@ export function ComponentWithComputed<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
+    (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
@@ -65,7 +81,7 @@ export function BehaviorWithComputed<
   TWatch extends Record<string, (...args: any[]) => void>,
   TComputed extends Record<
     string,
-    (data: TData & WechatMiniprogram.Component.PropertyOptionToData<TProperty>) => any
+    (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
   TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
 >(
