@@ -1,9 +1,6 @@
 export { behavior, computed, watch } from './behavior';
 type FilterUnknownType<T> = WechatMiniprogram.Component.FilterUnknownType<T>;
-type AllDataAndProperties<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TBehavior extends WechatMiniprogram.Component.BehaviorOption> = {
-    data: FilterUnknownType<TData> & WechatMiniprogram.Component.MixinData<TBehavior> & WechatMiniprogram.Component.MixinProperties<TBehavior> & WechatMiniprogram.Component.PropertyOptionToData<FilterUnknownType<TProperty>>;
-    properties: FilterUnknownType<TData> & WechatMiniprogram.Component.MixinData<TBehavior> & WechatMiniprogram.Component.MixinProperties<TBehavior> & WechatMiniprogram.Component.PropertyOptionToData<FilterUnknownType<TProperty>>;
-};
+type AllDataAndProperties<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TBehavior extends WechatMiniprogram.Component.BehaviorOption> = FilterUnknownType<TData> & WechatMiniprogram.Component.MixinData<TBehavior> & WechatMiniprogram.Component.MixinProperties<TBehavior> & WechatMiniprogram.Component.PropertyOptionToData<FilterUnknownType<TProperty>>;
 type ComputedInstance<TData extends WechatMiniprogram.Component.DataOption, TProperty extends WechatMiniprogram.Component.PropertyOption, TMethod extends WechatMiniprogram.Component.MethodOption, TBehavior extends WechatMiniprogram.Component.BehaviorOption, TComputed extends Record<string, (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any>, TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>> = WechatMiniprogram.Component.Instance<TData & {
     [k in keyof TComputed]: ReturnType<TComputed[k]>;
 }, TProperty, TMethod, TBehavior, TCustomProperty>;
