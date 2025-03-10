@@ -28,12 +28,15 @@ interface ComputedWatchInfo {
   computedUpdaters: Array<(...args: unknown[]) => boolean>
   computedRelatedPathValues: Array<Array<dataTracer.RelatedPathValue>>
   watchCurVal: Array<unknown>
-  _triggerFromComputedAttached: Record<string, boolean>
+  watchDisabled: boolean
 }
 
 enum ComputedWatchInitStatus {
   CREATED,
   ATTACHED,
+  DISABLE_WATCHES,
+  ENABLE_WATCHES,
+  CALL_WATCHES,
 }
 
 let computedWatchDefIdInc = 0
@@ -53,22 +56,24 @@ class ComputedBuilder {
   private computedWatchDefId = computedWatchDefIdInc++
   private computedList: Array<[string, (data: Record<string, unknown>) => unknown]> = []
   private watchList: Array<DataPathWithOptions[]> = []
+  private watchFunctions: Array<(...args: any[]) => void> = []
 
   constructor() {
     const computedWatchDefId = this.computedWatchDefId
     const computedList = this.computedList
     const watchList = this.watchList
+    const watchFunctions = this.watchFunctions
     this.observersItems.push({
       fields: '_computedWatchInit',
       observer(this: BehaviorExtend) {
         const status = this.data._computedWatchInit
         if (status === ComputedWatchInitStatus.CREATED) {
           // init data fields
-          const computedWatchInfo = {
+          const computedWatchInfo: ComputedWatchInfo = {
             computedUpdaters: [],
             computedRelatedPathValues: new Array(computedList.length),
             watchCurVal: new Array(watchList.length),
-            _triggerFromComputedAttached: Object.create(null),
+            watchDisabled: false,
           }
           if (!this._computedWatchInfo) this._computedWatchInfo = {}
           this._computedWatchInfo[computedWatchDefId] = computedWatchInfo
@@ -95,7 +100,6 @@ class ComputedBuilder {
             this.setData({
               [targetField]: dataTracer.unwrap(val),
             })
-            computedWatchInfo._triggerFromComputedAttached[targetField] = true
             computedWatchInfo.computedRelatedPathValues[index] = relatedPathValuesOnDef
 
             // will be invoked when setData is called
@@ -140,6 +144,14 @@ class ComputedBuilder {
             }
             computedWatchInfo.computedUpdaters.push(updateValueAndRelatedPaths)
           })
+        } else if (status === ComputedWatchInitStatus.DISABLE_WATCHES) {
+          const computedWatchInfo = this._computedWatchInfo[computedWatchDefId]
+          computedWatchInfo.watchDisabled = true
+        } else if (status === ComputedWatchInitStatus.ENABLE_WATCHES) {
+          const computedWatchInfo = this._computedWatchInfo[computedWatchDefId]
+          computedWatchInfo.watchDisabled = false
+        } else if (status === ComputedWatchInitStatus.CALL_WATCHES) {
+          watchFunctions.forEach((func) => func.call(this))
         }
       },
     })
@@ -170,32 +182,20 @@ class ComputedBuilder {
   }
 
   addWatch(watchPath: string, listener: (args: any) => void) {
+    const computedWatchDefId = this.computedWatchDefId
     const paths = dataPath.parseMultiDataPaths(watchPath)
     const index = this.watchList.length
     this.watchList.push(paths)
-    const computedWatchDefId = this.computedWatchDefId
+    this.watchFunctions.push(function (this: BehaviorExtend) {
+      const args = paths.map(({ path }) => dataPath.getDataOnPath(this.data, path))
+      listener.apply(this, args)
+    })
     this.observersItems.push({
       fields: watchPath,
       observer(this: BehaviorExtend) {
         if (!this._computedWatchInfo) return
         const computedWatchInfo = this._computedWatchInfo[computedWatchDefId]
         if (!computedWatchInfo) return
-        // (issue #58) ignore watch func when trigger by computed attached
-        if (Object.keys(computedWatchInfo._triggerFromComputedAttached).length) {
-          const pathsMap: Record<string, boolean> = {}
-          paths.forEach((path) => (pathsMap[path.path[0]] = true))
-          for (const computedVal in computedWatchInfo._triggerFromComputedAttached) {
-            if (computedWatchInfo._triggerFromComputedAttached[computedVal]) {
-              if (
-                pathsMap[computedVal] &&
-                computedWatchInfo._triggerFromComputedAttached[computedVal]
-              ) {
-                computedWatchInfo._triggerFromComputedAttached[computedVal] = false
-                return
-              }
-            }
-          }
-        }
         const oldVal = computedWatchInfo.watchCurVal[index]
 
         // get new watching field value
@@ -207,6 +207,7 @@ class ComputedBuilder {
           options.deepCmp ? deepClone(val) : val,
         )
         computedWatchInfo.watchCurVal[index] = curVal
+        if (computedWatchInfo.watchDisabled) return
 
         // compare
         let changed = false
@@ -241,6 +242,29 @@ export const behavior = Behavior({
     created(this: BehaviorExtend) {
       this.setData({
         _computedWatchInit: ComputedWatchInitStatus.CREATED,
+      })
+    },
+  },
+
+  methods: {
+    disableWatches() {
+      this.setData({
+        _computedWatchInit: ComputedWatchInitStatus.DISABLE_WATCHES,
+      })
+    },
+    enableWatches(callWatchesImmediately: boolean) {
+      this.setData({
+        _computedWatchInit: ComputedWatchInitStatus.ENABLE_WATCHES,
+      })
+      if (callWatchesImmediately) {
+        this.setData({
+          _computedWatchInit: ComputedWatchInitStatus.CALL_WATCHES,
+        })
+      }
+    },
+    triggerAllWatches() {
+      this.setData({
+        _computedWatchInit: ComputedWatchInitStatus.CALL_WATCHES,
       })
     },
   },
@@ -473,6 +497,29 @@ export function computed<
   return ctx.data as any
 }
 
+export const generateWatches = (self: BehaviorExtend) => ({
+  disableWatches() {
+    self.setData({
+      _computedWatchInit: ComputedWatchInitStatus.DISABLE_WATCHES,
+    })
+  },
+  enableWatches(triggerWatchesImmediately: boolean) {
+    self.setData({
+      _computedWatchInit: ComputedWatchInitStatus.ENABLE_WATCHES,
+    })
+    if (triggerWatchesImmediately) {
+      self.setData({
+        _computedWatchInit: ComputedWatchInitStatus.CALL_WATCHES,
+      })
+    }
+  },
+  triggerAllWatches() {
+    self.setData({
+      _computedWatchInit: ComputedWatchInitStatus.CALL_WATCHES,
+    })
+  },
+})
+
 export const watch = (
   ctx: adapter.builder.BuilderContext<any, any, any>,
   watchPath: string,
@@ -484,4 +531,5 @@ export const watch = (
   builder.observersItems.forEach(({ fields, observer }) => {
     ctx.observer(fields as any, observer)
   })
+  return generateWatches(ctx.self)
 }

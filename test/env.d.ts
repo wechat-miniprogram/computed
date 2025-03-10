@@ -7,7 +7,7 @@ export const renderComponent: (
     Component: adapter.ComponentConstructor,
     env: { Behavior: adapter.BehaviorConstructor, Page: adapter.PageConstructor },
   ) => void,
-) => adapter.glassEasel.GeneralComponent
+) => adapter.component.GeneralComponent
 
 export const defineComponent: (
   path: string | undefined,
@@ -16,4 +16,4 @@ export const defineComponent: (
     Component: adapter.ComponentConstructor,
     env: { Behavior: adapter.BehaviorConstructor },
   ) => void,
-) => adapter.glassEasel.GeneralComponent
+) => void

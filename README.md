@@ -6,9 +6,10 @@
 
 注意： 4.0.0 大版本变更了最基本的接口名，从低版本升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。
 
+
 ## 使用方法
 
-### 方式一 代码片段
+### 快速体验
 
 需要小程序基础库版本 >= 2.11.0 的环境。
 
@@ -19,22 +20,6 @@
 ```shell
 npm install --save miniprogram-computed
 ```
-
-### 方式二 本地构建
-
-将本仓库 clone 到本地，进入根目录安装 npm 依赖。
-
-```shell
-npm install
-```
-
-安装完成后执行
-
-```shell
-npm run dev // 构建 dev 版本
-```
-
-构建完毕后，根目录下的 `demo` 即为小程序代码根目录，可以将此 demo 导入开发者工具中进行体验。
 
 ### computed 基本用法
 
@@ -187,6 +172,17 @@ ComponentWithComputed({
 若在小程序中用 `TypeScript` 进行开发并使用到了 `Component` 构造器。这时定义 `computed` 或 `watch` 字段会出现类型报错。
 
 针对此问题，推荐使用 `ComponentWithComputed` 构造器代替 `Component` 构造器。
+
+### 其他 API
+
+有一些辅助 API 用于控制 `watch` 时的一些行为表现。可以在 `this` 上访问到这些方法；使用 Chaining API 时， `watch()` 的返回值会带有这些方法。
+
+| 方法名 | 参数示例 | 说明 |
+| ---- | ---- | ---- |
+| disableWatches | disableWatches() | 暂时禁用 watch |
+| enableWatches | enableWatches(triggerNow) | 启用 watch ，如果 `triggerNow` 为真，立刻触发所有 watch |
+| triggerAllWatches | triggerAllWatches() | 立刻触发所有 watch 一次 |
+
 
 ## 常见问题说明
 

@@ -895,7 +895,7 @@ describe('computed behavior', () => {
     expect(c2TriggerCount).toBe(2)
   })
 
-  test('ignore watch func when trigger by computed attached', () => {
+  test('call watch func when trigger by computed attached', () => {
     let cTriggerCount = 0
     let dTriggerCount = 0
     const behA = BehaviorWithComputed({
@@ -939,8 +939,116 @@ describe('computed behavior', () => {
       } as any)
     }) as any
     expect(innerHTML(component)).toBe('<view>40</view>')
+    expect(cTriggerCount).toBe(2)
+    expect(dTriggerCount).toBe(1)
+  })
+
+  test('disable and enable watches', () => {
+    let cTriggerCount = 0
+    const component = renderComponent(undefined, '<view>{{c}}</view>', (Component) => {
+      Component({
+        behaviors: [computedBehavior],
+        data: {
+          c: 1,
+        },
+        watch: {
+          c() {
+            cTriggerCount += 1
+          },
+        },
+        created() {
+          this.disableWatches()
+        },
+        methods: {
+          set(n: number) {
+            this.setData({
+              c: n,
+            })
+          },
+          enable(b: boolean) {
+            this.enableWatches(b)
+          },
+          disable() {
+            this.disableWatches()
+          },
+          trigger() {
+            this.triggerAllWatches()
+          },
+        },
+      } as any)
+    }) as any
+    component.set(2)
+    expect(cTriggerCount).toBe(0)
+    component.enable(false)
+    expect(cTriggerCount).toBe(0)
+    component.set(2)
+    expect(cTriggerCount).toBe(0)
+    component.disable()
+    component.trigger()
     expect(cTriggerCount).toBe(1)
-    expect(dTriggerCount).toBe(0)
+    component.enable(true)
+    expect(cTriggerCount).toBe(2)
+    component.set(3)
+    expect(cTriggerCount).toBe(3)
+    component.trigger()
+    expect(cTriggerCount).toBe(4)
+  })
+
+  test('disable and enable watches with chaining API', () => {
+    let cTriggerCount = 0
+    interface Watcher {
+      set(n: number): void
+      enable(b: boolean): void
+      disable(): void
+      trigger(): void
+    }
+    const watcherTrait = Behavior.trait<Watcher>()
+    const comp = renderComponent(undefined, '<view>{{c}}</view>', (Component) => {
+      Component()
+        .data(() => ({
+          c: 1,
+        }))
+        .init((ctx) => {
+          const { setData, implement, lifetime } = ctx
+          const watcher = watch(ctx, 'c', () => cTriggerCount += 1)
+          lifetime('created', () => {
+            watcher.disableWatches()
+          })
+          implement(watcherTrait, {
+            set(n: number) {
+              setData({
+                c: n,
+              })
+            },
+            enable(b: boolean) {
+              watcher.enableWatches(b)
+            },
+            disable() {
+              watcher.disableWatches()
+            },
+            trigger() {
+              watcher.triggerAllWatches()
+            },
+          })
+        })
+        .register()
+    })
+    const component = comp.traitBehavior(watcherTrait)!
+    component.set(2)
+    expect(cTriggerCount).toBe(0)
+    component.enable(false)
+    expect(cTriggerCount).toBe(0)
+    component.set(2)
+    expect(cTriggerCount).toBe(0)
+    component.disable()
+    component.trigger()
+    expect(cTriggerCount).toBe(1)
+    component.enable(true)
+    expect(cTriggerCount).toBe(2)
+    component.set(3)
+    expect(cTriggerCount).toBe(3)
+    component.trigger()
+    expect(cTriggerCount).toBe(4)
   })
 
   test('computed Array', () => {

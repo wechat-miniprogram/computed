@@ -46,3 +46,7 @@
 ## 6.0.0
 
 - 更新到 miniprogram-api-typing v4
+
+## 7.0.0
+
+- 新增一些 watch 辅助接口
