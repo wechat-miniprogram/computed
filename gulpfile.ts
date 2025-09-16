@@ -4,7 +4,6 @@ import tsc from 'gulp-typescript'
 import path from 'path'
 import swc from 'gulp-swc'
 import esbuild from 'gulp-esbuild'
-import watch from 'gulp-watch'
 
 import config from './config'
 
@@ -12,7 +11,6 @@ const {
   srcPath,
   esbuildOptions,
   swcOptions,
-  bundleInDemoPath,
   bundlePath,
   typesPath,
   tsConfigPath,
@@ -23,14 +21,6 @@ const {
 const genTsc = () => {
   return tsc.createProject(tsConfigPath)
 }
-
-gulp.task('clean-dev-bundle', () => {
-  return gulp.src(bundleInDemoPath, { allowEmpty: true }).pipe(clean())
-})
-
-gulp.task('clean-demo-dev-bundle', () => {
-  return gulp.src(bundleInDemoPath, { allowEmpty: true }).pipe(clean())
-})
 
 gulp.task('clean-bundle', () => {
   return gulp.src(bundlePath, { allowEmpty: true }).pipe(clean())
@@ -63,27 +53,17 @@ gulp.task('esbuild-bundle-dev', () => {
     .pipe(gulp.dest(bundlePath))
 })
 
-gulp.task('copy-2-demo', () => {
-  return gulp.src(path.resolve(swcBuildPath, '*.js')).pipe(gulp.dest(bundleInDemoPath))
-})
-
 gulp.task('watch', () => {
   const tsFile = path.resolve(srcPath, '*.ts')
-  const watcher = watch(tsFile, gulp.series('dev'))
-  watcher.on('change', function (path, stats) {
-    console.log(`File ${path} was changed`)
-  })
+  gulp.watch(tsFile, undefined, gulp.series('dev'))
 })
 
 // build for develop
 gulp.task(
   'dev',
   gulp.series(
-    'clean-dev-bundle',
-    'clean-demo-dev-bundle',
     'swc-ts-2-js',
     'esbuild-bundle-dev',
-    'copy-2-demo',
   ),
 )
 
