@@ -29,6 +29,8 @@ const behaviorA = Behavior({
 describe('computed behavior', () => {
   test('watch basics', () => {
     let funcTriggeringCount = 0
+    let prevA = 1
+    let prevB = 2
 
     const component = renderComponent(undefined, '<view>{{a}}+{{b}}={{c}}</view>', (Component) => {
       Component({
@@ -44,7 +46,11 @@ describe('computed behavior', () => {
           c: 3,
         },
         watch: {
-          'a, b': function (a, b) {
+          'a, b': function (a: number, b: number, oldA: number, oldB: number) {
+            expect(prevA).toBe(oldA)
+            expect(prevB).toBe(oldB)
+            prevA = a
+            prevB = b
             funcTriggeringCount++
             this.setData({
               c: a + b,
@@ -85,7 +91,13 @@ describe('computed behavior', () => {
           c: 0,
         }))
         .init((ctx) => {
-          watch(ctx, 'a, b', (a: number, b: number) => {
+          let oldA = ctx.data.a
+          let oldB = ctx.data.b
+          watch(ctx, 'a, b', (a: number, b: number, prevA: number, prevB: number) => {
+            expect(prevA).toBe(oldA)
+            expect(prevB).toBe(oldB)
+            oldA = a
+            oldB = b
             ctx.setData({ c: a + b })
           })
         })

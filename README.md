@@ -81,7 +81,7 @@ Component({
     sum: 2,
   },
   watch: {
-    'a, b': function (a, b) {
+    'a, b': function (a, b, oldA, oldB) {
       this.setData({
         sum: a + b,
       })

@@ -224,7 +224,7 @@ class ComputedBuilder {
         if (changed) {
           listener.apply(
             this,
-            originalCurValWithOptions.map(({ val }) => val),
+            originalCurValWithOptions.map(({ val }) => val).concat(oldVal),
           )
         }
       },
