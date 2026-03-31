@@ -22,7 +22,7 @@ declare enum ComputedWatchInitStatus {
     ENABLE_WATCHES = 3,
     CALL_WATCHES = 4
 }
-export declare const behavior: WechatMiniprogram.Behavior.BehaviorIdentifier<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, {
+export declare const behavior: WechatMiniprogram.Behavior.Identifier<WechatMiniprogram.Component.DataOption, WechatMiniprogram.Component.PropertyOption, {
     disableWatches(): void;
     enableWatches(callWatchesImmediately: boolean): void;
     triggerAllWatches(): void;
