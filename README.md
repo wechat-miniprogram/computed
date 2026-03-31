@@ -4,8 +4,10 @@
 
 > 此 behavior 依赖开发者工具的 npm 构建。具体详情可查阅[官方 npm 文档](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)。
 
-注意： 4.0.0 大版本变更了最基本的接口名，从低版本升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。
+> 注意： 4.0.0 大版本变更了最基本的接口名，从低版本升级到 4.0.0 以上时请注意 [#60](https://github.com/wechat-miniprogram/computed/issues/60) 的问题。
 
+[![npm version](https://img.shields.io/npm/v/miniprogram-computed.svg)](https://www.npmjs.com/package/miniprogram-computed)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/wechat-miniprogram/computed/ci.yml)](https://github.com/wechat-miniprogram/computed/actions)
 
 ## 使用方法
 
