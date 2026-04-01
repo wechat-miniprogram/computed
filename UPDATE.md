@@ -54,3 +54,8 @@
 ## 7.1.0
 
 - 为 watch 新增 oldValue
+
+## 8.0.0
+
+- 更新到 miniprogram-api-typings v5
+
