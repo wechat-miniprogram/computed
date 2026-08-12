@@ -24,7 +24,7 @@ const wrapData = (
 ) => {
   if (typeof data !== 'object' || data === null) return data
   const handler = {
-    get(obj: unknown, key: string) {
+    get(obj: object, key: string) {
       if (key === '__rawObject__') return obj
       let keyWrapper = null
       const keyPath = basePath.concat(key)
@@ -37,7 +37,7 @@ const wrapData = (
       keyWrapper = wrapData(value, relatedPathValues, keyPath)
       return keyWrapper
     },
-    ownKeys(obj: unknown) {
+    ownKeys(obj: object) {
       const keyPath = basePath.slice()
       const keys = Object.keys(obj).sort()
       relatedPathValues.push({

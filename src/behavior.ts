@@ -27,7 +27,7 @@ interface ObserversItem {
 interface ComputedWatchInfo {
   computedUpdaters: Array<(...args: unknown[]) => boolean>
   computedRelatedPathValues: Array<Array<dataTracer.RelatedPathValue>>
-  watchCurVal: Array<unknown>
+  watchCurVal: Array<unknown[]>
   watchDisabled: boolean
 }
 
@@ -111,7 +111,7 @@ class ComputedBuilder {
                 const item = oldPathValues[i]
                 if (item.kind === 'keys') {
                   const { path, keys: oldKeys } = item
-                  const curVal = dataPath.getDataOnPath(this.data, path)
+                  const curVal = dataPath.getDataOnPath(this.data, path) as object
                   const keys = Object.keys(curVal).sort()
                   if (keys.length !== oldKeys.length) {
                     needUpdate = true
@@ -173,7 +173,7 @@ class ComputedBuilder {
           try {
             changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this))
           } catch (err) {
-            console.error(err.stack)
+            console.error(err instanceof Error ? err.stack : String(err))
             break
           }
         } while (changed)
@@ -181,7 +181,7 @@ class ComputedBuilder {
     })
   }
 
-  addWatch(watchPath: string, listener: (args: any) => void) {
+  addWatch(watchPath: string, listener: (...args: any) => void) {
     const computedWatchDefId = this.computedWatchDefId
     const paths = dataPath.parseMultiDataPaths(watchPath)
     const index = this.watchList.length
@@ -467,7 +467,7 @@ export function computed<
   computedDefinition3?: any,
   computedDefinition4?: any,
 ): unknown {
-  tryInitInCtx(ctx)
+  tryInitInCtx(ctx as any)
   const builder = new ComputedBuilder()
   Object.keys(computedDefinition1).forEach((targetField) => {
     const updateMethod = computedDefinition1[targetField]

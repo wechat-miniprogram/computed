@@ -90,7 +90,7 @@ export function BehaviorWithComputed<
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = [] as any
   }
-  options.behaviors.unshift(behavior)
+  options.behaviors!.unshift(behavior)
   return Behavior(options)
 }
 
