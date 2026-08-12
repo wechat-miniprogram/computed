@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "strict": true,
     "module": "commonjs",
     "noImplicitAny": false,
+    "noImplicitThis": false,
     "removeComments": true,
     "target": "ESNEXT",
     "lib": ["ESNEXT", "DOM"],

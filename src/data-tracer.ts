@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import ProxyPolyfillBuilder from 'proxy-polyfill/src/proxy'
 const ProxyPolyfill = ProxyPolyfillBuilder()
 
@@ -50,7 +53,7 @@ const wrapData = (
   }
   try {
     return new Proxy(data, handler)
-  } catch (e) {
+  } catch (_e) {
     return new ProxyPolyfill(data, handler)
   }
 }

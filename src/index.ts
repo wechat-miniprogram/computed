@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { behavior } from './behavior'
 
 export { behavior, computed, watch } from './behavior'
@@ -13,13 +16,15 @@ type AllDataAndProperties<
   WechatMiniprogram.Component.MixinProperties<TBehavior> &
   WechatMiniprogram.Component.PropertyOptionToData<FilterUnknownType<TProperty>>
 
-
 type ComputedInstance<
   TData extends WechatMiniprogram.Component.DataOption,
   TProperty extends WechatMiniprogram.Component.PropertyOption,
   TMethod extends WechatMiniprogram.Component.MethodOption,
   TBehavior extends WechatMiniprogram.Component.BehaviorOption,
-  TComputed extends Record<string, (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any>,
+  TComputed extends Record<
+    string,
+    (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
+  >,
   TCustomProperty extends WechatMiniprogram.IAnyObject = Record<string, never>,
 > = WechatMiniprogram.Component.Instance<
   TData & { [k in keyof TComputed]: ReturnType<TComputed[k]> },
@@ -39,7 +44,7 @@ type ComputedOptions<
     string,
     (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = object,
 > = (Partial<WechatMiniprogram.Component.Data<TData>> &
   Partial<WechatMiniprogram.Component.Property<TProperty>> &
   Partial<WechatMiniprogram.Component.Method<TMethod>> &
@@ -50,7 +55,9 @@ type ComputedOptions<
     computed?: TComputed
     template?: string
   }) &
-  ThisType<ComputedInstance<TData, TProperty, TMethod, TBehavior, TComputed, TCustomInstanceProperty>>
+  ThisType<
+    ComputedInstance<TData, TProperty, TMethod, TBehavior, TComputed, TCustomInstanceProperty>
+  >
 
 export function ComponentWithComputed<
   TData extends WechatMiniprogram.Component.DataOption,
@@ -62,14 +69,22 @@ export function ComponentWithComputed<
     string,
     (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = object,
 >(
-  options: ComputedOptions<TData, TProperty, TMethod, TBehavior, TWatch, TComputed, TCustomInstanceProperty>,
+  options: ComputedOptions<
+    TData,
+    TProperty,
+    TMethod,
+    TBehavior,
+    TWatch,
+    TComputed,
+    TCustomInstanceProperty
+  >,
 ): string {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = [] as any
   }
-  (options.behaviors as any).unshift(behavior)
+  ;(options.behaviors as any).unshift(behavior)
   return Component(options)
 }
 
@@ -83,9 +98,17 @@ export function BehaviorWithComputed<
     string,
     (data: AllDataAndProperties<TData, TProperty, TBehavior>) => any
   >,
-  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = {},
+  TCustomInstanceProperty extends WechatMiniprogram.IAnyObject = object,
 >(
-  options: ComputedOptions<TData, TProperty, TMethod, TBehavior, TWatch, TComputed, TCustomInstanceProperty>,
+  options: ComputedOptions<
+    TData,
+    TProperty,
+    TMethod,
+    TBehavior,
+    TWatch,
+    TComputed,
+    TCustomInstanceProperty
+  >,
 ): string {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = [] as any

@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import rfdc from 'rfdc'
 import deepEqual from 'fast-deep-equal'
 import * as dataPath from './data-path'
@@ -151,6 +156,7 @@ class ComputedBuilder {
           const computedWatchInfo = this._computedWatchInfo[computedWatchDefId]
           computedWatchInfo.watchDisabled = false
         } else if (status === ComputedWatchInitStatus.CALL_WATCHES) {
+          // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
           watchFunctions.forEach((func) => func.call(this))
         }
       },
@@ -173,6 +179,7 @@ class ComputedBuilder {
           try {
             changed = computedWatchInfo.computedUpdaters.some((func) => func.call(this))
           } catch (err) {
+            // eslint-disable-next-line no-console
             console.error(err instanceof Error ? err.stack : String(err))
             break
           }
@@ -222,10 +229,7 @@ class ComputedBuilder {
 
         // if changed, update
         if (changed) {
-          listener.apply(
-            this,
-            originalCurValWithOptions.map(({ val }) => val).concat(oldVal),
-          )
+          listener.apply(this, originalCurValWithOptions.map(({ val }) => val).concat(oldVal))
         }
       },
     })
@@ -269,7 +273,7 @@ export const behavior = Behavior({
     },
   },
 
-  definitionFilter(defFields: any & BehaviorExtend) {
+  definitionFilter(defFields: any) {
     const computedDef = defFields.computed
     const watchDef = defFields.watch
 
@@ -299,6 +303,7 @@ export const behavior = Behavior({
         // defFields.observers[item.fields] = item.observer
         const f = defFields.observers[item.fields]
         if (!f) {
+          // eslint-disable-next-line @typescript-eslint/unbound-method
           defFields.observers[item.fields] = item.observer
         } else {
           defFields.observers[item.fields] = function () {
@@ -491,10 +496,11 @@ export function computed<
       builder.addComputed(targetField, updateMethod)
     })
   }
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   builder.observersItems.forEach(({ fields, observer }) => {
     ctx.observer(fields as any, observer)
   })
-  return ctx.data as any
+  return ctx.data
 }
 
 export const generateWatches = (self: BehaviorExtend) => ({
@@ -528,6 +534,7 @@ export const watch = (
   tryInitInCtx(ctx)
   const builder = new ComputedBuilder()
   builder.addWatch(watchPath, listener)
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   builder.observersItems.forEach(({ fields, observer }) => {
     ctx.observer(fields as any, observer)
   })

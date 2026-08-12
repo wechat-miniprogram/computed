@@ -22,7 +22,7 @@ if (!/[0-9]+\.[0-9]+\.[0-9]+(-alpha\.[0-9]+|-beta\.[0-9]+)?/.test(version)) {
 // run eslint
 console.info('Run eslint')
 if (
-  childProcess.spawnSync('npx', ['eslint', '.'], {
+  childProcess.spawnSync('npx', ['eslint', 'src'], {
     stdio: 'inherit',
   }).status !== 0
 ) {

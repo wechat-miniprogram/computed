@@ -12,7 +12,13 @@ type ParserState = {
 
 const throwParsingError = (path: string, index: number) => {
   throw new Error(
-    'Parsing data path "' + path + '" failed at char "' + path[index] + '" (index ' + index + ')',
+    'Parsing data path "' +
+      path +
+      '" failed at char "' +
+      path[index] +
+      '" (index ' +
+      index.toString() +
+      ')',
   )
 }
 
@@ -60,7 +66,7 @@ const parseSinglePath = (path: string, state: ParserState): DataPathWithOptions 
     const ch = path[state.index]
     if (ch === '[') {
       state.index++
-      paths.push(`${parseArrIndex(path, state)}`)
+      paths.push(parseArrIndex(path, state).toString())
       const nextCh = path[state.index]
       if (nextCh !== ']') throwParsingError(path, state.index)
       state.index++
