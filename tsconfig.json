@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "module": "commonjs",
     "noImplicitAny": false,
     "removeComments": true,
@@ -10,9 +9,6 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "declarationDir": "./types",
-    "emitDeclarationOnly": true,
     "skipLibCheck": true,
     "typeRoots": [ "./node_modules/@types", "./node_modules/miniprogram-api-typings" ]
   },

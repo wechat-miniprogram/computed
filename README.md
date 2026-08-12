@@ -111,10 +111,10 @@ Component({
 
 使用 glass-easel Chaining API 时，可以用更友好的 `computed` `watch` 函数。
 
-```js
+```ts
 import { computed, watch } from 'miniprogram-computed'
 
-Component()
+export default Component()
   .data(() => ({
     a: 1,
     b: 2,
