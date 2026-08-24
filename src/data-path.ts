@@ -132,7 +132,7 @@ export const getDataOnPath = (data: unknown, path: Array<string>) => {
   let ret = data
   path.forEach((s) => {
     if (typeof ret !== 'object' || ret === null) ret = undefined
-    else ret = ret[s]
+    else ret = (ret as { [key: string]: any })[s]
   })
   return ret
 }

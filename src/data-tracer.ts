@@ -1,10 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import ProxyPolyfillBuilder from 'proxy-polyfill/src/proxy'
-const ProxyPolyfill = ProxyPolyfillBuilder()
-
-interface WrappedData {
+type WrappedData<T> = T & {
   __rawObject__: unknown
 }
 
@@ -20,25 +14,25 @@ export type RelatedPathValue =
       keys: Array<string>
     }
 
-const wrapData = (
-  data: unknown,
+const wrapData = <T>(
+  data: T,
   relatedPathValues: Array<RelatedPathValue>,
   basePath: Array<string>,
-) => {
+): T => {
   if (typeof data !== 'object' || data === null) return data
   const handler = {
     get(obj: object, key: string) {
       if (key === '__rawObject__') return obj
-      let keyWrapper = null
+      let keyWrapper: any = null
       const keyPath = basePath.concat(key)
-      const value = obj[key]
+      const value = (obj as { [key: string]: unknown })[key]
       relatedPathValues.push({
         kind: 'value',
         path: keyPath,
         value,
       })
       keyWrapper = wrapData(value, relatedPathValues, keyPath)
-      return keyWrapper
+      return keyWrapper as T
     },
     ownKeys(obj: object) {
       const keyPath = basePath.slice()
@@ -51,39 +45,35 @@ const wrapData = (
       return keys
     },
   }
-  try {
-    return new Proxy(data, handler)
-  } catch (_e) {
-    return new ProxyPolyfill(data, handler)
-  }
+  return new Proxy(data, handler) as T
 }
 
-export function create(data: unknown, relatedPathValues: Array<RelatedPathValue>) {
+export function create<T>(data: T, relatedPathValues: Array<RelatedPathValue>): T {
   return wrapData(data, relatedPathValues, [])
 }
 
-export function unwrap(wrapped: unknown) {
+export function unwrap<T>(wrapped: T): T {
   // #70
   if (
     wrapped !== null &&
     typeof wrapped === 'object' &&
-    typeof (wrapped as WrappedData).__rawObject__ !== 'object'
+    typeof (wrapped as WrappedData<T>).__rawObject__ !== 'object'
   ) {
     if (Array.isArray(wrapped)) {
-      return wrapped.map((i) => unwrap(i))
+      return wrapped.map((i: unknown) => unwrap(i)) as T
     }
-    const ret = {}
+    const ret = {} as T
     Object.keys(wrapped).forEach((k) => {
-      ret[k] = unwrap(wrapped[k])
+      ;(ret as { [key: string]: unknown })[k] = unwrap((wrapped as { [key: string]: unknown })[k])
     })
     return ret
   }
   if (
     typeof wrapped !== 'object' ||
     wrapped === null ||
-    typeof (wrapped as WrappedData).__rawObject__ !== 'object'
+    typeof (wrapped as WrappedData<T>).__rawObject__ !== 'object'
   ) {
     return wrapped
   }
-  return (wrapped as WrappedData).__rawObject__
+  return (wrapped as WrappedData<T>).__rawObject__ as T
 }

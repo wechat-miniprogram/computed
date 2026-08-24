@@ -3,7 +3,7 @@
     "strict": true,
     "module": "commonjs",
     "noImplicitAny": false,
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "removeComments": true,
     "target": "ESNEXT",
     "lib": ["ESNEXT", "DOM"],

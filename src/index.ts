@@ -80,7 +80,7 @@ export function ComponentWithComputed<
     TComputed,
     TCustomInstanceProperty
   >,
-): string {
+): WechatMiniprogram.Component.Identifier<TData, TProperty, TMethod> {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = [] as any
   }
@@ -109,7 +109,7 @@ export function BehaviorWithComputed<
     TComputed,
     TCustomInstanceProperty
   >,
-): string {
+): WechatMiniprogram.Behavior.Identifier<TData, TProperty, TMethod, TBehavior> {
   if (!Array.isArray(options.behaviors)) {
     options.behaviors = [] as any
   }

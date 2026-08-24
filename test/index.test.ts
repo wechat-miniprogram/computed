@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as adapter from 'glass-easel-miniprogram-adapter'
 import { BehaviorWithComputed } from '../src'
 import { behavior as computedBehavior, computed, watch } from '../src'
@@ -12,12 +17,14 @@ const innerHTML = (component: adapter.component.GeneralComponent) => {
 adapter.glassEasel.globalOptions.throwGlobalError = true
 
 const behaviorA = Behavior({
+  properties: {},
   data: {
     b: 2,
     c: {
       d: 3,
       e: [1, 2, 3],
     },
+    attachedData: 0,
   },
   attached() {
     this.setData({
@@ -46,7 +53,7 @@ describe('computed behavior', () => {
           c: 3,
         },
         watch: {
-          'a, b': function (a: number, b: number, oldA: number, oldB: number) {
+          'a, b': function (this: any, a: number, b: number, oldA: number, oldB: number) {
             expect(prevA).toBe(oldA)
             expect(prevB).toBe(oldB)
             prevA = a
@@ -58,7 +65,7 @@ describe('computed behavior', () => {
           },
         },
       } as any)
-    }) as any
+    })
     expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(funcTriggeringCount).toBe(0)
 
@@ -93,7 +100,7 @@ describe('computed behavior', () => {
         .init((ctx) => {
           let oldA = ctx.data.a
           let oldB = ctx.data.b
-          watch(ctx, 'a, b', (a: number, b: number, prevA: number, prevB: number) => {
+          watch(ctx as any, 'a, b', (a: number, b: number, prevA: number, prevB: number) => {
             expect(prevA).toBe(oldA)
             expect(prevB).toBe(oldB)
             oldA = a
@@ -102,7 +109,7 @@ describe('computed behavior', () => {
           })
         })
         .register()
-    }) as any
+    })
     expect(innerHTML(component)).toBe('<view>1+2=0</view>')
 
     component.setData({ a: 10 })
@@ -125,7 +132,7 @@ describe('computed behavior', () => {
             b: String,
           },
           watch: {
-            'a, b': function (a, b) {
+            'a, b': function (this: any, a: number, b: string) {
               funcTriggeringCount++
               this.setData({
                 c: a + Number(b || 0),
@@ -149,7 +156,7 @@ describe('computed behavior', () => {
           },
         } as any)
       },
-    ) as any
+    )
 
     expect(innerHTML(component)).toBe('<inner><view>1+2=3</view></inner>')
     expect(funcTriggeringCount).toBe(1)
@@ -177,7 +184,7 @@ describe('computed behavior', () => {
             a() {
               func1TriggeringCount++
             },
-            ' a.d  ,b[0] ': function (ad, b0) {
+            ' a.d  ,b[0] ': function (this: any, ad: number, b0: number) {
               func2TriggeringCount++
               this.setData({
                 c: ad + b0,
@@ -186,7 +193,7 @@ describe('computed behavior', () => {
           },
         } as any)
       },
-    ) as any
+    )
 
     expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(func1TriggeringCount).toBe(0)
@@ -247,7 +254,7 @@ describe('computed behavior', () => {
             'obj.b': function () {
               func2TriggeringCount++
             },
-            'obj.**': function (obj) {
+            'obj.**': function (this: any, obj: any) {
               func3TriggeringCount++
               this.setData({
                 c: obj.a + obj.b,
@@ -256,7 +263,7 @@ describe('computed behavior', () => {
           },
         } as any)
       },
-    ) as any
+    )
 
     expect(innerHTML(component)).toBe('<view>1+2=3</view>')
     expect(func1TriggeringCount).toBe(0)
@@ -302,12 +309,12 @@ describe('computed behavior', () => {
             b: 2,
           },
           computed: {
-            c(data) {
+            c(data: any) {
               expect(data.nullProp).toBe(null)
               func1TriggeringCount++
               return data.a + data.b
             },
-            d(data) {
+            d(data: any) {
               func2TriggeringCount++
               return data.a * 2
             },
@@ -350,7 +357,7 @@ describe('computed behavior', () => {
           }))
           .init((ctx) => {
             const data = computed(
-              ctx,
+              ctx as any,
               {
                 c: (data) => data.a + data.b,
                 d: (data) => data.a * 2,
@@ -365,7 +372,7 @@ describe('computed behavior', () => {
           })
           .register()
       },
-    ) as any
+    )
     expect(innerHTML(component)).toBe('<view>1+2=3, 2+1=3</view>')
 
     component.setData({ a: 10 })
@@ -388,7 +395,7 @@ describe('computed behavior', () => {
             b: String,
           },
           computed: {
-            c(data) {
+            c(data: any) {
               funcTriggeringCount++
               return data.a + Number(data.b)
             },
@@ -434,11 +441,11 @@ describe('computed behavior', () => {
             b: 2,
           },
           computed: {
-            c(data) {
+            c(data: any) {
               func1TriggeringCount++
               return data.a + data.b
             },
-            d(data) {
+            d(data: any) {
               func2TriggeringCount++
               return data.a + data.c
             },
@@ -480,7 +487,7 @@ describe('computed behavior', () => {
             c: 2,
           },
           computed: {
-            d(data) {
+            d(data: any) {
               funcTriggeringCount++
               return data.a ? data.b : data.c
             },
@@ -525,7 +532,7 @@ describe('computed behavior', () => {
             b: [2],
           },
           computed: {
-            'c[1]': function (data) {
+            'c[1]': function (data: any) {
               funcTriggeringCount++
               return {
                 f: data.a.d + data.b[0],
@@ -571,17 +578,17 @@ describe('computed behavior', () => {
           a: ['a', 'b', 'c'],
         },
         computed: {
-          r(data) {
+          r(data: any) {
             const oriArr = ['a', 'b', 'c']
             expect(
               data.a
-                .filter((item, index) => {
+                .filter((item: any, index: any) => {
                   expect(item).toBe(oriArr[index])
                   return true
                 })
                 .join(),
             ).toBe('a,b,c')
-            data.a.forEach((item, index) => {
+            data.a.forEach((item: any, index: any) => {
               expect(item).toBe(oriArr[index])
             })
             expect(data.a.includes('b')).toBe(true)
@@ -589,14 +596,14 @@ describe('computed behavior', () => {
             expect(data.a.indexOf('b')).toBe(1)
             expect(
               data.a
-                .map((item, index) => {
+                .map((item: any, index: any) => {
                   expect(item).toBe(oriArr[index])
                   return item + '1'
                 })
                 .join(),
             ).toBe('a1,b1,c1')
             expect(
-              data.a.reduce((res, item, index) => {
+              data.a.reduce((res: any, item: any, index: any) => {
                 expect(item).toBe(oriArr[index])
                 return res + item
               }, ''),
@@ -624,10 +631,10 @@ describe('computed behavior', () => {
             },
           },
           computed: {
-            newArr(data) {
+            newArr(data: any) {
               return data.arr
             },
-            newObj(data) {
+            newObj(data: any) {
               return data.obj
             },
           },
@@ -645,7 +652,7 @@ describe('computed behavior', () => {
           a: 1,
         },
         computed: {
-          c(data) {
+          c(data: any) {
             return data.a + data.b
           },
         },
@@ -665,7 +672,7 @@ describe('computed behavior', () => {
             a: 1,
           },
           computed: {
-            f(data) {
+            f(data: any) {
               return data.a + data.c.d + data.c.e[0]
             },
           },
@@ -686,7 +693,7 @@ describe('computed behavior', () => {
             a: 1,
           },
           computed: {
-            g(data) {
+            g(data: any) {
               return data.a + data.attachedData
             },
           },
@@ -705,12 +712,12 @@ describe('computed behavior', () => {
           c: 1,
         },
         computed: {
-          b(data) {
+          b(data: any) {
             return data.a
           },
         },
         observers: {
-          '**': function () {
+          '**': function (this: any) {
             if (this.data.c === 1) this.setData({ c: 2 })
           },
         },
@@ -729,7 +736,7 @@ describe('computed behavior', () => {
         },
       },
       watch: {
-        'a, b': function() {
+        'a, b': function () {
           this.setData({ c: this.data.a + this.data.b })
         },
       },
@@ -745,7 +752,7 @@ describe('computed behavior', () => {
           behaviors: [behA],
           onLoad() {
             this.setData({ a: 1 })
-          }
+          },
         } as any)
       },
     ) as any
@@ -760,10 +767,10 @@ describe('computed behavior', () => {
         Page({
           behaviors: [computedBehavior],
           computed: {
-            b(data) {
+            b(data: any) {
               return data.a * 2
             },
-            c(data) {
+            c(data: any) {
               return data.a + data.b
             },
           },
@@ -837,7 +844,7 @@ describe('computed behavior', () => {
             c1: 100,
           },
           computed: {
-            c2(data) {
+            c2(data: any) {
               c2TriggerCount += 1
               return data.b2 + data.c1 * 2
             },
@@ -890,7 +897,7 @@ describe('computed behavior', () => {
           b: 10,
         },
         computed: {
-          c(data) {
+          c(data: any) {
             c2TriggerCount += 1
             return data.b * 2
           },
@@ -972,18 +979,18 @@ describe('computed behavior', () => {
           this.disableWatches()
         },
         methods: {
-          set(n: number) {
+          set(this: any, n: number) {
             this.setData({
               c: n,
             })
           },
-          enable(b: boolean) {
+          enable(this: any, b: boolean) {
             this.enableWatches(b)
           },
-          disable() {
+          disable(this: any) {
             this.disableWatches()
           },
-          trigger() {
+          trigger(this: any) {
             this.triggerAllWatches()
           },
         },
@@ -1022,7 +1029,7 @@ describe('computed behavior', () => {
         }))
         .init((ctx) => {
           const { setData, implement, lifetime } = ctx
-          const watcher = watch(ctx, 'c', () => cTriggerCount += 1)
+          const watcher = watch(ctx as any, 'c', () => (cTriggerCount += 1))
           lifetime('created', () => {
             watcher.disableWatches()
           })
@@ -1079,22 +1086,22 @@ describe('computed behavior', () => {
           ],
         },
         computed: {
-          computedWithRoot(data) {
+          computedWithRoot(data: any) {
             aTriggerCount++
             const res = data.root
             return res
           },
-          computedWithRootClone(data) {
+          computedWithRootClone(data: any) {
             bTriggerCount++
-            const res = data.root.map((v) => v)
+            const res = data.root.map((v: any) => v)
             return res
           },
-          computedWithCWR(data) {
+          computedWithCWR(data: any) {
             cTriggerCount++
             const res = data.computedWithRoot[0].values
             return res
           },
-          computedWithCWRC(data) {
+          computedWithCWRC(data: any) {
             dTriggerCount++
             const res = data.computedWithRootClone[0].values
             return res
@@ -1138,22 +1145,22 @@ describe('computed behavior', () => {
           root: { values: { arr: [1, 2, 3] } },
         },
         computed: {
-          computedWithRoot(data) {
+          computedWithRoot(data: any) {
             aTriggerCount++
             const res = data.root
             return res
           },
-          computedWithRootClone(data) {
+          computedWithRootClone(data: any) {
             bTriggerCount++
             const res = Object.assign({}, data.root)
             return res
           },
-          computedWithCWR(data) {
+          computedWithCWR(data: any) {
             cTriggerCount++
             const res = data.computedWithRoot.values?.arr
             return res
           },
-          computedWithCWRC(data) {
+          computedWithCWRC(data: any) {
             dTriggerCount++
             const res = data.computedWithRootClone.values?.arr
             return res

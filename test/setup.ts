@@ -6,7 +6,7 @@ const compileTemplate = (src: string) => {
   group.addTmpl('', src)
   const genObjectSrc = `return ${group.getTmplGenObjectGroups()}`
   group.free()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/no-unsafe-call
   const genObjectGroupList = new Function(genObjectSrc)() as {
     [key: string]: any
   }
@@ -22,9 +22,11 @@ const setup = () => {
   const codeSpace = env.createCodeSpace('', true)
   const backend = env.associateBackend()
   codeSpace.componentEnv('', (env) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     ;(globalThis as any).Behavior = env.Behavior
   })
-  globalThis.__defineComponent = (
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  ;(globalThis as any).__defineComponent = (
     path: string,
     template: string,
     f: (Component: adapter.ComponentConstructor, _: any) => void,
@@ -36,8 +38,10 @@ const setup = () => {
     })
     const def = codeSpace.getComponentSpace().getComponentByUrl(compPath, '')
     codeSpace.getComponentSpace().setGlobalUsingComponent(compPath, def)
+    return def
   }
-  globalThis.__renderComponent = (
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  ;(globalThis as any).__renderComponent = (
     path: string,
     template: string,
     f: (Component: adapter.ComponentConstructor, _: any) => void,
@@ -55,5 +59,4 @@ const setup = () => {
   }
 }
 
-//@ts-ignore
 module.exports = setup
