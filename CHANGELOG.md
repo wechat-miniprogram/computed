@@ -1,5 +1,10 @@
 # Changelog
 
+## 9.0.0
+
+- 移除 proxy polyfill
+- 清理 npm 依赖
+
 ## 8.1.0
 
 ### Changed
