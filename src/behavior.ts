@@ -8,7 +8,6 @@ import deepEqual from 'fast-deep-equal'
 import * as dataPath from './data-path'
 import * as dataTracer from './data-tracer'
 import type { DataPathWithOptions } from './data-path'
-import type * as adapter from 'glass-easel-miniprogram-adapter'
 
 const deepClone = rfdc({ proto: true })
 
@@ -317,7 +316,9 @@ export const behavior = Behavior({
 })
 
 const tryInitInCtx = (
-  ctx: adapter.builder.BuilderContext<any, any, any> & { _computedWatchInit?: boolean },
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<any, any, any> & {
+    _computedWatchInit?: boolean
+  },
 ) => {
   if (ctx._computedWatchInit) return
   ctx._computedWatchInit = true
@@ -337,39 +338,39 @@ const tryInitInCtx = (
 export function computed<
   TComputedDefinition1 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>,
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<TPrevData, TProperty>,
     ) => any
   },
-  TPrevData extends adapter.glassEasel.typeUtils.DataList,
-  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+  TPrevData extends WechatMiniprogram.GlassEasel.TypeUtils.DataList,
+  TProperty extends WechatMiniprogram.GlassEasel.TypeUtils.PropertyList,
 >(
-  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<TPrevData, TProperty, any>,
   computedDefinition1: TComputedDefinition1,
-): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+): WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
   TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> },
   TProperty
 >
 export function computed<
   TComputedDefinition1 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>,
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<TPrevData, TProperty>,
     ) => any
   },
   TComputedDefinition2 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> },
         TProperty
       >,
     ) => any
   },
-  TPrevData extends adapter.glassEasel.typeUtils.DataList,
-  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+  TPrevData extends WechatMiniprogram.GlassEasel.TypeUtils.DataList,
+  TProperty extends WechatMiniprogram.GlassEasel.TypeUtils.PropertyList,
 >(
-  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<TPrevData, TProperty, any>,
   computedDefinition1: TComputedDefinition1,
   computedDefinition2: TComputedDefinition2,
-): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+): WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
   TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
     [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
   },
@@ -378,12 +379,12 @@ export function computed<
 export function computed<
   TComputedDefinition1 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>,
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<TPrevData, TProperty>,
     ) => any
   },
   TComputedDefinition2 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> },
         TProperty
       >,
@@ -391,7 +392,7 @@ export function computed<
   },
   TComputedDefinition3 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
           [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
         },
@@ -399,14 +400,14 @@ export function computed<
       >,
     ) => any
   },
-  TPrevData extends adapter.glassEasel.typeUtils.DataList,
-  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+  TPrevData extends WechatMiniprogram.GlassEasel.TypeUtils.DataList,
+  TProperty extends WechatMiniprogram.GlassEasel.TypeUtils.PropertyList,
 >(
-  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<TPrevData, TProperty, any>,
   computedDefinition1: TComputedDefinition1,
   computedDefinition2: TComputedDefinition2,
   computedDefinition3: TComputedDefinition3,
-): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+): WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
   TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
     [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
   } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> },
@@ -415,12 +416,12 @@ export function computed<
 export function computed<
   TComputedDefinition1 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<TPrevData, TProperty>,
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<TPrevData, TProperty>,
     ) => any
   },
   TComputedDefinition2 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> },
         TProperty
       >,
@@ -428,7 +429,7 @@ export function computed<
   },
   TComputedDefinition3 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
           [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
         },
@@ -438,7 +439,7 @@ export function computed<
   },
   TComputedDefinition4 extends {
     [k: string]: (
-      data: adapter.glassEasel.typeUtils.DataWithPropertyValues<
+      data: WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
         TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
           [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
         } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> },
@@ -446,15 +447,15 @@ export function computed<
       >,
     ) => any
   },
-  TPrevData extends adapter.glassEasel.typeUtils.DataList,
-  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+  TPrevData extends WechatMiniprogram.GlassEasel.TypeUtils.DataList,
+  TProperty extends WechatMiniprogram.GlassEasel.TypeUtils.PropertyList,
 >(
-  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<TPrevData, TProperty, any>,
   computedDefinition1: TComputedDefinition1,
   computedDefinition2: TComputedDefinition2,
   computedDefinition3: TComputedDefinition3,
   computedDefinition4: TComputedDefinition4,
-): adapter.glassEasel.typeUtils.DataWithPropertyValues<
+): WechatMiniprogram.GlassEasel.TypeUtils.DataWithPropertyValues<
   TPrevData & { [k in keyof TComputedDefinition1]: ReturnType<TComputedDefinition1[k]> } & {
     [k in keyof TComputedDefinition2]: ReturnType<TComputedDefinition2[k]>
   } & { [k in keyof TComputedDefinition3]: ReturnType<TComputedDefinition3[k]> } & {
@@ -463,10 +464,10 @@ export function computed<
   TProperty
 >
 export function computed<
-  TPrevData extends adapter.glassEasel.typeUtils.DataList,
-  TProperty extends adapter.glassEasel.typeUtils.PropertyList,
+  TPrevData extends WechatMiniprogram.GlassEasel.TypeUtils.DataList,
+  TProperty extends WechatMiniprogram.GlassEasel.TypeUtils.PropertyList,
 >(
-  ctx: adapter.builder.BuilderContext<TPrevData, TProperty, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<TPrevData, TProperty, any>,
   computedDefinition1: any,
   computedDefinition2?: any,
   computedDefinition3?: any,
@@ -527,7 +528,7 @@ export const generateWatches = (self: BehaviorExtend) => ({
 })
 
 export const watch = (
-  ctx: adapter.builder.BuilderContext<any, any, any>,
+  ctx: WechatMiniprogram.GlassEasel.TypeUtils.BuilderContext<any, any, any>,
   watchPath: string,
   listener: (...args: any[]) => void,
 ) => {
